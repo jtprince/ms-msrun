@@ -1,0 +1,7 @@
+## version 0.0.1
+* initial release as gem
+* some differences from mspire:
+*   all spectra are read in lazy
+*   cleaned up code a lot
+*   uses Struct instead of Arrayclass to minimize dependencies
+*   bumps task of providing indices for peak data onto AXML 

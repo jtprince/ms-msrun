@@ -1,0 +1,55 @@
+= {ms-msrun}[http://mspire.rubyforge.org/projects/ms-msrun]
+
+A library for working with LC/MS runs.
+
+== Examples
+
+The following examples will work on *mzXML*, *mzData*, and *mzML* files!
+
+=== Reading a file or io object
+
+    require "ms/msrun" 
+
+    Ms::Msrun.open("file.mzXML") do |ms|
+      ms.scan_count  # do something here
+    end
+
+=== Accessing run information
+
+    Ms::Msrun.open("file.mzXML") do |ms|
+        ms.start_time
+        ms.end_time
+
+        ms.scan_count    # number of scans
+    ms.scan_count(0) # same thing (number of scans)
+        ms.scan_count(1) # number of MS scans
+        ms.scan_count(2) # number of MS/MS scans, etc.
+    end
+
+    # also takes an io object
+    ms = File.open("file.mzXML") {|io| Ms::Msrun.new(io) }
+
+=== Accessing scan information
+
+    ms.scans.each do |scan|
+      scan.num          # scan number
+      scan.ms_level     # ms_level
+      scan.time         # retention time in seconds
+      scan.start_mz     # the first m/z value
+      scan.end_mz       # the last m/z value
+
+      pr = scan.precursor  # an Ms::Precursor object!
+      pr.mz
+      pr.intensity
+      pr.parent         # the parent scan
+      pr.charge_states  # Array of possible charge states of the precursor
+                        # ('charge_states' is not always defined)
+
+== Installation
+
+    gem install ms-msrun
+
+The library currently relies on xmlparser.  After installation of ms-msrun
+(which will automatically install `axml`) issue this command to get instructions on installing xmlparser:
+
+    ruby -rubygems -e 'require "axml"; puts AXML::Autoload.install_instructions(:xmlparser)'
