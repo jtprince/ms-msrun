@@ -5,7 +5,6 @@ module Ms ; end
 
 class Ms::Spectrum
 
-
   # m/z's
   attr_accessor :mzs  
   # intensities
@@ -24,13 +23,31 @@ class Ms::Spectrum
     @intensities = intensity_ar
   end
 
-  def has_mz_data?
-    @mzs && (@mzs.size > 0) && (@mzs.first.is_a?(Numeric))
+  def mzs_and_intensities
+    [@mzs, @intensities]
+  end
+  
+  # uses index function and returns the intensity at that value
+  def intensity_at_mz(mz)
+    if x = index(mz)
+      intensities[x]
+    else
+      nil
+    end
   end
 
-  def has_intensity_data?
-    @intensities && (@intensities.size > 0) && (@intensities.first.is_a?(Numeric))
+  # less_precise should be a float
+  # precise should be a float
+  def equal_after_rounding?(precise, less_precise)
+    # determine the precision of less_precise
+    exp10 = precision_as_neg_int(less_precise)
+    #puts "EXP10: #{exp10}"
+    answ = ((precise*exp10).round == (less_precise*exp10).round)
+    #puts "TESTING FOR EQUAL: #{precise} #{less_precise}"
+    #puts answ
+    (precise*exp10).round == (less_precise*exp10).round
   end
+
 
   # returns the index of the first value matching that m/z.  the argument m/z
   # may be less precise than the actual m/z (rounding to the same precision
@@ -87,31 +104,10 @@ class Ms::Spectrum
     end
     return_val
   end
-  
-  # uses index function and returns the intensity at that value
-  def intensity_at_mz(mz)
-    if x = index(mz)
-      intensities[x]
-    else
-      nil
-    end
-  end
-
-  # less_precise should be a float
-  # precise should be a float
-  def equal_after_rounding?(precise, less_precise)
-    # determine the precision of less_precise
-    exp10 = precision_as_neg_int(less_precise)
-    #puts "EXP10: #{exp10}"
-    answ = ((precise*exp10).round == (less_precise*exp10).round)
-    #puts "TESTING FOR EQUAL: #{precise} #{less_precise}"
-    #puts answ
-    (precise*exp10).round == (less_precise*exp10).round
-  end
 
   # returns 1 for ones place, 10 for tenths, 100 for hundredths
   # to a precision exceeding 1e-6
-  def precision_as_neg_int(float)
+  def precision_as_neg_int(float) # :nodoc:
     neg_exp10 = 1
     loop do
       over = float * neg_exp10
@@ -123,6 +119,7 @@ class Ms::Spectrum
     end
     neg_exp10
   end
+
 
 end
 
@@ -136,6 +133,7 @@ module Ms::Spectrum::LazyIO
       raise RunTimeError, "must give 5 or 7 args for peak data and pair data respectively"
     end
   end
+
 end
 
 # stores an io object and the start and end indices and only evaluates the
@@ -162,26 +160,35 @@ class Ms::Spectrum::LazyIO::Pair < Ms::Spectrum
   end
 
   # beware that this converts the information on disk every time it is called.  
-  def mzs
+  def mzs(save=false)
+    return @mzs if @mzs
     @io.pos = @mz_start_index
     b64_string = @io.read(@mz_num_bytes)
-    Ms::Spectrum.base64_to_array(b64_string, @mz_precision, @mz_network_order)
+    mzs_ar = Ms::Spectrum.base64_to_array(b64_string, @mz_precision, @mz_network_order)
+    if save
+      @mzs = mzs_ar
+    else
+      mzs_ar
+    end
+  end
+
+  def flush!
+    @mzs = nil
+    @intensities = nil
   end
 
   # beware that this converts the information in @intensity_string every time
   # it is called.
-  def intensities
+  def intensities(save=false)
+    return @intensities if @intensities
     @io.pos = @intensity_start_index
     b64_string = @io.read(@intensity_num_bytes)
-    Ms::Spectrum.base64_to_array(b64_string, @intensity_precision, @intensity_network_order)
-  end
-
-  def has_mz_data?
-    (!@io.closed?) && @mz_start_index && @mz_num_bytes && @mz_precision && !@mz_network_order.nil?
-  end
-
-  def has_intensity_data?
-    (!@io.closed?) && @intensity_start_index && @intensity_num_bytes && @intensity_precision && !@intensity_network_order.nil?
+    inten_ar = Ms::Spectrum.base64_to_array(b64_string, @intensity_precision, @intensity_network_order)
+    if save
+      @intensities = inten_ar
+    else
+      inten_ar
+    end
   end
 
 end
@@ -200,39 +207,61 @@ class Ms::Spectrum::LazyIO::Peaks < Ms::Spectrum
     @network_order = network_order
   end
 
+  # removes any stored data
+  def flush!
+    @data = nil
+  end
+
+  # returns an array of alternating values: [mz, intensity, mz, intensity]
+  def flat_peaks
+    @io.pos = @start_index
+    Ms::Spectrum.base64_to_array(@io.read(@num_bytes), @precision, @network_order)
+  end
+
   # returns two arrays: an array of m/z values and an array of intensity
   # values.  This is the preferred way to access mzXML file information under
   # lazy evaluation
-  def mzs_and_intensities
+  def mzs_and_intensities(save=false)
+    return @data if @data
     @io.pos = @start_index
     b64_string = @io.read(@num_bytes)
-    Ms::Spectrum.mzs_and_intensities_from_base64_peaks(b64_string, @precision, @network_order)
+    data = Ms::Spectrum.mzs_and_intensities_from_base64_peaks(b64_string, @precision, @network_order)
+    if save
+      @data = data
+    else
+      data
+    end
   end
 
   # when using 'io' lazy evaluation on files with m/z and intensity data
   # interwoven (i.e., mzXML) it is more efficient to call 'mzs_and_intensities'
   # if you are using both mz and intensity data. 
-  def mzs
+  def mzs(save=false)
+    return @data.first if @data
+    data = mzs_and_intensities
+    if save
+      @data = data
+      @data.first
+    else
+      data.first
+    end
     # TODO: this can be made slightly faster
-    mzs_and_intensities.first
   end
 
   # when using 'io' lazy evaluation on files with m/z and intensity data
   # interwoven (i.e., mzXML) it is more efficient to call
   # 'mzs_and_intensities'
   # if you are using both mz and intensity data. 
-  def intensities
+  def intensities(save=false)
+    return @data.last if @data
+    data = mzs_and_intensities
+    if save
+      @data = data
+      @data.last
+    else
+      data.last
+    end
     # TODO: this can be made slightly faster
-    mzs_and_intensities.last  
-  end
-
-
-  def has_mz_data?
-    (!@io.closed?) && @start_index && @num_bytes && @precision && !@network_order.nil?
-  end
-
-  def has_intensity_data?
-    (!@io.closed?) && @start_index && @num_bytes && @precision && !@network_order.nil?
   end
 
 end

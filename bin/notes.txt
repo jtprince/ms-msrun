@@ -1,0 +1,47 @@
+
+(file stamp of Feb 15 2005)
+
+$ ./extract_msn.exe   
+ EXTRACT_MSN usage:  extract_msn [options] [datafile]
+ options = -Fnum     where num is an INT specifying the first scan
+           -Lnum     where num is an INT specifying the last scan
+           -Bnum     where num is a FLOAT specifying the bottom MW for datafile creation
+           -Tnum     where num is a FLOAT specifying the top MW for datafile creation
+           -Mnum     where num is a FLOAT specifying the precursor mass
+                        tolerance for grouping (default=1.4)
+           -Snum     where num is an INT specifying the number of allowed
+                        different intermediate scans for grouping. (default=1)
+           -Cnum     where num is an INT specifying the charge state to use
+           -Gnum     where num is an INT specifying the minimum # of related
+                        grouped scans needed for a .dta file (default=2)
+           -Inum     where num is an INT specifying the minimum # of ions
+                        needed for a .dta file (default=0)
+           -Rnum     where num is a FLOAT specifying the minimum signal-to-noise value
+                        needed for a peak to be written to a .dta file (default=3)
+           -rnum     where num is an INT specifying the minimum number of major peaks
+                        (peaks above S/N threshold) needed for a .dta file (default=5)
+           -Dstring  where string is a path name
+           -Ystring  where string is a subsequence
+           -Z        Controls whether the zta files are written
+           -K        Controls whether the charge calculations are performed
+           -Ustring  where string is the path of a template file
+             [Default name is chgstate.tpl]
+           -Acontrolstring containing any of the options
+             T: use template          F: use discrete Fourier transform
+             E: use Eng's algorithm   H: use scan header
+             M: use MSMS count
+             O: override header charge state
+             S: create summary file   L: create log file
+             D: create both files     C: create MSMS count file
+             A: find CS even for nonzero headers
+             tfehm: include algorithm output in summary file even if not called
+             [NOTE: This version of the program has a default string of -AHTFEMAOSC,
+             but if -A option is used all desired parameters must be specified]
+           -H        print this information
+
+ If lcq_dta.exclude present, will ignore list of ions in exclude list.
+ Format of lcq_dta.exclude:  mass tolerance on 1st line
+                             precursor masses on subsequent lines
+
+
+

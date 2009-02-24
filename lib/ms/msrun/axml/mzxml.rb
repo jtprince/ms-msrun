@@ -69,10 +69,10 @@ class Ms::Msrun::Axml::Mzxml
       when 'peaks'
         # assumes that parsing was done with a LazyPeaks parser!
         nc = node.content
-        scan[6] = Ms::Spectrum.lazy(io, nc.first, nc.last, node['precision'].to_i, NetworkOrder)
+        scan[8] = Ms::Spectrum.lazy(io, nc.first, nc.last, node['precision'].to_i, NetworkOrder)
       end
     end
-    scan[5] = prec
+    scan[7] = prec
     scan
   end
 
@@ -114,6 +114,8 @@ class Ms::Msrun::Axml::Mzxml
     if x = node['startMz']
       scan[3] = x.to_f
       scan[4] = node['endMz'].to_f
+      scan[5] = node['peaksCount'].to_i
+      scan[6] = node['totIonCurrent'].to_f
     end
     scan
   end
