@@ -1,22 +1,50 @@
-require File.dirname(__FILE__) + '/../spec_helper.rb'
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 require 'ms/msrun'
 
-class MsrunSpec < MiniTest::Spec
-  before do
-    @file = '/home/john/ms-msrun/test_files/twenty_scans.mzXML'
-  end
-  it 'reads' do
+module MsrunSpec
+  extend Shareable
 
-    Ms::Msrun.foreach(@file) do |scan|
-      p scan.tic
-      p scan.ms_level
-      p scan.start_mz
-      p scan.spectrum
-      (mz, inten) = scan.spectrum.mzs_and_intensities
-      puts "COUTNS: "
-      p scan.num_peaks
-      p mz.size
+  before do
+    @file = nil  # you need to define this!
+    @key = nil   # <- do nothing with this.
+  end
+
+  def key
+    @key || @key = YAML.load_file(@file + '.key.yml')
+  end
+
+  it 'reads header information' do
+    Ms::Msrun.open(@file) do |ms|
+      key['header'].each do |k,v|
+        ms.send(k.to_sym).must_equal v
+      end
     end
   end
+
 end
+
+class Mzxml_v1 < MiniTest::Spec
+  include MsrunSpec
+  before do
+    super
+    @file = '/home/jtprince/ms-msrun/spec/files/opd1/000.v1.mzXML'
+  end
+end
+
+class Mzxml_v2_0 < MiniTest::Spec
+  include MsrunSpec
+  before do
+    super
+    @file = '/home/jtprince/ms-msrun/spec/files/opd1/020.v2.0.readw.mzXML'
+  end
+end
+
+class Mzxml_v2_1 < MiniTest::Spec
+  include MsrunSpec
+  before do
+    super
+    @file = '/home/jtprince/ms-msrun/spec/files/opd1/000.v2.1.mzXML'
+  end
+end
+

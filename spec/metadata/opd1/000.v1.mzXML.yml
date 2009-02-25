@@ -1,0 +1,3 @@
+source: John Prince
+description: |
+  Run 000 of opd1.  This is mzXML version 1 output.  Only the first twenty scans have been retained.  Because of this modification, at least the indexOffset and sha1 tags are incorrect.  Other values have been modified to reflect the twenty scans.

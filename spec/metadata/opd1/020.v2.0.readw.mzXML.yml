@@ -1,0 +1,3 @@
+source: John Prince
+description: |
+  mzXML version 2.0 readw.exe output of opd1, 020.RAW.  The file has been cut to have only the first twenty scans. Because of this modification, at least the indexOffset and sha1 tags are incorrect.  Other values have been modified to reflect the twenty scans.

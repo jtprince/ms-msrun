@@ -1,0 +1,3 @@
+source: John Prince
+description: |
+  mzData version 1.05 Xcalibur/Bioworks output of opd1, 020.RAW.  Note the output is buggy in its SpectrumRef and SpectrumList 'count' attribute.  The file has been cut to have only the first twenty scans.  The SpectrumList 'count' attribute is off, but it was wrong already.  Other values have been modified to reflect the twenty scans.
