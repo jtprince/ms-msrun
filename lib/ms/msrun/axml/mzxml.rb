@@ -17,9 +17,20 @@ class Ms::Msrun::Axml::Mzxml
   def parse(msrun_obj, io, version)
     root = AXML.parse(io, :text_indices => 'peaks')
     msrun_n = msrun_node(root, version)
+
+    # The filename
+    parent_n = msrun_n.find_first_child('parentFile')
+    fn = parent_n['fileName']
+    fn.gsub!(/\\/, '/')
+    msrun_obj.parent_basename = File.basename(fn)
+    dn = File.dirname(fn)
+    dn = nil if dn == '.' && !fn.include?('/')
+    msrun_obj.parent_location = dn
+
     ## HEADER
     scan_count = msrun_n['scanCount'].to_i
     msrun_obj.scan_count = scan_count
+
     scans_by_num = Array.new(scan_count + 1)
 
     ## SPECTRUM
@@ -87,7 +98,7 @@ class Ms::Msrun::Axml::Mzxml
       if version > '1.0'
         new_nodes = scan_n.find('child::scan')
         if new_nodes.size > 0
-          scn_index = add_scan_nodes(new_nodes, scans, scn_index, scans_by_num, io)
+          scn_index = add_scan_nodes(new_nodes, scans, scn_index, scans_by_num, version, io)
         end
       end
     end

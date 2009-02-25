@@ -40,9 +40,9 @@ class Ms::Scan
   # if > cutoff is below the precusure, then it is considered a +1 charge,
   # otherwise > 1
   # Algorithm from the MzXML2Search code by Jimmy Eng
-  def plus1?(cutoff=0.95)
+  def plus1?(cutoff=0.95, save=false)
     prec_mz = precursor.mz 
-    mzs, intens = spectrum.mzs_and_intensities
+    mzs, intens = spectrum.mzs_and_intensities(save)
     tic = 0.0
     below = 0.0
     mzs.zip(intens) do |mz, int|

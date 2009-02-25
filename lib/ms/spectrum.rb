@@ -26,7 +26,13 @@ class Ms::Spectrum
   def mzs_and_intensities
     [@mzs, @intensities]
   end
-  
+
+  # yields(mz, inten) across the spectrum, or array of doublets if no block
+  def peaks(&block)
+    (m, i) = mzs_and_intensities
+    m.zip(i, &block)
+  end
+
   # uses index function and returns the intensity at that value
   def intensity_at_mz(mz)
     if x = index(mz)
@@ -145,6 +151,8 @@ class Ms::Spectrum::LazyIO::Pair < Ms::Spectrum
   undef intensities=
 
   def initialize(io, mz_start_index, mz_num_bytes, mz_precision, mz_network_order, intensity_start_index, intensity_num_bytes, intensity_precision, intensity_network_order)
+    @mzs = nil
+    @intensities = nil
     @io = io
 
     @mz_start_index = mz_start_index
@@ -200,6 +208,7 @@ class Ms::Spectrum::LazyIO::Peaks < Ms::Spectrum
   undef intensities=
 
   def initialize(io, start_index, num_bytes, precision, network_order)
+    @data = nil
     @io = io
     @start_index = start_index
     @num_bytes = num_bytes

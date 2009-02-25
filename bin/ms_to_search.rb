@@ -10,11 +10,25 @@ class Ms::Msrun ; end
 
 # Documentation here
 class Ms::Msrun::Search < Tap::Task
-  config :first_scan, 0, :short => 'F', &c.integer # first scan
-  config :last_scan, 1e12, :short => 'L', &c.integer  # last scan
-  config :charge_states, [2,3], :short => 'c', {|v| v.split(',') }
-  config :bottom_mh, 0, :short => 'B', &c.float  # bottom MH+ 
-  config :top_mh, 
+  
+  #config :first_scan, 0, :short => 'F', &c.integer # first scan
+  #config :last_scan, 1e12, :short => 'L', &c.integer  # last scan
+  ## if not determined to be +1, then create these charge states
+  #config( :charge_states, [2,3], :short => 'c') {|v| v.split(',') }
+  #config :bottom_mh, 0, :short => 'B', &c.float # bottom MH+ 
+  #config :top_mh, -1.0, :short => 'T', &c.float # top MH+
+  #config :min_peaks, 0, :short => 'P', &c.integer # minimum peak count
+  #config :ms_levels, 2..-1, :short => 'M', &c.range  # ms levels to export
+
+
+  def process(filename)
+    Ms::Msrun.open(filename) do |ms|
+      ms.to_mgf(ms.filename.chomp(File.extname(ms.filename)))
+    end
+  end
+end
+
+Ms::Msrun::Search.execute
 
 
   #config :group_mass_tol, 1.4, :short => 'M', &c.float # prec. mass tolerance for grouping
@@ -27,26 +41,3 @@ class Ms::Msrun::Search < Tap::Task
   # Ahn lab sets this to: 2
   # config : :short => 'P', 
 
-  def process(filename)
-    raise NotImplementedError, "haven't implemented interm_scans > 0" if interm_scans > 0
-    Ms::Msrun.open(filename) do |ms|
-      File.open(ms.basename_noext + '.mgf', 'w') do |out|
-        prev_prec_mass = nil
-        prev_group = nil
-        ms.scans.each do |scan|
-          next if scan.ms_level <= 1 || scan.num_peaks < min_ions
-          mz, inten = scan.mzs_and_intensities(true)
-          prec_mz = scan.precursor.mz
-          if prev_prec_mass && (prev_prec_mass - prec_mz).abs <= group_mass_tol
-            prev_group << [mz, inten]
-          end
-          prev_groups << [mz, inten]
-          prev_prec_masses.unshift prec_mz
-          prev_prec_masses.pop
-        end
-      end
-    end
-  end
-end
-
-Ms::Msrun::Search.execute

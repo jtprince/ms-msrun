@@ -22,4 +22,6 @@ class Ms::Precursor
     self[1]
   end
 
+  alias_method :inten, :intensity
+
 end

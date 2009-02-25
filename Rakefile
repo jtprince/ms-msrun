@@ -65,7 +65,7 @@ end
 
 tm = Time.now
 gemspec = Gem::Specification.new do |t|
-  description = get_description(readme)
+  description = 'A library for working with LC/MS runs. Part of mspire.  Has parsers for mzXML v1, 2, and 3, mzData and mzML.  Can convert to commonly desired search output (such as mgf)'
   summary = "A library for working with LC/MS runs"
   t.platform = Gem::Platform::RUBY
   t.name = NAME
@@ -79,7 +79,7 @@ gemspec = Gem::Specification.new do |t|
   t.has_rdoc = true
   t.authors = ["John Prince"]
   t.files = dist_files
-  t.add_dependancy 'axml', '~> 0.0.5'
+  t.add_dependency 'axml', '~> 0.0.5'
   t.rdoc_options = rdoc_options
   t.extra_rdoc_files = rdoc_extra_includes
   t.executables = FL["bin/*"].map {|file| File.basename(file) }

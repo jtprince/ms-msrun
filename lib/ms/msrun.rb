@@ -2,36 +2,60 @@
 require 'ms/scan'
 require 'ms/precursor'
 require 'ms/spectrum'
+require 'ms/msrun/search'
 
 module Ms; end
 class Ms::Msrun
 
-  attr_accessor :start_time, :end_time
+  # the retention time in seconds of the first scan (regardless of any
+  # meta-data written in the header)
+  attr_accessor :start_time
+  # the retention time in seconds of the last scan (regardless of any
+  # meta-data written in the header)
+  attr_accessor :end_time
+  # an array of scans
   attr_accessor :scans
-  # (just for reference) the type of file this is (as symbol)
+
+  # The filetype. Valid types (for parsing) are:
+  #   :mzxml
+  #   :mzdata
+  #   :mzml
   attr_accessor :filetype
-  # (just for reference) the version string of this type of file
+
+  # the string passed in to open the file for reading
+  attr_accessor :filename
+
+  # The version string of this type of file
   attr_accessor :version
   # the total number of scans
   attr_writer :scan_count
-  # the basename with no extension
-  attr_accessor :basename_noext
-  # full path of the file
-  attr_accessor :filename
 
+  # The basename of the parent file listed (e.g., a .RAW file).  Note that in
+  # v1 mzXML this will be *.mzXML while in later versions it's *.RAW.
+  # See parent_basename_noext for more robust value
+  attr_accessor :parent_basename
+
+  # The location of the parent file (e.g., a .RAW file).  In version mzXML v1
+  # this will be nil.
+  attr_accessor :parent_location
+
+  # Opens the filename 
   def self.open(filename, &block)
     File.open(filename) {|io| block.call( self.new(io, filename) ) }
   end
 
-  # takes an io object
+  # takes an io object.  The preferred way to access Msrun objects is through
+  # the open method since it ensures that the io object will be available for
+  # the lazy evaluation of spectra.
   def initialize(io, filename=nil)
-    if filename
-      @filename = File.expand_path(filename)
-      @basename_noext = File.basename(filename, File.extname(filename))
-    end
+    @filename = filename
     @filetype, @version = Utils.filetype_and_version(io)
     parser = Utils.get_parser(@filetype, @version)
     parser.new.parse(self, io, @version)
+  end
+
+  def parent_basename_noext
+    @parent_basename.chomp(File.extname(@parent_basename))
   end
 
   # returns each scan
@@ -46,9 +70,18 @@ class Ms::Msrun
     end
   end
 
+  def scans_by_ms_level
+    by_level = []
+    scans.each do |scan|
+      by_level[scan.ms_level] = scan
+    end
+    by_level
+  end
+
   # returns an array, whose indices provide the number of scans in each index level the ms_levels, [0] = all the scans, [1] = mslevel 1, [2] = mslevel 2,
   # ...
   def scan_counts
+    return @scan_counts if @scan_counts
     ar = []
     ar[0] = 0
     scans.each do |sc|
@@ -59,20 +92,24 @@ class Ms::Msrun
       ar[level] += 1
       ar[0] += 1
     end
-    ar
+    @scan_counts = ar
   end
 
   def scan_count(mslevel=0)
-    if mslevel == 0
-      @scan_count 
+    if @scan_counts
+      @scan_counts[mslevel]
     else
-      num = 0
-      scans.each do |sc|
-        if sc.ms_level == mslevel
-          num += 1
+      if mslevel == 0
+        @scan_count 
+      else
+        num = 0
+        scans.each do |sc|
+          if sc.ms_level == mslevel
+            num += 1
+          end
         end
+        num
       end
-      num
     end
   end
 
