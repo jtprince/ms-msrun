@@ -10,6 +10,7 @@ class Ms::Spectrum
   # intensities
   attr_accessor :intensities
 
+
   #######################
   ## CLASS METHODS:
   #######################
@@ -130,6 +131,19 @@ class Ms::Spectrum
 end
 
 module Ms::Spectrum::LazyIO
+
+  # Saves the spectrum after reading it from disk (default=false).  [Set to
+  # true if you want to do a few operations on a spectrum and don't want to
+  # re-read from disk each time.  Use Spectrum#flush! when you think you are
+  # done with it.]
+  attr_accessor :save
+
+  # sets save to true and returns the spectrum object for chaining commands
+  def save!
+    save = true
+    self
+  end
+
   def self.new(*args)
     if args.size == 5  # mzXMl
       Ms::Spectrum::LazyIO::Peaks.new(*args)
@@ -151,6 +165,7 @@ class Ms::Spectrum::LazyIO::Pair < Ms::Spectrum
   undef intensities=
 
   def initialize(io, mz_start_index, mz_num_bytes, mz_precision, mz_network_order, intensity_start_index, intensity_num_bytes, intensity_precision, intensity_network_order)
+    @save = false
     @mzs = nil
     @intensities = nil
     @io = io
@@ -168,7 +183,7 @@ class Ms::Spectrum::LazyIO::Pair < Ms::Spectrum
   end
 
   # beware that this converts the information on disk every time it is called.  
-  def mzs(save=false)
+  def mzs
     return @mzs if @mzs
     @io.pos = @mz_start_index
     b64_string = @io.read(@mz_num_bytes)
@@ -187,7 +202,7 @@ class Ms::Spectrum::LazyIO::Pair < Ms::Spectrum
 
   # beware that this converts the information in @intensity_string every time
   # it is called.
-  def intensities(save=false)
+  def intensities
     return @intensities if @intensities
     @io.pos = @intensity_start_index
     b64_string = @io.read(@intensity_num_bytes)
@@ -230,7 +245,7 @@ class Ms::Spectrum::LazyIO::Peaks < Ms::Spectrum
   # returns two arrays: an array of m/z values and an array of intensity
   # values.  This is the preferred way to access mzXML file information under
   # lazy evaluation
-  def mzs_and_intensities(save=false)
+  def mzs_and_intensities
     return @data if @data
     @io.pos = @start_index
     b64_string = @io.read(@num_bytes)
@@ -245,7 +260,7 @@ class Ms::Spectrum::LazyIO::Peaks < Ms::Spectrum
   # when using 'io' lazy evaluation on files with m/z and intensity data
   # interwoven (i.e., mzXML) it is more efficient to call 'mzs_and_intensities'
   # if you are using both mz and intensity data. 
-  def mzs(save=false)
+  def mzs
     return @data.first if @data
     data = mzs_and_intensities
     if save

@@ -5,7 +5,6 @@ require 'rake/gempackagetask'
 require 'rake/testtask'
 require 'rake/clean'
 require 'fileutils'
-require 'email_encrypt'
 
 ###############################################
 # GLOBAL
@@ -83,14 +82,14 @@ gemspec = Gem::Specification.new do |t|
   t.rdoc_options = rdoc_options
   t.extra_rdoc_files = rdoc_extra_includes
   t.executables = FL["bin/*"].map {|file| File.basename(file) }
-  t.requirements << 'xmlparser or libxml'
+  t.requirements << 'xmlparser (preferrably) or libxml'
   t.test_files = FL["spec/**/*_spec.rb"]
 end
 
 desc "Create packages."
 Rake::GemPackageTask.new(gemspec) do |pkg|
   #pkg.need_zip = true
-  pkg.need_tar = true
+  #pkg.need_tar = true
 end
 
 task :remove_pkg do 

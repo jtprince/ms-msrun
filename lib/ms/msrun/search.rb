@@ -59,7 +59,8 @@ module Ms
             next unless scan.num_peaks >= _min_peaks
 
             # tic under precursor > 95% and true = save the spectrum info
-            if scan.plus1?(0.95, true)  
+            scan.spectrum.save!
+            if scan.plus1?(0.95)
               _charge_states = [1]
             end
 
@@ -84,15 +85,6 @@ module Ms
             scan.spectrum.flush!
           end
 
-          sorted_scans = self.scans_by_ms_level[opts[:ms_levels]].flatten.sort_by {|v| v.num }
-          count = 0
-          sorted_scans.each do |v| 
-            next unless v.num_peaks >= opts[:min_peaks]
-            if v.plus1?
-              out.puts v.precursor.mz
-            end
-            mz, inten = v.spectrum.mzs_and_intensities(true)
-          end
           if out_type == :string_io
             out.string
           else
