@@ -42,7 +42,7 @@ class Ms::Scan
   # Algorithm from the MzXML2Search code by Jimmy Eng
   def plus1?(cutoff=0.95, save=false)
     prec_mz = precursor.mz 
-    mzs, intens = spectrum.mzs_and_intensities(save)
+    mzs, intens = spectrum.mzs_and_intensities
     tic = 0.0
     below = 0.0
     mzs.zip(intens) do |mz, int|

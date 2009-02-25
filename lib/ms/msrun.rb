@@ -48,6 +48,7 @@ class Ms::Msrun
   # the open method since it ensures that the io object will be available for
   # the lazy evaluation of spectra.
   def initialize(io, filename=nil)
+    @scan_counts = nil
     @filename = filename
     @filetype, @version = Utils.filetype_and_version(io)
     parser = Utils.get_parser(@filetype, @version)
