@@ -53,6 +53,7 @@ class Ms::Msrun
     @filetype, @version = Utils.filetype_and_version(io)
     parser = Utils.get_parser(@filetype, @version)
     parser.new.parse(self, io, @version)
+    @scan_counts = nil  # <- to keep warnings away
   end
 
   def parent_basename_noext
