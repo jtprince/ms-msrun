@@ -43,7 +43,7 @@ module Ms
          _last_scan = scans.last.num
        end
 
-       if _ms_levels.last == -1
+       if !_ms_levels.is_a?(Integer) && _ms_levels.last == -1
          _ms_levels = ((_ms_levels.first)..(scan_counts.size-1))
        end
 
