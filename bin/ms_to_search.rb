@@ -3,7 +3,6 @@
 require 'rubygems'
 require 'tap'
 
-# extract_msn.exe -M0.2 -B85 -T4500 -S0 -G1 -I35 -C0 -P2 -D output smallraw.RAW
 
 module Ms ; end
 class Ms::Msrun ; end
@@ -29,6 +28,8 @@ class Ms::Msrun::Search < Tap::Task
 end
 
 Ms::Msrun::Search.execute
+
+# extract_msn.exe -M0.2 -B85 -T4500 -S0 -G1 -I35 -C0 -P2 -D output smallraw.RAW
 
 
   #config :group_mass_tol, 1.4, :short => 'M', &c.float # prec. mass tolerance for grouping
