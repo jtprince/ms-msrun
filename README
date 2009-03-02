@@ -4,52 +4,59 @@ A library for working with LC/MS runs.
 
 == Examples
 
-The following examples will work on *mzXML*, *mzData*, and *mzML* files!
-
-=== Reading a file or io object
+The following example will work on *mzXML*, *mzData* ( and *mzML* files, shortly)!
 
     require "ms/msrun" 
 
     Ms::Msrun.open("file.mzXML") do |ms|
-      ms.scan_count  # do something here
+      ms.start_time       # in seconds
+      ms.end_time         # in seconds 
+
+      ms.scan_count       # number of scans
+      ms.scan_count(1)    # number of MS scans
+      ms.scan_count(2)    # number of MS/MS scans, etc.
+
+      ms.parent_basename_noext   # "file" (as recorded _in the xml_)
+      ms.filename                # "file.mzXML"
+
+      ms.scans.each do |scan|
+        scan.num          # scan number
+        scan.ms_level     # ms_level
+        scan.time         # retention time in seconds
+        scan.start_mz     # the first m/z value
+        scan.end_mz       # the last m/z value
+  
+        # Precursor information
+        pr = scan.precursor  # an Ms::Precursor object
+        pr.mz
+        pr.intensity      # does fast binary search if info not already given
+        pr.parent         # the parent scan
+        pr.charge_states  # Array of possible charge states
+
+        # Spectral information
+        spectrum = scan.spectrum
+        spectrum.mzs          # Array of m/z values
+        spectrum.intensities  # Array of m/z values
+        spectrum.peaks do |mz, inten|
+          puts "#{mz} #{inten}"   # print each peak on own line
+        end
+      end
     end
 
-=== Accessing run information
+== Features
 
-    Ms::Msrun.open("file.mzXML") do |ms|
-        ms.start_time
-        ms.end_time
-
-        ms.scan_count    # number of scans
-    ms.scan_count(0) # same thing (number of scans)
-        ms.scan_count(1) # number of MS scans
-        ms.scan_count(2) # number of MS/MS scans, etc.
-    end
-
-    # also takes an io object
-    ms = File.open("file.mzXML") {|io| Ms::Msrun.new(io) }
-
-=== Accessing scan information
-
-    ms.scans.each do |scan|
-      scan.num          # scan number
-      scan.ms_level     # ms_level
-      scan.time         # retention time in seconds
-      scan.start_mz     # the first m/z value
-      scan.end_mz       # the last m/z value
-
-      pr = scan.precursor  # an Ms::Precursor object!
-      pr.mz
-      pr.intensity
-      pr.parent         # the parent scan
-      pr.charge_states  # Array of possible charge states of the precursor
-                        # ('charge_states' is not always defined)
+[*Fast*] uses xmlparser under the hood.
+[*Unified*] one interface for all formats
+[<b>Lazy evaluation of spectra</b>] By default, reads from IO when data is required.
+[<b>Minimal Dependencies</b>] xmlparser (available for most distros and windows one-click installer) and axml.  Very nearly have supoort for LibXML.
 
 == Installation
 
     gem install ms-msrun
 
-The library currently relies on xmlparser.  After installation of ms-msrun
-(which will automatically install `axml`) issue this command to get instructions on installing xmlparser:
+The library currently relies on xmlparser (though LibXML is close to being
+supported).  After installation of ms-msrun (which will automatically install
+`axml`) issue this command to get instructions on installing xmlparser:
 
-    ruby -rubygems -e 'require "axml"; puts AXML::Autoload.install_instructions(:xmlparser)'
+    ruby -rubygems -e 'require "axml" \ 
+        puts AXML::Autoload.install_instructions(:xmlparser)'
