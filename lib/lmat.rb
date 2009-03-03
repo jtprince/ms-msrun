@@ -18,7 +18,13 @@ class Lmat
   end
 
   def max
-    mat.max.max
+    max = mat[0][0]
+    mat.each do |row|
+      row.each do |v|
+        max = v if v > max
+      end
+    end
+    max
   end
 
   # returns self
@@ -50,7 +56,6 @@ class Lmat
       raise RuntimeError, "bad n vec size" if nvec.size != num_n
       @mat = NArray.new(num_m)
       num_m.times do |m|
-        puts "LINE!"
         line = io.readline
         line.chomp!
         @mat[m] = NArray.new(line.split(' ').map {|v| v.to_f })
