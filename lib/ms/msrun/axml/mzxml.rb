@@ -80,12 +80,12 @@ class Ms::Msrun::Axml::Mzxml
       when 'peaks'
         # assumes that parsing was done with a LazyPeaks parser!
         nc = node.text
-        p nc
-        if nc.first < 0 || nc.last < 0
-          puts "PROBLEM: "
-          p nc
-          abort 'here'
-        end
+        #p nc
+        #if nc.first < 0 || nc.last < 0
+        #  puts "PROBLEM: "
+        #  p nc
+        #  abort 'here'
+        #end
         scan[8] = Ms::Spectrum.lazy(io, nc.first, nc.last, node['precision'].to_i, NetworkOrder)
       end
     end
@@ -98,8 +98,8 @@ class Ms::Msrun::Axml::Mzxml
   def add_scan_nodes(nodes, scans, scn_index, scans_by_num, version, io)
     nodes.each do |scan_n|
       scan = create_scan(scan_n, scans_by_num, io)
-      puts "scannum: "
-      p scan[0]
+      #puts "scannum: "
+      #p scan[0]
       scans[scn_index] = scan
       scans_by_num[scan[0]] = scan 
       scn_index += 1
