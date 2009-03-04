@@ -1,11 +1,11 @@
-require File.expand_path( File.dirname(__FILE__) + '/../../spec_helper' )
+require File.expand_path( File.dirname(__FILE__) + '/spec_helper' )
 
-require 'ms/msrun/lmat'
+require 'lmat'
 
 class LmatUnitSpec < MiniTest::Spec
 
   def initialize(*args)
-    @klass = Ms::Msrun::Lmat
+    @klass = Lmat
     super(*args)
   end
 
