@@ -49,13 +49,12 @@ task :default => :spec
 
 desc 'Run specs.'
 Rake::TestTask.new(:spec) do |t|
-  t.verbose = true
-  t.warning = true
-  ENV['RUBYOPT'] = 'rubygems'
+  #t.verbose = true
+  #t.warning = true
   ENV['TEST'] = ENV['SPEC'] if ENV['SPEC']
   t.libs = ['lib']
   t.test_files = Dir.glob( File.join('spec', ENV['pattern'] || '**/*_spec.rb') )
-  t.options = "-v"
+  #t.options = "-v"
 end
 
 ###############################################
@@ -79,6 +78,7 @@ gemspec = Gem::Specification.new do |t|
   t.authors = ["John Prince"]
   t.files = dist_files
   t.add_dependency 'axml', '~> 0.0.5'
+  t.add_dependency 'runarray'
   t.rdoc_options = rdoc_options
   t.extra_rdoc_files = rdoc_extra_includes
   t.executables = FL["bin/*"].map {|file| File.basename(file) }
