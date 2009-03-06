@@ -3,10 +3,8 @@ require 'runarray'
 include Runarray
 
 ## Labeled matrix
-module Ms ; end
-class Ms::Msrun ; end
 
-class Ms::Msrun::Lmat
+class Lmat
   attr_accessor :mvec
   attr_accessor :nvec
   # an array of narray objects
@@ -20,9 +18,16 @@ class Ms::Msrun::Lmat
   end
 
   def max
-    mat.max.max
+    max = mat[0][0]
+    mat.each do |row|
+      row.each do |v|
+        max = v if v > max
+      end
+    end
+    max
   end
 
+  # returns self
   def from_lmat(file)
     string = IO.read(file)
     mdim = string.unpack("i")
@@ -34,11 +39,30 @@ class Ms::Msrun::Lmat
       rows << string.unpack("f#{ndim}")
     end
     @mat = rows
+    self
   end
 
-  # need to write
-  #def from_lmata
-  #end
+  # returns self
+  def from_lmata(file)
+    # this can probably be made faster
+    File.open(file) do |io|
+      num_m = io.readline.to_i
+      mline = io.readline.chomp
+      @mvec = NArray.new( mline.split(' ').map {|v| v.to_f } )
+      raise RuntimeError, "bad m vec size" if mvec.size != num_m
+      num_n = io.readline.to_i
+      nline = io.readline.chomp
+      @nvec = NArray.new( nline.split(' ').map {|v| v.to_f } )
+      raise RuntimeError, "bad n vec size" if nvec.size != num_n
+      @mat = NArray.new(num_m)
+      num_m.times do |m|
+        line = io.readline
+        line.chomp!
+        @mat[m] = NArray.new(line.split(' ').map {|v| v.to_f })
+      end
+    end
+    self
+  end
 
   # converts raw times and spectrum to a labeled matrix
   # times is an array (or VecI object)
