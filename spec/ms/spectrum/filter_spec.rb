@@ -10,7 +10,7 @@ class Array
   end
 end
 
-class CompareSpec < MiniTest::Spec
+class FilterSpec < MiniTest::Spec
   include Ms
 
   before do
