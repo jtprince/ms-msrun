@@ -10,6 +10,7 @@ class Ms::Spectrum
   # intensities
   attr_accessor :intensities
 
+  alias_method :ints, :intensities
 
   #######################
   ## CLASS METHODS:
@@ -17,6 +18,16 @@ class Ms::Spectrum
 
   def self.lazy(*args)
     Ms::Spectrum::LazyIO.new(*args)
+  end
+
+  def self.from_peaks(ar_of_doublets)
+    _mzs = []
+    _ints = []
+    ar_of_doublets.each do |mz, int|
+      _mzs << mz
+      _ints << int
+    end
+    self.new(_mzs, _ints)
   end
   
   def initialize(mz_ar=[], intensity_ar=[])
@@ -28,11 +39,18 @@ class Ms::Spectrum
     [@mzs, @intensities]
   end
 
+  def ==(other)
+    mzs == other.mzs && ints == other.ints
+  end
+
   # yields(mz, inten) across the spectrum, or array of doublets if no block
   def peaks(&block)
     (m, i) = mzs_and_intensities
     m.zip(i, &block)
   end
+
+  alias_method :each, :peaks
+  alias_method :each_peak, :peaks
 
   # uses index function and returns the intensity at that value
   def intensity_at_mz(mz)
