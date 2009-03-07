@@ -1,6 +1,9 @@
 require 'base64'
 require 'bsearch'
 
+require 'ms/spectrum/compare'
+require 'ms/spectrum/filter'
+
 module Ms ; end
 
 class Ms::Spectrum

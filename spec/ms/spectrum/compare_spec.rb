@@ -34,6 +34,11 @@ class CompareSpec < MiniTest::Spec
     exp.size.must_equal 0
   end
 
+  it 'computes similarity score' do
+    p @a.sim_score(@b)
+    p @a.sim_score(@a)
+  end
+
 end
 
 
