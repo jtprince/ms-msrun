@@ -2,7 +2,7 @@
 
 require 'rubygems'
 require 'ms/msrun'
-require 'ms/msrun/lmat'
+require 'lmat'
 require 'optparse'
 require 'ostruct'
 require 'runarray'
