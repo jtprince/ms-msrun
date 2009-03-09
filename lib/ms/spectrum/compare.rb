@@ -31,16 +31,19 @@ module Ms
       #     will only return intensities on mutual best matches within radius.
       #     yields [self_intensity, other_intensity] for each match within
       #     the radius.  
-      #     if opts[:diff] == true then returns [inten, inten, diff]
       #
       # opts[:type] == :best
       #     yields the best match in the radius peak.  If one peak is already
-      #     spoken for, a different peak may still match a close peak if it is its
-      #     best match (how to explain this?).
+      #     spoken for, a different peak may still match a close peak if it is
+      #     its best match (how to explain this?).
+      #
+      # if opts[:yield_diff] == true then returns [..., diff] (d: true)
+      # if opts[:yield_mz] == true then returns [mz, mz, int, int] (d: false)
+      # if opts[:yield_indices] == true then returns [i,j] (d: false)
       # assumes mzs are increasing
       def compare(other, opts={})
-        defaults = {:radius => 1.0, :type=>:mutual_best, :yield_diff => true}
-        (radius, type, yield_diff) = defaults.merge(opts).values_at(:radius, :type, :yield_diff)
+        defaults = {:radius => 1.0, :type=>:mutual_best, :yield_diff => true, :yield_mz => false, :yield_indices => false}
+        (radius, type, yield_diff, yield_mz, yield_indices) = defaults.merge(opts).values_at(:radius, :type, :yield_diff, :yield_mz, :yield_indices)
         blk = block_given?
         output = [] if !blk
         s_ints = self.intensities
@@ -81,18 +84,22 @@ module Ms
               iset[i] = true
               jset[j] = true
             end
+            to_ret = 
+              if yield_indices
+                [i,j]
+              else
+                [s_ints[i], o_ints[j]]
+              end
+            if yield_mz
+              to_ret.unshift( s_mzs[i], o_mzs[j] )
+            end
             if yield_diff
-              if blk
-                yield [s_ints[i], o_ints[j], diff]
-              else
-                output << [s_ints[i], o_ints[j], diff]
-              end
+              to_ret.push( diff )
+            end
+            if blk
+              yield to_ret
             else
-              if blk
-                yield [s_ints[i], o_ints[j]]
-              else
-                output << [s_ints[i], o_ints[j]]
-              end
+              output << to_ret
             end
           end
           if type == :mutual_best

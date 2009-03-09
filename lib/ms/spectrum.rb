@@ -46,6 +46,10 @@ class Ms::Spectrum
     mzs == other.mzs && ints == other.ints
   end
 
+  def [](array_index)
+    [mzs[array_index], intensities[array_index]]
+  end
+
   # yields(mz, inten) across the spectrum, or array of doublets if no block
   def peaks(&block)
     (m, i) = mzs_and_intensities
