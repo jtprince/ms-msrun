@@ -5,7 +5,7 @@ require 'ms/msrun'
 class SearchSpec < MiniTest::Spec
 
   xit 'works' do
-    @file = '/home/jtprince/ms-msrun/spec/files/opd1/000.v1.mzXML'
+    @file = '/home/jtprince/dev/ms-msrun/spec/files/opd1/000.v1.mzXML'
     params = {
       :bottom_mh => 300.0,
       :top_mh => 4500.0,

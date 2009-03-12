@@ -35,8 +35,9 @@ class CompareSpec < MiniTest::Spec
   end
 
   it 'computes similarity score' do
-    p @a.sim_score(@b)
-    p @a.sim_score(@a)
+    @a.sim_score(@a, :radius => 0.1).must_equal 1.0
+    # this is just frozen, not verified:
+    @a.sim_score(@b).must_be_close_to 0.702945603476432, 0.000001
   end
 
 end

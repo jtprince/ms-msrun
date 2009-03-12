@@ -80,6 +80,11 @@ class Ms::Spectrum
     (precise*exp10).round == (less_precise*exp10).round
   end
 
+  # returns a new spectrum whose intensities have been normalized by the tic
+  def normalize
+    tic = self.intensities.inject(0.0) {|sum,int| sum += int }
+    Ms::Spectrum.new(self.mzs, self.intensities.map {|v| v / tic })
+  end
 
   # returns the index of the first value matching that m/z.  the argument m/z
   # may be less precise than the actual m/z (rounding to the same precision

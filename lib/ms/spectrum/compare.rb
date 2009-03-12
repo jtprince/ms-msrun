@@ -18,13 +18,35 @@ module Ms
   class Spectrum
     module Compare
 
+      # Zhang Analytical Chemistry. 2004 76(14)
+      # "the ratio between the sum of geometric mean and sum of arithmetic mean
+      # of all ions, after the two spectra are normalized to the same total
+      # ion intensity"
+      # The score will be 1 for identical spectra
       # (Σ (Ii*Ij)^½) / (ΣIi * ΣIj)^½
+      #
+      # options:
+      # 
+      #   :normalize => true | false (d: true) normalizes intensities first
+      #
+      # relevant options given for 'compare' will be passed through:
+      #
+      #     :radius
+      #     :type
       def sim_score(other, opts={})
+        opts = {:normalize => true}.merge(opts)
+        (a_spec, b_spec) = 
+          if opts[:normalize] == true
+            [self.normalize, other.normalize]
+          else
+            [self, other]
+          end
         numer = 0.0
-        compare(other, {:yield_diff => false}) do |sint, oint|
+        
+        a_spec.compare(b_spec, opts.merge( {:yield_diff => false} )) do |sint, oint|
           numer += Math.sqrt(sint * oint)
         end
-        numer / Math.sqrt( self.ints.sum * other.ints.sum )
+        numer / Math.sqrt( a_spec.ints.sum * b_spec.ints.sum )
       end
 
       # opts[:type] == :mutual_best
