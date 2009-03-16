@@ -40,6 +40,12 @@ class CompareSpec < MiniTest::Spec
     @a.sim_score(@b).must_be_close_to 0.702945603476432, 0.000001
   end
 
+  it 'computes a pic score' do
+    @a.pic_score(@a, :radius => 0.01).must_equal 100.0
+    @a.pic_score(@d, :radius => 0.01).must_equal 0.0
+    # frozen:
+    @a.pic_score(@b).must_be_close_to 68.4981684981685, 0.000001 
+  end
 end
 
 

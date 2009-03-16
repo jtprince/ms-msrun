@@ -17,6 +17,24 @@ end
 module Ms
   class Spectrum
     module Compare
+  
+      # percent ion current score: the percent of total ion current of the
+      # calling object that can be explained by other. Ranges from 0-100
+      def pic_score(other, opts={})
+        opts= {:normalize => true}.merge(opts)
+        (a_spec, b_spec) = 
+          if opts[:normalize] == true
+            [self.normalize, other.normalize]
+          else
+            [self, other]
+          end
+        overlapping_current = 0.0
+        a_spec.compare(b_spec, opts.merge( {:yield_diff => false} )) do |sint, oint|
+          overlapping_current += [oint, sint].min
+        end
+        100.0 * (overlapping_current / a_spec.intensities.sum)
+      end
+
 
       # Zhang Analytical Chemistry. 2004 76(14)
       # "the ratio between the sum of geometric mean and sum of arithmetic mean

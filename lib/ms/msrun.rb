@@ -72,6 +72,14 @@ class Ms::Msrun
     end
   end
 
+  # returns the scan at that number
+  def scan(num)
+    p scans[0]
+    scans[num]
+  end
+
+  alias_method '[]'.to_sym, :scan
+
   def scans_by_ms_level
     by_level = []
     scans.each do |scan|
