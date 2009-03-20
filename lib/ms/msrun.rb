@@ -50,8 +50,8 @@ class Ms::Msrun
   def initialize(io, filename=nil)
     @scan_counts = nil
     @filename = filename
-    @filetype, @version = Utils.filetype_and_version(io)
-    parser = Utils.get_parser(@filetype, @version)
+    @filetype, @version = Ms::Msrun.filetype_and_version(io)
+    parser = Ms::Msrun.class.get_parser(@filetype, @version)
     parser.new.parse(self, io, @version)
     @scan_counts = nil  # <- to keep warnings away
   end
@@ -208,12 +208,7 @@ class Ms::Msrun
       [times, spectra]
     end
   end
-end
 
-
-module Ms::Msrun::Axml ; end  # so we can get our parser
-
-module Ms::Msrun::Utils
 
   def self.get_parser(filetype, version)
     require "ms/msrun/axml/#{filetype}"
@@ -254,6 +249,7 @@ module Ms::Msrun::Utils
       prev_scan = scan
     end
   end
+
 
   Mzxml_regexp = /http:\/\/sashimi.sourceforge.net\/schema(_revision)?\/([\w\d_\.]+)/o
   # 'http://sashimi.sourceforge.net/schema/MsXML.xsd' # version 1
@@ -302,4 +298,5 @@ module Ms::Msrun::Utils
       end
     end
   end
+
 end
