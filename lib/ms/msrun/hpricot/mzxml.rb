@@ -10,15 +10,16 @@ module Ms
   end
 end
 
-class Ms::Msrun::Axml::Hpricot
+class Ms::Msrun::Hpricot::Mzxml
   NetworkOrder = true
 
   # note that the string may contain a trailing end scan node or may be
   # missing its terminating node!
   # version is a string
-  def parse_scan(string, version)
+  # returns a Ms::Scan object
+  def self.parse_scan(string, version)
     doc = Hpricot.XML(string)
-    doc
+    p doc.at("/scan").attr
   end
 
 
