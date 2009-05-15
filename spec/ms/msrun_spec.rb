@@ -22,13 +22,23 @@ module MsrunSpec
     end
   end
 
+  it 'reads spectra' do
+    Ms::Msrun.open(@file) do |ms|
+      ms.scans.each do |scan|
+        spec = scan.spectrum
+        p spec.mzs
+        p spec.intensities
+      end
+    end
+  end
+
 end
 
 class Mzxml_v1 < MiniTest::Spec
   include MsrunSpec
   before do
     super
-    @file = '/home/jtprince/dev/ms-msrun/spec/files/opd1/000.v1.mzXML'
+    @file = TESTFILES + '/opd1/000.v1.mzXML'
   end
 end
 
@@ -36,7 +46,7 @@ class Mzxml_v2_0 < MiniTest::Spec
   include MsrunSpec
   before do
     super
-    @file = '/home/jtprince/dev/ms-msrun/spec/files/opd1/020.v2.0.readw.mzXML'
+    @file = TESTFILES + '/opd1/020.v2.0.readw.mzXML'
   end
 end
 
@@ -44,7 +54,7 @@ class Mzxml_v2_1 < MiniTest::Spec
   include MsrunSpec
   before do
     super
-    @file = '/home/jtprince/dev/ms-msrun/spec/files/opd1/000.v2.1.mzXML'
+    @file = TESTFILES + '/opd1/000.v2.1.mzXML'
   end
 end
 

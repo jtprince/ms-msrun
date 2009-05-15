@@ -92,6 +92,7 @@ gemspec = Gem::Specification.new do |t|
   t.has_rdoc = true
   t.authors = ["John Prince"]
   t.files = dist_files
+  t.add_dependency 'ms-core'
   t.add_dependency 'axml', '~> 0.0.7'
   t.add_dependency 'runarray', '~> 0.0.0'
   t.rdoc_options = rdoc_options

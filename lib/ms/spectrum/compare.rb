@@ -64,7 +64,7 @@ module Ms
         a_spec.compare(b_spec, opts.merge( {:yield_diff => false} )) do |sint, oint|
           numer += Math.sqrt(sint * oint)
         end
-        numer / Math.sqrt( a_spec.ints.sum * b_spec.ints.sum )
+        numer / Math.sqrt( a_spec.intensities.sum * b_spec.intensities.sum )
       end
 
       # opts[:type] == :mutual_best

@@ -1,5 +1,5 @@
 require 'base64'
-require 'bsearch'
+require 'ms/support/binary_search'
 
 require 'ms/spectrum/compare'
 require 'ms/spectrum/filter'
@@ -43,7 +43,7 @@ class Ms::Spectrum
   end
 
   def ==(other)
-    mzs == other.mzs && ints == other.ints
+    mzs == other.mzs && intensities == other.intensities
   end
 
   def [](array_index)

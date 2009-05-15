@@ -63,31 +63,6 @@ class Ms::Scan
     arr.join(" ")
   end
 
-  # adds the attribute parent to each scan with a parent
-  # (level 1 = no parent; level 2 = prev level 1, etc.
-  def self.add_parent_scan(scans)
-    prev_scan = nil
-    parent_stack = [nil]
-    ## we want to set the level to be the first mslevel we come to
-    prev_level = 1
-    scans.each do |scan|
-      if scan then prev_level = scan.ms_level; break; end
-    end
-    scans.each do |scan|
-      next unless scan  ## the first one is nil, (others?)
-      level = scan.ms_level
-      if prev_level < level
-        parent_stack.unshift prev_scan
-      end
-      if prev_level > level
-        (prev_level - level).times do parent_stack.shift end
-      end
-      scan.parent = parent_stack.first
-      prev_level = level
-      prev_scan = scan
-    end
-  end
-
 end
 
 

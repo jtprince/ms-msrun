@@ -51,7 +51,7 @@ class Ms::Msrun
     @scan_counts = nil
     @filename = filename
     @filetype, @version = Ms::Msrun.filetype_and_version(io)
-    parser = Ms::Msrun.class.get_parser(@filetype, @version)
+    parser = Ms::Msrun.get_parser(@filetype, @version)
     parser.new.parse(self, io, @version)
     @scan_counts = nil  # <- to keep warnings away
   end

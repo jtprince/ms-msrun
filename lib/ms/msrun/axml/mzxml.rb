@@ -1,4 +1,6 @@
 
+require 'ms/spectrum'
+require 'ms/data/lazy_io'
 require 'ms/msrun'
 require 'ms/precursor'
 require 'axml'
@@ -48,7 +50,7 @@ class Ms::Msrun::Axml::Mzxml
     add_scan_nodes(scan_nodes, scans, scn_index, scans_by_num, version, io)
 
     ## update the scan's parents
-    Ms::Msrun::Utils.add_parent_scan(scans)
+    Ms::Msrun.add_parent_scan(scans)
 
     # note that startTime and endTime are optional AND in >2.2 are dateTime
     # instead of duration types!, so we will just use scan times...
@@ -86,7 +88,7 @@ class Ms::Msrun::Axml::Mzxml
         #  p nc
         #  abort 'here'
         #end
-        scan[8] = Ms::Spectrum.lazy(io, nc.first, nc.last, node['precision'].to_i, NetworkOrder)
+        scan[8] = Ms::Spectrum.new(Ms::Data::LazyIO.new(io, nc.first, nc.last, Ms::Data::LazyIO.unpack_code(node['precision'].to_i, NetworkOrder)) )
       end
     end
     scan[7] = prec

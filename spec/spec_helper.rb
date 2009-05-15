@@ -4,6 +4,8 @@ require 'minitest/spec'
 
 MiniTest::Unit.autorun
 
+TESTFILES = File.expand_path(File.dirname(__FILE__)) + '/testfiles'
+
 def xit(*args, &block)
   puts "SKIPPING: #{args}"
 end
