@@ -2,16 +2,14 @@ require 'ms/precursor'
 
 module Ms ; end
 
-#              0      1          2      3         4        5           6     7
-#        8 
+#              0      1          2      3         4        5           6     7           8 
 MsScanAtts =  [:num, :ms_level, :time, :start_mz, :end_mz, :num_peaks, :tic, :precursor, :spectrum]
 
-Ms::Scan = Struct.new(*MsScanAtts)
+Ms::Scan = Struct.new(*MsScanAtts) do
 
 # time in seconds
 # everything else in float/int
 
-class Ms::Scan
  
   def to_s
     "<Scan num=#{num} ms_level=#{ms_level} time=#{time}>"

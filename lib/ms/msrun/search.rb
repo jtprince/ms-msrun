@@ -1,3 +1,4 @@
+require 'ms/mass'
 
 module Ms
   class Msrun
@@ -12,8 +13,6 @@ module Ms
     #config :ms_levels, 2..-1, :short => 'M', &c.range  # ms levels to export
 
     module Search
-
-      PROTON_MASS = 1.007276
 
       # returns a string, or writes the string to file if given an out_filename
       # if given a filename or IO object, returns the number of spectra
@@ -59,7 +58,6 @@ module Ms
             next unless scan.num_peaks >= _min_peaks
 
             # tic under precursor > 95% and true = save the spectrum info
-            scan.spectrum.save!
             if scan.plus1?(0.95)
               _charge_states = [1]
             end
@@ -69,7 +67,7 @@ module Ms
             pmz = scan.precursor && scan.precursor.mz
 
             _charge_states.each do |z|
-              mh = (pmz * z) - (z - 1)*PROTON_MASS
+              mh = (pmz * z) - (z - 1)*Ms::Mass::PROTON
               next unless (mh >= _bottom_mh) 
               next unless (mh <= _top_mh) if _top_mh
               out.puts "BEGIN IONS"
@@ -82,7 +80,7 @@ module Ms
               out.puts "END IONS\n\n"
             end
 
-            scan.spectrum.flush!
+            scan.spectrum.data.reset
           end
 
           if out_type == :string_io

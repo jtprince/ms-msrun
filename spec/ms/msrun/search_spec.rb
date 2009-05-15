@@ -4,8 +4,8 @@ require 'ms/msrun'
 
 class SearchSpec < MiniTest::Spec
 
-  xit 'works' do
-    @file = '/home/jtprince/dev/ms-msrun/spec/files/opd1/000.v1.mzXML'
+  it 'works' do
+    @file = TESTFILES + '/opd1/000.v1.mzXML'
     params = {
       :bottom_mh => 300.0,
       :top_mh => 4500.0,
@@ -45,7 +45,6 @@ class SearchSpec < MiniTest::Spec
     Ms::Msrun.open(@file) do |ms|
       no_scans.each do |k,v|
         reply = ms.to_mgf(nil, k => v)
-        puts reply
         reply.must_match(/BEGIN.IONS/)
         reply.must_match(/END.IONS/)
       end

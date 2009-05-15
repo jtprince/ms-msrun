@@ -1,5 +1,6 @@
 
 require 'ms/spectrum'
+require 'ms/data'
 require 'ms/data/lazy_io'
 require 'ms/msrun'
 require 'ms/precursor'
@@ -82,13 +83,8 @@ class Ms::Msrun::Axml::Mzxml
       when 'peaks'
         # assumes that parsing was done with a LazyPeaks parser!
         nc = node.text
-        #p nc
-        #if nc.first < 0 || nc.last < 0
-        #  puts "PROBLEM: "
-        #  p nc
-        #  abort 'here'
-        #end
-        scan[8] = Ms::Spectrum.new(Ms::Data::LazyIO.new(io, nc.first, nc.last, Ms::Data::LazyIO.unpack_code(node['precision'].to_i, NetworkOrder)) )
+        data = Ms::Data::LazyIO.new(io, nc.first, nc.last, Ms::Data::LazyIO.unpack_code(node['precision'].to_i, NetworkOrder))
+        scan[8] = Ms::Spectrum.new(Ms::Data::Interleaved.new(data))
       end
     end
     scan[7] = prec

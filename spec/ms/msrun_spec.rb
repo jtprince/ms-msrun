@@ -23,11 +23,10 @@ module MsrunSpec
   end
 
   it 'reads spectra' do
+    first = true
     Ms::Msrun.open(@file) do |ms|
       ms.scans.each do |scan|
-        spec = scan.spectrum
-        p spec.mzs
-        p spec.intensities
+        puts "NEED TO WRITE SCAN/SPECTRUM TESTS!"
       end
     end
   end
