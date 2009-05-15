@@ -37,7 +37,7 @@ module Ms
         ret_ints = []
         ret_mzs = include.map {|int, mz| [mz, int] }.sort.map {|mz,int| ret_ints << int ; mz }
 
-        return Spectrum.new(ret_mzs, ret_ints)
+        return Spectrum.new([ret_mzs, ret_ints])
       end
 
     end
