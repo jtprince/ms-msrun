@@ -4,7 +4,7 @@ A library for working with LC/MS runs.
 
 == Examples
 
-The following example will work on *mzXML*, *mzData* ( and *mzML* files, shortly)!
+The following example will work on *mzXML*, *mzData* ( and *mzML* files in near future)!
 
     require "ms/msrun" 
 
@@ -55,8 +55,7 @@ The following example will work on *mzXML*, *mzData* ( and *mzML* files, shortly
     gem install ms-msrun
 
 The library currently relies on xmlparser (though LibXML is close to being
-supported).  After installation of ms-msrun (which will automatically install
+supported).  After installation of ms-msrun (which should automatically install
 `axml`) issue this command to get instructions on installing xmlparser:
 
-    ruby -rubygems -e 'require "axml" \ 
-        puts AXML::Autoload.install_instructions(:xmlparser)'
+    ruby -rubygems -e 'require "axml"; puts AXML::Autoload.install_instructions(:xmlparser)'

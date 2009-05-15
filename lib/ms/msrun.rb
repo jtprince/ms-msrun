@@ -78,7 +78,8 @@ class Ms::Msrun
     scans[num]
   end
 
-  alias_method '[]'.to_sym, :scan
+  bracket_method = '[]'.to_sym
+  alias_method bracket_method, :scan
 
   def scans_by_ms_level
     by_level = []

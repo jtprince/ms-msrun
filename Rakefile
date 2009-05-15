@@ -35,10 +35,25 @@ Rake::RDocTask.new do |rd|
   rd.options.push( *rdoc_options )
 end
 
-desc "create and upload docs to server"
-task :upload_docs => [:rdoc] do
-  sh "scp -r #{rdoc_dir}/* jtprince@rubyforge.org:/var/www/gforge-projects/mspire/ms-msrun/"
+
+desc "Publish RDoc to RubyForge"
+task :publish_rdoc => [:rdoc] do
+  require 'yaml'
+  
+  config = YAML.load(File.read(File.expand_path("~/.rubyforge/user-config.yml")))
+  host = "#{config["username"]}@rubyforge.org"
+  
+  rsync_args = "-v -c -r"
+  remote_dir = "/var/www/gforge-projects/mspire/projects/#{NAME}"
+  local_dir = "rdoc"
+ 
+  sh %{rsync #{rsync_args} #{local_dir}/ #{host}:#{remote_dir}}
 end
+
+#desc "create and upload docs to server"
+#task :upload_docs => [:rdoc] do
+#  sh "scp -r #{rdoc_dir}/* jtprince@rubyforge.org:/var/www/gforge-projects/mspire/projects/ms-msrun/"
+#end
 
 ###############################################
 # TESTS
@@ -77,8 +92,8 @@ gemspec = Gem::Specification.new do |t|
   t.has_rdoc = true
   t.authors = ["John Prince"]
   t.files = dist_files
-  t.add_dependency 'axml', '~> 0.0.5'
-  t.add_dependency 'runarray'
+  t.add_dependency 'axml', '~> 0.0.7'
+  t.add_dependency 'runarray', '~> 0.0.0'
   t.rdoc_options = rdoc_options
   t.extra_rdoc_files = rdoc_extra_includes
   t.executables = FL["bin/*"].map {|file| File.basename(file) }
