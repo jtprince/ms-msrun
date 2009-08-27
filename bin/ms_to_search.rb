@@ -19,6 +19,7 @@ class Ms::Msrun::Search < Tap::Task
   #config :min_peaks, 0, :short => 'P', &c.integer # minimum peak count
   #config :ms_levels, 2..-1, :short => 'M', &c.range  # ms levels to export
 
+  config 
 
   def process(filename)
     Ms::Msrun.open(filename) do |ms|
