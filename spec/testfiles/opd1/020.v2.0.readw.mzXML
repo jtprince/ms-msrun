@@ -356,27 +356,27 @@
   </scan>
  </msRun>
   <index name="scan">
-    <offset id="1">1149</offset>
-    <offset id="2">10003</offset>
-    <offset id="3">11017</offset>
-    <offset id="4">12228</offset>
-    <offset id="5">13296</offset>
-    <offset id="6">23335</offset>
-    <offset id="7">24244</offset>
-    <offset id="8">25916</offset>
-    <offset id="9">27235</offset>
-    <offset id="10">36654</offset>
-    <offset id="11">37951</offset>
-    <offset id="12">39304</offset>
-    <offset id="13">39939</offset>
-    <offset id="14">50083</offset>
-    <offset id="15">51888</offset>
-    <offset id="16">53299</offset>
-    <offset id="17">54916</offset>
-    <offset id="18">63621</offset>
-    <offset id="19">65437</offset>
-    <offset id="20">66727</offset>
+    <offset id="1">1147</offset>
+    <offset id="2">10001</offset>
+    <offset id="3">11015</offset>
+    <offset id="4">12226</offset>
+    <offset id="5">13294</offset>
+    <offset id="6">23333</offset>
+    <offset id="7">24242</offset>
+    <offset id="8">25914</offset>
+    <offset id="9">27233</offset>
+    <offset id="10">36652</offset>
+    <offset id="11">37949</offset>
+    <offset id="12">39302</offset>
+    <offset id="13">39937</offset>
+    <offset id="14">50081</offset>
+    <offset id="15">51886</offset>
+    <offset id="16">53297</offset>
+    <offset id="17">54914</offset>
+    <offset id="18">63619</offset>
+    <offset id="19">65435</offset>
+    <offset id="20">66725</offset>
   </index>
-  <indexOffset>13623066</indexOffset>
-  <sha1>f7c9ccdd385f0cfc124cc6d0ca3e2bb36e4a9090</sha1>
+  <indexOffset>68381</indexOffset>
+  <sha1>56789db4aa8d1eb473e1a533f91a2e98132f5776</sha1>
 </mzXML>

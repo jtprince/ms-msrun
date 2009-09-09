@@ -1,4 +1,4 @@
-require 'axml'
+require 'libxml'
 require 'ms/msrun'
 
 module Ms ; end
@@ -63,8 +63,12 @@ module Ms::Msrun::Index
           when :mzxml : MZXML_INDEX_TAG
           end
     size = File.size(filename)
+    p size
     File.open(filename) do |io|
       (offset, length) = index_offset(io, size, tag)
+      puts "HERER"
+      p offset
+      p length
       io.pos = offset
       xml = io.read(length)
       self.index_to_array(xml, offset, ft)
