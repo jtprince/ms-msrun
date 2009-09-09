@@ -10,13 +10,11 @@ class Sha1Spec < MiniTest::Spec
     super(*args)
   end
 
+  ## NOTE: this does NOT match up to real files yet!
   it 'can determine a sha1 for an mzxml file' do
     @files.each do |file|
       (actual, recorded) = Ms::Sha1.digest_mzxml_file file
       [actual, recorded].each {|v| assert !v.nil? }
-      puts "act and rec: "
-      p actual
-      p recorded
       actual.must_equal recorded
     end
   end

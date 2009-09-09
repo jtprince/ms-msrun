@@ -1,4 +1,4 @@
-require 'libxml'
+require 'rexml/document'
 require 'ms/msrun'
 
 module Ms ; end
@@ -32,12 +32,14 @@ module Ms::Msrun::Index
   # last_offset is used to calculate the length of the last scan object (or
   # whatever)
   def self.index_to_array(xml_string, last_offset, type=:mzml) # :nodoc:
+    indices = []
     case type
     when :mzxml
-      node = AXML.parse(xml_string)
-      indices = []
-      node.each do |child|
-        indices[child['id'].to_i] = child.text.to_i
+      doc = REXML::Document.new xml_string
+      root_el = doc.root
+      raise RuntimeError, "expecting scan index!" unless root_el.attributes['name'] == 'scan'
+      root_el.elements.each do |el|
+        indices << el.text.to_i
       end
     when :mzml
       raise NotImplementedError
@@ -53,22 +55,31 @@ module Ms::Msrun::Index
     new_indices
   end
 
-  # takes an mzxml filename
+  # takes an mzxml filename or io object
   # and returns an array of offsets and lengths for the scans
   # note that the offset 
-  def self.index(filename)
-    (ft, version) = Ms::Msrun.filetype_and_version(filename)
+  def self.index(filename_or_io)
+    (ft, version) = Ms::Msrun.filetype_and_version(filename_or_io)
     tag = case ft
           when :mzml : MZML_INDEX_TAG
           when :mzxml : MZXML_INDEX_TAG
           end
-    size = File.size(filename)
-    p size
-    File.open(filename) do |io|
+    #######################33
+    #
+    #
+    #
+    #
+    # WORKING HERE......  
+    #
+    #
+    #
+    size = 
+      if filename_or_io.is_a? String
+        File.size(filename_or_io)  # a filename
+      else # a File object
+      end
+    File.open(filename_or_io) do |io|
       (offset, length) = index_offset(io, size, tag)
-      puts "HERER"
-      p offset
-      p length
       io.pos = offset
       xml = io.read(length)
       self.index_to_array(xml, offset, ft)
