@@ -1,0 +1,11 @@
+<node1>
+    <node2>
+        <node3>my text</node3>
+    </node2>
+</node1>
+</node1>
+<node1 id="3">
+</node1>
+<node1 id="4">
+</node1>
+</msrun>

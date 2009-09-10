@@ -17,12 +17,18 @@ module MsrunSpec
   it 'reads header information' do
     Ms::Msrun.open(@file) do |ms|
       key['header'].each do |k,v|
+        #puts "K: #{k} Vexp: #{v} Vact: #{ms.send(k.to_sym)}"
         ms.send(k.to_sym).must_equal v
       end
     end
   end
 
-  it 'reads spectra' do
+  it 'can access random scans' do
+    Ms::Msrun.open(@file) do |ms|
+    end
+  end
+
+  xit 'reads spectra' do
     first = true
     Ms::Msrun.open(@file) do |ms|
       ms.scans.each do |scan|

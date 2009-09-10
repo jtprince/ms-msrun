@@ -1,6 +1,6 @@
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 
-require 'ms/sha1'
+require 'ms/msrun/sha1'
 
 class Sha1Spec < MiniTest::Spec
   def initialize(*args)
@@ -13,7 +13,7 @@ class Sha1Spec < MiniTest::Spec
   ## NOTE: this does NOT match up to real files yet!
   it 'can determine a sha1 for an mzxml file' do
     @files.each do |file|
-      (actual, recorded) = Ms::Sha1.digest_mzxml_file file
+      (actual, recorded) = Ms::Msrun::Sha1.digest_mzxml_file file
       [actual, recorded].each {|v| assert !v.nil? }
       actual.must_equal recorded
     end

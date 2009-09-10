@@ -3,9 +3,14 @@ require 'ms/scan'
 require 'ms/precursor'
 require 'ms/spectrum'
 require 'ms/msrun/search'
+require 'ms/msrun/index'
 
 module Ms; end
 class Ms::Msrun
+
+  #DEFAULT_PARSER = 'axml'
+  #DEFAULT_PARSER = 'regexp'
+  DEFAULT_PARSER = 'nokogiri'
 
   # the retention time in seconds of the first scan (regardless of any
   # meta-data written in the header)
@@ -39,6 +44,12 @@ class Ms::Msrun
   # this will be nil.
   attr_accessor :parent_location
 
+  # an array of doublets, [start_byte, length] for each scan element
+  attr_accessor :index
+
+  # holds the class that parses the file
+  attr_accessor :parser
+
   # Opens the filename 
   def self.open(filename, &block)
     File.open(filename) {|io| block.call( self.new(io, filename) ) }
@@ -51,14 +62,18 @@ class Ms::Msrun
     @scan_counts = nil
     @filename = filename
     @filetype, @version = Ms::Msrun.filetype_and_version(io)
-    parser = Ms::Msrun.get_parser(@filetype, @version)
-    parser.new.parse(self, io, @version)
+    parser_klass = Ms::Msrun.get_parser(@filetype, @version)
+
+    @parser = parser_klass.new(self, io, @version)
+    @parser.parse_header
+    @index = Ms::Msrun::Index.new(io)
     @scan_counts = nil  # <- to keep warnings away
   end
 
   def parent_basename_noext
     @parent_basename.chomp(File.extname(@parent_basename))
   end
+
 
   # returns each scan
   def each(&block)
@@ -72,10 +87,9 @@ class Ms::Msrun
     end
   end
 
-  # returns the scan at that number
+  # returns a Ms::Scan object for the scan at that number
   def scan(num)
-    p scans[0]
-    scans[num]
+    @parser.parse_scan(*(@index[num]))
   end
 
   bracket_method = '[]'.to_sym
@@ -212,9 +226,9 @@ class Ms::Msrun
 
 
   def self.get_parser(filetype, version)
-    require "ms/msrun/axml/#{filetype}"
+    require "ms/msrun/#{DEFAULT_PARSER}/#{filetype}"
     parser_class = filetype.to_s.capitalize
-    base_class = Ms::Msrun::Axml
+    base_class = Ms::Msrun.const_get( DEFAULT_PARSER.capitalize )
     if base_class.const_defined? parser_class
       base_class.const_get parser_class
     else
@@ -263,6 +277,7 @@ class Ms::Msrun
     if file_or_io.is_a? IO
       io = file_or_io
       found = nil
+      io.rewind
       # Test for RAW file:
       header = io.read(18).unpack(Raw_header_unpack_code).join
       if header == 'Finnigan'
