@@ -65,15 +65,14 @@ class Ms::Msrun
     parser_klass = Ms::Msrun.get_parser(@filetype, @version)
 
     @parser = parser_klass.new(self, io, @version)
-    @parser.parse_header
     @index = Ms::Msrun::Index.new(io)
+    @parser.parse_header(@index.header_length)
     @scan_counts = nil  # <- to keep warnings away
   end
 
   def parent_basename_noext
     @parent_basename.chomp(File.extname(@parent_basename))
   end
-
 
   # returns each scan
   def each(&block)
@@ -92,8 +91,8 @@ class Ms::Msrun
     @parser.parse_scan(*(@index[num]))
   end
 
-  bracket_method = '[]'.to_sym
-  alias_method bracket_method, :scan
+  #bracket_method = '[]'.to_sym
+  #alias_method bracket_method, :scan
 
   def scans_by_ms_level
     by_level = []

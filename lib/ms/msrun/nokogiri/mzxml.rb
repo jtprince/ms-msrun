@@ -10,6 +10,7 @@ require 'ms/mzxml'
 module Ms
   class Msrun
     module Nokogiri
+      NOBLANKS = ::Nokogiri::XML::ParseOptions::DEFAULT_XML | ::Nokogiri::XML::ParseOptions::NOBLANKS
     end
   end
 end
@@ -26,28 +27,27 @@ class Ms::Msrun::Nokogiri::Mzxml
   end
 
   # returns the msrun
-  def parse_header(length_of_header)
-    io.rewind
-    Nio.read(length_of_header)
-    while line = @io.gets
-      if line =~ %r{\s+fileName=['"](.*?)['"]}
-        (bn, dn) = Ms::Mzxml.parent_basename_and_dir($1)
-        @msrun.parent_basename = bn
-        @msrun.parent_location = dn
+  def parse_header(byte_length_or_header_string)
+    string = 
+      if byte_length_or_header_string.is_a? Integer
+        @io.rewind
+        @io.read(byte_length_or_header_string)
+      else
+        length_or_header_string
       end
-      if line =~ /\s+scanCount=['"](\w+)['"]/
-        @msrun.scan_count = $1.to_i
-      end
-      if line =~ /startTime=['"]([\w\.]+)['"]/
-        @msrun.start_time = $1[2...-1].to_f
-      end
-      if line =~ /endTime=['"]([\w\.]+)['"]/
-        @msrun.end_time = $1[2...-1].to_f
-      end
-      if @io =~ /^\s*<scan/
-        break
-      end
+    doc = Nokogiri::XML.parse(string, nil, nil, Ms::Msrun::Nokogiri::NOBLANKS)
+    msrun_n = doc.root 
+    if @version >= '2.0'
+      msrun_n = msrun_n.child
     end
+    @msrun.scan_count = msrun_n['scanCount'].to_i
+    @msrun.start_time = msrun_n['startTime'][2...-1].to_f
+    @msrun.end_time = msrun_n['endTime'][2...-1].to_f
+
+    filename = msrun_n.search("parentFile").first['fileName']
+    (bn, dn) = Ms::Mzxml.parent_basename_and_dir(filename)
+    @msrun.parent_basename = bn
+    @msrun.parent_location = dn
     @msrun
   end
 
@@ -74,34 +74,56 @@ class Ms::Msrun::Nokogiri::Mzxml
 
   # we have to do this because nokogiri doesn't keep track of the byte
   # position for us!
-  def peak_start_and_length(string)
-    end_pos = string.rindex("</peak>")
-    string.rindex(">", end_pos)
+  def peakdata_start_and_length(string)
+    end_pos = string.rindex("</peaks>")
+    start = string.rindex(">", end_pos) + 1
+    [start, (end_pos - start)]
   end
   
   # assumes that the io object has been set to the beginning of the scan
   # element.  Returns an Ms::Scan object
-  def parse_scan(start_byte, length)
-    string = io.read(length, start_byte)
-    node_set = Nokogiri::XML.parse(string, nil, nil, Nokogiri::XML::ParseOptions::DEFAULT_XML | Nokogiri::XML::ParseOptions::NOBLANKS )
-
-    scan_n = node_set.child
+  # options: 
+  #     :spectrum => true | false (default is true)
+  #     :precursor => true | false (default is true)
+  def parse_scan(start_byte, length, options={})
+    opts = {:spectrum => true}.merge(options)
+    start_io_pos = @io.pos
+    @io.pos = start_byte
+    string = @io.read(length)
+    doc = Nokogiri::XML.parse(string, nil, nil, Ms::Msrun::Nokogiri::NOBLANKS )
+    scan_n = doc.root
     scan = new_scan_from_node( scan_n )
+    prec_n = scan_n.child
 
-    prec_n = scan_n / "child::precursorMz"
-    prec = Ms::Precursor.new
-    prec[1] = node['precursorIntensity'].to_f
-    prec[0] = node.text.to_f
-    if x = node['precursorCharge']
-      prec[3] = [x.to_i]
-    end
+    peaks_n = 
+      if prec_n.name == 'precursorMz'
+        if opts[:precursor]
+          prec = Ms::Precursor.new
+          prec[1] = prec_n['precursorIntensity'].to_f
+          prec[0] = prec_n.text.to_f
+          if x = prec_n['precursorCharge']
+            prec[3] = [x.to_i]
+          end
+          scan.precursor = prec
+        end
+        prec_n.next_sibling
+      else
+        prec_n # this is a peaks node
+      end
+    raise RuntimeError, "expecting peaks node!" unless peaks_n.name == 'peaks'
+
     # is this for mzData?
     #if x = node['precursorScanNum']
     #  prec[2] = scans_by_num[x.to_i]
     #end
-    (start, length) = peak_start_and_length(string)
-    data = Ms::Data::LazyIO.new(io, <start_byte>, <length>, Ms::Data::LazyIO.unpack_code(peak_n['precision'].to_i, NetworkOrder))
-    scan[8] = Ms::Spectrum.new(Ms::Data::Interleaved.new(data))
+    
+    if opts[:spectrum]
+      (string_start, string_length) = peakdata_start_and_length(string)
+      peaks_start_byte = start_io_pos + string_start
+
+      data = Ms::Data::LazyIO.new(@io, peaks_start_byte, string_length, Ms::Data::LazyIO.unpack_code(peaks_n['precision'].to_i, NetworkOrder))
+      scan[8] = Ms::Spectrum.new(Ms::Data::Interleaved.new(data))
+    end
     scan
   end
 
@@ -120,7 +142,6 @@ class Ms::Msrun::Nokogiri::Mzxml
     end
     scan
   end
-
 
 end
 

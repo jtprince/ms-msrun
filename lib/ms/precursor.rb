@@ -1,8 +1,9 @@
 
 module Ms
   # charge_states are the possible charge states of the precursor
-  # parent references a scan
-  PrecursorAtts = [:mz, :intensity, :parent, :charge_states]
+  # parent references a scan and scan references the scan the precursor
+  # belongs to (i.e., the scan holding the precursor information).
+  PrecursorAtts = [:mz, :intensity, :parent, :charge_states, :scan]
 end
 
 Ms::Precursor = Struct.new(*Ms::PrecursorAtts)

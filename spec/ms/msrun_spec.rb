@@ -25,17 +25,19 @@ module MsrunSpec
 
   it 'can access random scans' do
     Ms::Msrun.open(@file) do |ms|
+      p ms.scan(2)
     end
   end
 
-  xit 'reads spectra' do
-    first = true
-    Ms::Msrun.open(@file) do |ms|
-      ms.scans.each do |scan|
-        puts "NEED TO WRITE SCAN/SPECTRUM TESTS!"
-      end
-    end
-  end
+  #it 'reads spectra' do
+    #first = true
+    #Ms::Msrun.open(@file) do |ms|
+      #ms.each do |scan|
+        #p scan
+        #puts "NEED TO WRITE SCAN/SPECTRUM TESTS!"
+      #end
+    #end
+  #end
 
 end
 
@@ -47,19 +49,19 @@ class Mzxml_v1 < MiniTest::Spec
   end
 end
 
-class Mzxml_v2_0 < MiniTest::Spec
-  include MsrunSpec
-  before do
-    super
-    @file = TESTFILES + '/opd1/020.v2.0.readw.mzXML'
-  end
-end
+#class Mzxml_v2_0 < MiniTest::Spec
+  #include MsrunSpec
+  #before do
+    #super
+    #@file = TESTFILES + '/opd1/020.v2.0.readw.mzXML'
+  #end
+#end
 
-class Mzxml_v2_1 < MiniTest::Spec
-  include MsrunSpec
-  before do
-    super
-    @file = TESTFILES + '/opd1/000.v2.1.mzXML'
-  end
-end
+#class Mzxml_v2_1 < MiniTest::Spec
+  #include MsrunSpec
+  #before do
+    #super
+    #@file = TESTFILES + '/opd1/000.v2.1.mzXML'
+  #end
+#end
 
