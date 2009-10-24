@@ -7,6 +7,7 @@ require 'ms/msrun/index'
 
 module Ms; end
 class Ms::Msrun
+  include Enumerable
 
   #DEFAULT_PARSER = 'axml'
   #DEFAULT_PARSER = 'regexp'
@@ -18,8 +19,6 @@ class Ms::Msrun
   # the retention time in seconds of the last scan (regardless of any
   # meta-data written in the header)
   attr_accessor :end_time
-  # an array of scans
-  attr_accessor :scans
 
   # The filetype. Valid types (for parsing) are:
   #   :mzxml
@@ -75,9 +74,12 @@ class Ms::Msrun
   end
 
   # returns each scan
-  def each(&block)
-    scans.each(&block)
+  def each_scan(parse_opts={}, &block)
+    @index.scan_nums.each do |scan_num|
+      block.call(scan(scan_num, parse_opts))
+    end
   end
+  alias_method :each, :each_scan
 
   # opens the file and yields each scan in the block
   def self.foreach(filename, &block)
@@ -87,20 +89,13 @@ class Ms::Msrun
   end
 
   # returns a Ms::Scan object for the scan at that number
-  def scan(num)
-    @parser.parse_scan(*(@index[num]))
+  def scan(num, parse_opts={})
+    #@parser.parse_scan(*(@index[num]), parse_opts)
+    @parser.parse_scan(@index[num].first, @index[num].last, parse_opts)
   end
 
   #bracket_method = '[]'.to_sym
   #alias_method bracket_method, :scan
-
-  def scans_by_ms_level
-    by_level = []
-    scans.each do |scan|
-      by_level[scan.ms_level] = scan
-    end
-    by_level
-  end
 
   # returns an array, whose indices provide the number of scans in each index level the ms_levels, [0] = all the scans, [1] = mslevel 1, [2] = mslevel 2,
   # ...

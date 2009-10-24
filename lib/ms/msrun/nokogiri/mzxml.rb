@@ -51,45 +51,62 @@ class Ms::Msrun::Nokogiri::Mzxml
     @msrun
   end
 
-  def parse_peaks
-    precision = 32
-    byte_order = 'network'
-    while line = @io.gets
-      if line =~ /(precision|byteOrder)=["'](\w+)["']/
-        case $1
-        when 'precision'
-          $2.to_i
-        when 'byteOrder'
-          byte_order = $2
-        end
-      end
-      if line =~ %r{</peaks>}
-        first_pos = line.index('>')
-        last_pos = @io.pos + line.rindex("</peaks>")
-        Ms::Spectrum
+  # returns the ms_level as an Integer, nil if it cannot be found.
+  def parse_ms_level(start_byte, length)
+    start_io_pos = @io.pos
+    @io.pos = start_byte
+    ms_level = nil
+    total_length = 0
+    @io.each("\n") do |line|
+      if line =~ /msLevel="(\d+)"/o
+        ms_level = $1.to_i
         break
       end
+      total_length += line.size
+      break if total_length > length
     end
+    @io.pos = start_io_pos
+    ms_level
   end
 
-  # we have to do this because nokogiri doesn't keep track of the byte
-  # position for us!
-  def peakdata_start_and_length(string)
-    end_pos = string.rindex("</peaks>")
-    start = string.rindex(">", end_pos) + 1
-    [start, (end_pos - start)]
-  end
-  
   # assumes that the io object has been set to the beginning of the scan
   # element.  Returns an Ms::Scan object
   # options: 
   #     :spectrum => true | false (default is true)
   #     :precursor => true | false (default is true)
+  #
+  # Note that if both :spectrum and :precursor are set to false, the basic
+  # information in the scan node *is* parsed (such as ms_level)
   def parse_scan(start_byte, length, options={})
-    opts = {:spectrum => true}.merge(options)
+    opts = {:spectrum => true, :precursor => true}.merge(options)
     start_io_pos = @io.pos
     @io.pos = start_byte
-    string = @io.read(length)
+
+    # read in the data keeping track of peaks start and stop
+    string = ""
+    if opts[:spectrum]
+      string = @io.read(length)
+    else
+      # don't bother reading all the peak information if we aren't wanting it
+      # and can avoid it!  This is important for high res instruments
+      # especially since the peak data is huge.
+      @io.each do |line|
+        if md = %r{<peaks}.match(line)
+          # just add the part of the string before the <peaks> tag
+          string << line.slice!(0, md.end(0) - 6)
+          break
+        else
+          string << line
+          if string.size >= length
+            if string.size > length
+              string.slice!(0,length)
+            end
+            break
+          end
+        end
+      end
+    end
+        
     doc = Nokogiri::XML.parse(string, nil, nil, Ms::Msrun::Nokogiri::NOBLANKS )
     scan_n = doc.root
     scan = new_scan_from_node( scan_n )
@@ -116,13 +133,15 @@ class Ms::Msrun::Nokogiri::Mzxml
     #if x = node['precursorScanNum']
     #  prec[2] = scans_by_num[x.to_i]
     #end
-    
+     
     if opts[:spectrum]
-      (string_start, string_length) = peakdata_start_and_length(string)
-      peaks_start_byte = start_io_pos + string_start
-
-      data = Ms::Data::LazyIO.new(@io, peaks_start_byte, string_length, Ms::Data::LazyIO.unpack_code(peaks_n['precision'].to_i, NetworkOrder))
-      scan[8] = Ms::Spectrum.new(Ms::Data::Interleaved.new(data))
+      # all mzXML (at least versions 1--3.0) *must* be 'network' byte order!
+      # data is stored as the base64 string until we actually try to access
+      # it!  At that point the string is decoded and knows it is interleaved
+      # data.  So, no spectrum is actually decoded unless it is accessed!
+      peaks_data = Ms::Data.new_interleaved(Ms::Data::LazyString.new(peaks_n.text, Ms::Data::LazyIO.unpack_code(peaks_n['precision'].to_i, NetworkOrder)))
+      spec = Ms::Spectrum.new(peaks_data)
+      scan[8] = Ms::Spectrum.new(peaks_data)
     end
     scan
   end

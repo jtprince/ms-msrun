@@ -14,6 +14,17 @@ module MsrunSpec
     @key || @key = YAML.load_file(@file + '.key.yml')
   end
 
+  def hash_match(hash, obj)
+    hash.each do |k,v|
+      if v.is_a?(Hash)
+        hash_match(v, obj.send(k.to_sym))
+      else
+        puts "#{k}: #{v} but was #{obj.send(k.to_sym)}" if obj.send(k.to_sym) != v
+        obj.send(k.to_sym).must_equal v
+      end
+    end
+  end
+
   it 'reads header information' do
     Ms::Msrun.open(@file) do |ms|
       key['header'].each do |k,v|
@@ -25,20 +36,31 @@ module MsrunSpec
 
   it 'can access random scans' do
     Ms::Msrun.open(@file) do |ms|
-      p ms.scan(2)
+      scan = ms.scan(20)
+      hash_match(key['scans'][20], scan)
     end
   end
 
-  #it 'reads spectra' do
-    #first = true
-    #Ms::Msrun.open(@file) do |ms|
-      #ms.each do |scan|
-        #p scan
-        #puts "NEED TO WRITE SCAN/SPECTRUM TESTS!"
-      #end
-    #end
+  it 'can read all scans' do
+    total = (1..20).to_a.inject(0) {|sum,v| sum + v }
+    Ms::Msrun.open(@file) do |ms|
+      ms.each do |scan|
+        # do something with your scan
+        total -= scan.num
+      end
+    end
+    total.must_equal 0
+  end
+
+  working here 
+  ################ WORKING HERE!
+  #it 'can avoid reading spectrum' do 
+  #  Ms::Msrun.foreach(@file) do |scan|  # <- like IO.foreach 
+  #  end
   #end
 
+  #it 'can just read ms_level' do
+  #end
 end
 
 class Mzxml_v1 < MiniTest::Spec

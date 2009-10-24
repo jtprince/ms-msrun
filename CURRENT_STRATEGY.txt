@@ -1,0 +1,2 @@
+
+current strategy is to have laziness at the *scan* level.  Scans can then be parsed completely, or for everything besided peak information.  Spectrum themselves (if parsed) are *not* lazy.  This is really the only sane strategy considering the limitations of most xml parsers (i.e., that they won't give the io position of a particular position).
