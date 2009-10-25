@@ -1,5 +1,6 @@
-require 'rexml/document'
+require 'nokogiri'
 require 'ms/msrun'
+require 'ms/msrun/nokogiri'
 
 module Ms ; end
 class Ms::Msrun ; end
@@ -102,12 +103,12 @@ class Ms::Msrun::Index < Array
     @scan_nums = []
     case type
     when :mzxml
-      doc = REXML::Document.new xml_string
+      doc = Nokogiri::XML.parse(xml_string, *Ms::Msrun::Nokogiri::PARSER_ARGS)
       root_el = doc.root
-      raise RuntimeError, "expecting scan index!" unless root_el.attributes['name'] == 'scan'
-      root_el.elements.each do |el|
+      raise RuntimeError, "expecting scan index!" unless root_el['name'] == 'scan'
+      root_el.children.each do |el|
         indices << el.text.to_i
-        @scan_nums << el.attributes['id'].to_i
+        @scan_nums << el['id'].to_i
       end
     when :mzml
       raise NotImplementedError
@@ -122,5 +123,31 @@ class Ms::Msrun::Index < Array
     end
     new_indices
   end
+
+
+=begin
+   <index name="scan">
+    <offset id="1">1147</offset>
+    <offset id="2">10001</offset>
+    <offset id="3">11015</offset>
+    <offset id="4">12226</offset>
+    <offset id="5">13294</offset>
+    <offset id="6">23333</offset>
+    <offset id="7">24242</offset>
+    <offset id="8">25914</offset>
+    <offset id="9">27233</offset>
+    <offset id="10">36652</offset>
+    <offset id="11">37949</offset>
+    <offset id="12">39302</offset>
+    <offset id="13">39937</offset>
+    <offset id="14">50081</offset>
+    <offset id="15">51886</offset>
+    <offset id="16">53297</offset>
+    <offset id="17">54914</offset>
+    <offset id="18">63619</offset>
+    <offset id="19">65435</offset>
+    <offset id="20">66725</offset>
+  </index>
+=end
 
 end

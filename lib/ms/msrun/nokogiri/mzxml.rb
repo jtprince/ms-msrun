@@ -1,5 +1,6 @@
 
 require 'nokogiri'
+require 'ms/msrun/nokogiri'
 require 'ms/msrun'
 require 'ms/spectrum'
 require 'ms/data'
@@ -7,13 +8,6 @@ require 'ms/data/lazy_io'
 require 'ms/precursor'
 require 'ms/mzxml'
 
-module Ms
-  class Msrun
-    module Nokogiri
-      NOBLANKS = ::Nokogiri::XML::ParseOptions::DEFAULT_XML | ::Nokogiri::XML::ParseOptions::NOBLANKS
-    end
-  end
-end
 
 class Ms::Msrun::Nokogiri::Mzxml
   NetworkOrder = true
@@ -35,7 +29,7 @@ class Ms::Msrun::Nokogiri::Mzxml
       else
         length_or_header_string
       end
-    doc = Nokogiri::XML.parse(string, nil, nil, Ms::Msrun::Nokogiri::NOBLANKS)
+    doc = Nokogiri::XML.parse(string, *Ms::Msrun::Nokogiri::PARSER_ARGS)
     msrun_n = doc.root 
     if @version >= '2.0'
       msrun_n = msrun_n.child
@@ -106,8 +100,8 @@ class Ms::Msrun::Nokogiri::Mzxml
         end
       end
     end
-        
-    doc = Nokogiri::XML.parse(string, nil, nil, Ms::Msrun::Nokogiri::NOBLANKS )
+
+    doc = Nokogiri::XML.parse(string, *Ms::Msrun::Nokogiri::PARSER_ARGS)
     scan_n = doc.root
     scan = new_scan_from_node( scan_n )
     prec_n = scan_n.child
@@ -127,7 +121,6 @@ class Ms::Msrun::Nokogiri::Mzxml
       else
         prec_n # this is a peaks node
       end
-    raise RuntimeError, "expecting peaks node!" unless peaks_n.name == 'peaks'
 
     # is this for mzData?
     #if x = node['precursorScanNum']
@@ -156,9 +149,9 @@ class Ms::Msrun::Nokogiri::Mzxml
     if x = node['startMz']
       scan[3] = x.to_f
       scan[4] = node['endMz'].to_f
-      scan[5] = node['peaksCount'].to_i
-      scan[6] = node['totIonCurrent'].to_f
     end
+    scan[5] = node['peaksCount'].to_i
+    scan[6] = node['totIonCurrent'].to_f
     scan
   end
 

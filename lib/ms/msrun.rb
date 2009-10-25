@@ -74,21 +74,41 @@ class Ms::Msrun
   end
 
   # returns each scan
+  # options:
+  #     :spectrum => true | false (default is true)
+  #     :precursor => true | false (default is true)
+  #     :ms_level => Integer or Array return only scans of that level
   def each_scan(parse_opts={}, &block)
+    ms_levels = 
+      if msl = parse_opts[:ms_level]
+        if msl.is_a?(Integer) ; [msl]
+        else ; msl  
+        end
+      end
     @index.scan_nums.each do |scan_num|
+      if ms_levels
+        next unless ms_levels.include?(ms_level(scan_num))
+      end
       block.call(scan(scan_num, parse_opts))
     end
   end
   alias_method :each, :each_scan
 
   # opens the file and yields each scan in the block
-  def self.foreach(filename, &block)
+  # see each_scan for parsing options
+  def self.foreach(filename, parse_opts={}, &block)
     self.open(filename) do |obj|
-      obj.each(&block)
+      obj.each_scan(parse_opts, &block)
     end
   end
 
+  # a very fast method to only query the ms_level of a scan
+  def ms_level(num)
+    @parser.parse_ms_level(@index[num].first, @index[num].last)
+  end
+
   # returns a Ms::Scan object for the scan at that number
+  #
   def scan(num, parse_opts={})
     #@parser.parse_scan(*(@index[num]), parse_opts)
     @parser.parse_scan(@index[num].first, @index[num].last, parse_opts)
