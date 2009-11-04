@@ -66,7 +66,6 @@ class Ms::Msrun
     @parser = parser_klass.new(self, io, @version)
     @index = Ms::Msrun::Index.new(io)
     @parser.parse_header(@index.header_length)
-    @scan_counts = nil  # <- to keep warnings away
   end
 
   def parent_basename_noext
@@ -123,7 +122,7 @@ class Ms::Msrun
     return @scan_counts if @scan_counts
     ar = []
     ar[0] = 0
-    scans.each do |sc|
+    each_scan do |sc|
       level = sc.ms_level
       unless ar[level]
         ar[level] = 0
@@ -141,13 +140,7 @@ class Ms::Msrun
       if mslevel == 0
         @scan_count 
       else
-        num = 0
-        scans.each do |sc|
-          if sc.ms_level == mslevel
-            num += 1
-          end
-        end
-        num
+        scan_counts[mslevel]
       end
     end
   end

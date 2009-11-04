@@ -83,6 +83,15 @@ module MsrunSpec
       assert scan.precursor.nil?
     end
   end
+
+  it 'gives scan counts for different ms levels' do
+    Ms::Msrun.open(@file) do |ms|
+      key['scan_count'].each do |index, count|
+        ms.scan_count(index).must_equal count
+      end
+    end
+  end
+
 end
 
 class Mzxml_v1 < MiniTest::Spec
