@@ -1,37 +1,29 @@
 #!/usr/bin/ruby
 
 require 'rubygems'
-require 'tap'
+require 'optparse'
+require 'ms/msrun/search'
 
+opts = OptionParser.new do |op|
+  op.banner = "usage: #{File.basename(__FILE__)} <file>.mzXML ..."
+  op.separator "outputs: <file>.mgf"
+  op.separator "[by default outputs .mgf file]"
 
-module Ms ; end
-class Ms::Msrun ; end
+end
 
-# Documentation here
-class Ms::Msrun::Search < Tap::Task
-  
-  #config :first_scan, 0, :short => 'F', &c.integer # first scan
-  #config :last_scan, 1e12, :short => 'L', &c.integer  # last scan
-  ## if not determined to be +1, then create these charge states
-  #config( :charge_states, [2,3], :short => 'c') {|v| v.split(',') }
-  #config :bottom_mh, 0, :short => 'B', &c.float # bottom MH+ 
-  #config :top_mh, -1.0, :short => 'T', &c.float # top MH+
-  #config :min_peaks, 0, :short => 'P', &c.integer # minimum peak count
-  #config :ms_levels, 2..-1, :short => 'M', &c.range  # ms levels to export
+if ARGV.size == 0
+  puts opts.to_s
+  exit
+end
 
-  config 
-
-  def process(filename)
-    Ms::Msrun.open(filename) do |ms|
-      ms.to_mgf(ms.filename.chomp(File.extname(ms.filename)))
-    end
+ARGV.each do |file|
+  Ms::Msrun.open(file) do |ms|
+    outfile = ms.to_mgf(file.sub(/\.mzxml/i, '.mgf'))
+    ms.to_mgf(outfile)
   end
 end
 
-Ms::Msrun::Search.execute
-
 # extract_msn.exe -M0.2 -B85 -T4500 -S0 -G1 -I35 -C0 -P2 -D output smallraw.RAW
-
 
   #config :group_mass_tol, 1.4, :short => 'M', &c.float # prec. mass tolerance for grouping
   #config :bottom_mw, 0.0, :short => 'B', &c.float # bottom MW for data file creation
