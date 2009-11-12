@@ -14,11 +14,12 @@ module Ms
 
     module Search
 
-      # returns a string, or writes the string to file if given an out_filename
-      # if given a filename or IO object, returns the number of spectra
-      # written
-      def to_mgf(file_or_io=nil, opts={})
+      # returns a string unless :output given (may be a String (filename) or a
+      # writeable IO object in which case the data is written to file or io
+      # and the number of spectra written is returned
+      def to_mgf(opts={})
         opts = {
+          :output => nil,  # an output file or io object
           :bottom_mh => 0.0,
           :top_mh => nil,
           :ms_levels => (2..-1),  # range or intger, -1 at end will be substituted for last level
@@ -29,8 +30,10 @@ module Ms
           :prec_int_precision => 2,
           :frag_mz_precision => 5,
           :frag_int_precision => 1,
+          :charge_states_for_unknowns => [2,3],
+          :determine_plus_ones => false,
         }.merge(opts)
-       (_first_scan, _last_scan, _bottom_mh, _top_mh, _ms_levels, _min_peaks, _charge_states, _prec_mz_precision, _prec_int_precision, _frag_mz_precision, _frag_int_precision) = opts.values_at(:first_scan, :last_scan, :bottom_mh, :top_mh, :ms_levels, :min_peaks, :charge_states, :prec_mz_precision, :prec_int_precision, :frag_mz_precision, :frag_int_precision)
+       (_first_scan, _last_scan, _bottom_mh, _top_mh, _ms_levels, _min_peaks, _charge_states_for_unknowns, _prec_mz_precision, _prec_int_precision, _frag_mz_precision, _frag_int_precision, _determine_plus_ones) = opts.values_at(:first_scan, :last_scan, :bottom_mh, :top_mh, :ms_levels, :min_peaks, :charge_states_for_unknowns, :prec_mz_precision, :prec_int_precision, :frag_mz_precision, :frag_int_precision, :determine_plus_ones)
 
        sep = ' '
 
@@ -39,7 +42,7 @@ module Ms
        end
 
        if _last_scan.nil? or _last_scan == -1
-         _last_scan = scans.last.num
+         _last_scan = self.scan_nums.last
        end
 
        if !_ms_levels.is_a?(Integer) && _ms_levels.last == -1
@@ -49,24 +52,29 @@ module Ms
         prec_string = "PEPMASS=%0.#{_prec_mz_precision}f %0.#{_prec_int_precision}f\n"
         frag_string = "%0.#{_frag_mz_precision}f%s%0.#{_frag_int_precision}f\n"
 
-        any_input(file_or_io) do |out, out_type|
-          scans.each do |scan|
+        any_output(opts[:output]) do |out, out_type|
+          each_scan(:ms_level => _ms_levels) do |scan|
             sn = scan.num
 
-            next unless _ms_levels === scan.ms_level
             next unless sn >= _first_scan and sn <= _last_scan
             next unless scan.num_peaks >= _min_peaks
 
-            # tic under precursor > 95% and true = save the spectrum info
-            if scan.plus1?(0.95)
-              _charge_states = [1]
+            
+            if _determine_plus_ones
+              # tic under precursor > 95% and true = save the spectrum info
+              if scan.plus1?(0.95)
+                _charge_states = [1]
+              end
             end
 
-            # (scanHeader.precursorMZ * iCharge) - (iCharge - 1)*dChargeMass;
+            chrg_sts = scan.precursor.charge_states
+            if chrg_sts.nil? || !chrg_sts.first.is_a?(Integer)
+              chrg_sts = _charge_states_for_unknowns
+            end
 
             pmz = scan.precursor && scan.precursor.mz
 
-            _charge_states.each do |z|
+            chrg_sts.each do |z|
               mh = (pmz * z) - (z - 1)*Ms::Mass::PROTON
               next unless (mh >= _bottom_mh) 
               next unless (mh <= _top_mh) if _top_mh
@@ -79,8 +87,6 @@ module Ms
               end
               out.puts "END IONS\n\n"
             end
-
-            scan.spectrum.data.reset
           end
 
           if out_type == :string_io
@@ -94,7 +100,7 @@ module Ms
 
 
       # yields an IO object and the type input (:io, :filename, :string_io)
-      def any_input(arg, &block)
+      def any_output(arg, &block)
         # this is pretty ugly, can we clean up?
           if arg.is_a? IO  # an IO object passed in
             block.call(arg, :io)

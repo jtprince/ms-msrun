@@ -93,12 +93,11 @@ gemspec = Gem::Specification.new do |t|
   t.authors = ["John Prince"]
   t.files = dist_files
   t.add_dependency 'ms-core'
-  t.add_dependency 'axml', '~> 0.0.7'
-  t.add_dependency 'runarray', '~> 0.0.0'
+  t.add_dependency 'nokogiri'
+  t.add_dependency 'runarray'
   t.rdoc_options = rdoc_options
   t.extra_rdoc_files = rdoc_extra_includes
   t.executables = FL["bin/*"].map {|file| File.basename(file) }
-  t.requirements << 'xmlparser (preferrably) or libxml'
   t.test_files = FL["spec/**/*_spec.rb"]
 end
 

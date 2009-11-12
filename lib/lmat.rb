@@ -100,10 +100,8 @@ class Lmat
       times = []
       @nvec = nil
       vecs = []
-      puts $VERBOSE
       num_scans = msrun.scan_count
       printf "Reading #{num_scans} spectra [.=100]" if $VERBOSE
-      puts "HIYA3"
       spectrum_cnt = 0
       msrun.each do |scan|
         spectrum = scan.spectrum

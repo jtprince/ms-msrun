@@ -5,3 +5,10 @@
 *   cleaned up code a lot
 *   uses Struct instead of Arrayclass to minimize dependencies
 *   bumps task of providing indices for peak data onto AXML 
+
+## version 0.1.0
+* switched to nokogiri as the xml parser
+* using mzxml indices to read scans (lazy reading of scans)
+* semi-lazy reading of spectrum (lazy string)
+*   the string is not converted into a spectrum until an mz value is asked for
+* lots of interface changes

@@ -61,18 +61,18 @@ Scan3 = '<scan num="4"
            </msRun>
 '
 
-class Sha1Spec < MiniTest::Spec
-  def initialize(*args)
-    @files = %w(000.v1.mzXML 020.v2.0.readw.mzXML 000.v2.1.mzXML).map do |file|
-      TESTFILES + "/opd1/#{file}"
-    end
-    super(*args)
-  end
+#class Sha1Spec < MiniTest::Spec
+  #def initialize(*args)
+    #@files = %w(000.v1.mzXML 020.v2.0.readw.mzXML 000.v2.1.mzXML).map do |file|
+      #TESTFILES + "/opd1/#{file}"
+    #end
+    #super(*args)
+  #end
 
-  ## NOTE: this does NOT match up to real files yet!
-  it 'can read xml scans with extra or missing tags' do
-    Scan.new(from_xml)    
-  end
+  ### NOTE: this does NOT match up to real files yet!
+  #it 'can read xml scans with extra or missing tags' do
+    #Scan.new(from_xml)    
+  #end
 
 
-end
+#end

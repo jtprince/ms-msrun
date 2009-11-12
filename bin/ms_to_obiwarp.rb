@@ -37,11 +37,8 @@ ARGV.each do |file|
   Ms::Msrun.open(file) do |msrun|
     mslevel = 1
     lmat = Lmat.new
-    puts "WORK1"
     t = Time.now
     lmat.from_msrun(msrun, opt)
-    print "Took: #{Time.now - t} sec"
-    puts "WORK2"
     ext = File.extname(file)
     outfile = file.sub(/#{Regexp.escape(ext)}$/, opt[:newext])
       if opt[:ascii]
