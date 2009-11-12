@@ -64,49 +64,67 @@ class Lmat
     self
   end
 
-  # converts raw times and spectrum to a labeled matrix
-  # times is an array (or VecI object)
-  # where each row = [mz,inten,mz,inten...]
+  # converts msrun object to a labeled matrix
   # takes hash with symbols as keys
-  # if inc_tm is undefined, then times from the times array will be used
-  def from_times_and_spectra(times, spectra, args)
+  def from_msrun(msrun, args)
     opt = {
-      :start_mz => 400.0, 
-      :end_mz => 1500.0,
       :inc_mz => 1.0,
       :behave_mz => 'sum', 
-
-      :start_tm => 0.0, 
-      :end_tm => 3600.0,
-      :inc_tm => nil,
-
       :baseline=> 0.0,
+
+      #:start_tm => 0.0, 
+      #:end_tm => 3600.0,
+      #:inc_tm => nil,
+      
+      #:start_mz => 400.0, 
+      #:end_mz => 1500.0,
     }
     opt.merge!(args)
-    unless opt[:start_tm] then opt[:start_tm] = times.first end
-    unless opt[:end_tm] then opt[:end_tm] = times.last end
-    
+
+    (st, en) = msrun.start_and_end_mz
+    unless st && en
+      msg = ["scanning spectrum for start and end m/z values"]
+      msg << "(use :start_mz and :end_mz options to avoid this)"
+      warn msg
+      (st, en) = msrun.start_and_end_mz_brute_force
+    end
+    opt[:start_mz] ||= st
+    opt[:end_mz] ||= en
+
+    #unless opt[:start_tm] then opt[:start_tm] = times.first end
+    #unless opt[:end_tm] then opt[:end_tm] = times.last end
+
     if opt[:inc_tm]
       raise NotImplementedError, "haven't implemented interpolation in ruby yet! (#{File.basename(__FILE__)}: #{__LINE__})"
     else ## No interpolation
-      if times.first != opt[:start_tm] || times.last != opt[:end_tm]
-        abort "haven't implemented yet! (#{File.basename(__FILE__)}: #{__LINE__})"
-      else
-        @mvec = NArray.new(times)
-        give_vecs = true
-        vecs = spectra.map do |spectrum|
-          #(mz,inten) = spectrum_to_mz_and_inten(spectrum, VecD)
-          # TODO: Figure out a shallow copy here:
-          # perhaps we'll make spectra Vec objects by default in future and
-          # then we'd be set...
-          mzs = NArray.new(spectrum.mzs)
-          intens = NArray.new(spectrum.intensities)
-          (x,y) = mzs.inc_x(intens, opt[:start_mz], opt[:end_mz], opt[:inc_mz], opt[:baseline], opt[:behave_mz])
-          @nvec = x # ends up being the last one, but that's OK
-          y
+      times = []
+      @nvec = nil
+      vecs = []
+      puts $VERBOSE
+      num_scans = msrun.scan_count
+      printf "Reading #{num_scans} spectra [.=100]" if $VERBOSE
+      puts "HIYA3"
+      spectrum_cnt = 0
+      msrun.each do |scan|
+        spectrum = scan.spectrum
+        times << scan.time
+        #(mz,inten) = spectrum_to_mz_and_inten(spectrum, VecD)
+        # TODO: Figure out a shallow copy here:
+        # perhaps we'll make spectra Vec objects by default in future and
+        # then we'd be set...
+        mzs = NArray.new(spectrum.mzs)
+        intens = NArray.new(spectrum.intensities)
+        (x,y) = mzs.inc_x(intens, opt[:start_mz], opt[:end_mz], opt[:inc_mz], opt[:baseline], opt[:behave_mz])
+        spectrum_cnt += 1
+        if spectrum_cnt % 100 == 0
+          printf "." if $VERBOSE ; $stdout.flush
         end
-        @mat = vecs
+        @nvec ||= x # just need the first one for the x values
+        vecs << y
       end
+      puts "DONE!" if $VERBOSE
+      @mvec = NArray.new(times)
+      @mat = vecs
     end
     self  
   end
@@ -122,28 +140,6 @@ class Lmat
 
   def ==(other)
      other != nil && self.class == other.class && @nvec == other.nvec && @mvec == other.mvec && @mat == other.mat
-  end
-
-  # converts a single array of alternating m/z intensity values to two
-  # separate arrays
-  # (maybe implement in Ruby::Inline?)
-  # the answer is given in terms of arrs_as (object of class "arrs_as" must
-  # respond to "[]" and create a certain sized array with arrs_as.new(size))
-  def spectrum_to_mz_and_inten(spectrum, arrs_as=Array)
-    half_size = spectrum.size / 2
-    mzs = arrs_as.new(half_size)
-    intens = arrs_as.new(half_size)
-    mz = true 
-    spectrum.each_index do |i|
-      if mz
-        mzs[i/2] = spectrum[i]
-        mz = false
-      else
-        mz = true
-        intens[(i-1)/2] = spectrum[i]
-      end
-    end
-    [mzs, intens]
   end
 
   def write(file=nil)

@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-require 'ms/spectrum'
+require 'ms/data/lazy_string'
 
 if ARGV.size == 0
   puts "usage: #{File.basename(__FILE__)} <base64_string>"
@@ -8,7 +8,5 @@ if ARGV.size == 0
   exit
 end
 
-precision = 32
-network_order = true
-ar = Ms::Spectrum.base64_to_array(ARGV.shift, precision, network_order)
+ar = Ms::Data::LazyString.new(ARGV.shift).to_a
 puts "[ " + ar.join(", ") + " ]"

@@ -92,6 +92,12 @@ module MsrunSpec
     end
   end
 
+  it 'gives start and end mz even if the information is not given' do
+    Ms::Msrun.open(@file) do |ms|
+      ms.start_and_end_mz_brute_force.must_equal(key['start_and_end_mz'][1])
+    end
+  end
+
 end
 
 class Mzxml_v1 < MiniTest::Spec
@@ -99,6 +105,14 @@ class Mzxml_v1 < MiniTest::Spec
   before do
     super
     @file = TESTFILES + '/opd1/000.v1.mzXML'
+  end
+
+  it 'can give start and end mz' do
+    # scan has attributes startMz endMz
+    Ms::Msrun.open(@file) do |ms|
+      #ms.start_and_end_mz.must_equal([300.0, 1500.0])
+      ms.start_and_end_mz.must_equal(key['start_and_end_mz'][1])
+    end
   end
 end
 
@@ -116,5 +130,29 @@ class Mzxml_v2_1 < MiniTest::Spec
     super
     @file = TESTFILES + '/opd1/000.v2.1.mzXML'
   end
+
+  it 'gives nil if scans do not have start and end mz info' do
+    # scans do not have startMz endMz or filterLine
+    Ms::Msrun.open(@file) do |ms|
+      ms.start_and_end_mz.must_equal([nil, nil])
+    end
+  end
+
+  it 'gives start and end mz if filterLine present' do
+    newname = @file + ".TMP.mzXML"
+    File.open(newname, 'w') do |out|
+      IO.foreach(@file) do |line|
+        if line =~ /msLevel="1"/
+          out.puts %Q{        filterLine="FTMS + p NSI Full ms [300.00-1500.00]"}
+        end
+        out.print line
+      end
+    end
+    Ms::Msrun.open(newname) do |ms|
+      ms.start_and_end_mz.must_equal([300.0, 1500.0])
+    end
+    File.unlink(newname) if File.exist?(newname)
+  end
+
 end
 

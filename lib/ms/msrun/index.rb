@@ -101,7 +101,7 @@ class Ms::Msrun::Index < Array
     @scan_nums = []
     case type
     when :mzxml
-      xml_string.each("\n") do |line|
+      xml_string.each_line("\n") do |line|
         if line =~ /id="(\d+)".*>(\d+)</
           @scan_nums << $1.to_i
           indices << $2.to_i

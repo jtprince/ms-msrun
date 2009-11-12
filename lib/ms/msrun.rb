@@ -49,6 +49,9 @@ class Ms::Msrun
   # holds the class that parses the file
   attr_accessor :parser
 
+  # an array holding the scan numbers found in the run
+  attr_accessor :scan_nums
+
   # Opens the filename 
   def self.open(filename, &block)
     File.open(filename) {|io| block.call( self.new(io, filename) ) }
@@ -65,6 +68,7 @@ class Ms::Msrun
 
     @parser = parser_klass.new(self, io, @version)
     @index = Ms::Msrun::Index.new(io)
+    @scan_nums = @index.scan_nums
     @parser.parse_header(@index.header_length)
   end
 
@@ -77,6 +81,7 @@ class Ms::Msrun
   #     :spectrum => true | false (default is true)
   #     :precursor => true | false (default is true)
   #     :ms_level => Integer or Array return only scans of that level
+  #     :reverse => true | false (default is false) goes backwards
   def each_scan(parse_opts={}, &block)
     ms_levels = 
       if msl = parse_opts[:ms_level]
@@ -84,7 +89,9 @@ class Ms::Msrun
         else ; msl  
         end
       end
-    @index.scan_nums.each do |scan_num|
+    snums = @index.scan_nums
+    snums = snums.reverse if parse_opts[:reverse]
+    snums.each do |scan_num|
       if ms_levels
         next unless ms_levels.include?(ms_level(scan_num))
       end
@@ -145,92 +152,47 @@ class Ms::Msrun
     end
   end
 
-  # for level 1, finds first scan and asks if it has start_mz/end_mz
-  # attributes.  for other levels, asks for start_mz/ end_mz and takes the
-  # min/max.  If start_mz and end_mz are not found, goes through every scan
-  # finding the max/min first and last m/z. returns [start_mz (rounded down to
-  # nearest int), end_mz (rounded up to nearest int)]
-  def start_and_end_mz(mslevel=1)
-    if mslevel == 1
-      # special case for mslevel 1 (where we expect scans to be same length)
-      scans.each do |sc|
-        if sc.ms_level == mslevel
-          if sc.start_mz && sc.end_mz
-            return [sc.start_mz, sc.end_mz]
-          end
-          break
-        end
+
+  # returns [start_mz, end_mz] or [nil,nil] if unknown
+  def start_and_end_mz
+    scan = first(:ms_level => 1, :spectrum => false, :precursor => false)
+    [scan.start_mz, scan.end_mz]
+  end
+
+  # goes through every scan and gets the first and last m/z, then returns the
+  # max.ceil and min.floor
+  def start_and_end_mz_brute_force
+    first_scan = first(:ms_level => 1, :precursor => false)
+    first_mzs = first_scan.spectrum.mzs
+
+    lo_mz = first_mzs[0]
+    hi_mz = first_mzs[-1]
+
+    each_scan(:ms_level => 1, :precursor => false) do |sc|
+      mz_ar = sc.spectrum.mzs
+      if mz_ar.last > hi_mz
+        hi_mz = mz_ar.last
       end
-    end
-    hi_mz = nil
-    lo_mz = nil
-    # see if we have start_mz and end_mz for the level we want
-    # set the initial hi_mz and lo_mz in any case
-    have_start_end_mz = false
-    scans.each do |sc|
-      if sc.ms_level == mslevel
-        if sc.start_mz && sc.end_mz
-          lo_mz = sc.start_mz
-          hi_mz = sc.end_mz
-        else
-          mz_ar = sc.spectrum.mzs
-          hi_mz = mz_ar.last
-          lo_mz = mz_ar.first
-        end
-        break
-      end
-    end
-    if have_start_end_mz
-      scans.each do |sc|
-        if sc.ms_level == mslevel
-          if sc.start_mz < lo_mz
-            lo_mz = sc.start_mz
-          end
-          if sc.end_mz > hi_mz
-            hi_mz = sc.end_mz
-          end
-        end
-      end
-    else
-      # didn't have the attributes (find by brute force)
-      scans.each do |sc|
-        if sc.ms_level == mslevel
-          mz_ar = sc.spectrum.mzs
-          if mz_ar.last > hi_mz
-            hi_mz = mz_ar.last
-          end
-          if mz_ar.last < lo_mz
-            lo_mz = mz_ar.last
-          end
-        end
+      if mz_ar.last < lo_mz
+        lo_mz = mz_ar.last
       end
     end
     [lo_mz.floor, hi_mz.ceil]
   end
 
-  # returns an array of times and parallel array of spectra objects.
-  # ms_level = 0  then all spectra and times
-  # ms_level = 1 then all spectra of ms_level 1
-  def times_and_spectra(ms_level=0)
-    spectra = []
-    if ms_level == 0
-      times = @scans.map do |scan|
-        spectra << scan.spectrum  
-        scan.time
-      end
-      [times, spectra]
-    else  # choose a particular ms_level
-      times = []
-      @scans.each do |scan|
-        if ms_level == scan.ms_level
-          spectra << scan.spectrum  
-          times << scan.time
-        end
-      end
-      [times, spectra]
+  def first(opts={})
+    the_first = nil
+    each_scan(opts) do |scan|
+      the_first = scan
+      break
     end
+    the_first
   end
 
+  def last(opts={})
+    opts[:reverse] = true
+    first(opts)
+  end
 
   def self.get_parser(filetype, version)
     require "ms/msrun/#{DEFAULT_PARSER}/#{filetype}"

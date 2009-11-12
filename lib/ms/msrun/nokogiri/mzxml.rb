@@ -139,6 +139,11 @@ class Ms::Msrun::Nokogiri::Mzxml
     scan
   end
 
+  def start_end_from_filter_line(line)
+    # "ITMS + c NSI d Full ms3 654.79@cid35.00 630.24@cid35.00 [160.00-1275.00]"
+    /\[([^-]+)-([^-]+)\]/.match(line)[1,2].map {|v| v.to_f }
+  end
+
   def new_scan_from_node(node)
     scan = Ms::Scan.new  # array class creates one with 9 positions
     scan[0] = node['num'].to_i
@@ -152,6 +157,9 @@ class Ms::Msrun::Nokogiri::Mzxml
     end
     scan[5] = node['peaksCount'].to_i
     scan[6] = node['totIonCurrent'].to_f
+    if fl = node['filterLine']
+      (scan[3], scan[4]) = start_end_from_filter_line(fl)
+    end
     scan
   end
 
