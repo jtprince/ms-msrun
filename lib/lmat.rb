@@ -1,10 +1,17 @@
 
-require 'runarray'
-include Runarray
+require 'gsl'
+require 'narray'
+#include Runarray
+
+include Math
+include GSL
 
 ## Labeled matrix
 
 class Lmat
+
+  NUM_BYTE_SIZE = 4
+
   attr_accessor :mvec
   attr_accessor :nvec
   # an array of narray objects
@@ -29,16 +36,13 @@ class Lmat
 
   # returns self
   def from_lmat(file)
-    string = IO.read(file)
-    mdim = string.unpack("i")
-    @mvec = NArray.new(string.unpack("f#{mdim}"))
-    ndim = string.unpack("i")
-    @nvec = NArray.new(string.unpack("f#{ndim}"))
-    rows = []
-    mdim.times do
-      rows << string.unpack("f#{ndim}")
+    File.open(file) do |io|
+      (@mvec, @nvec) = [true, true].map do |iv|
+        _len = io.read(4).unpack('I').first
+        NArray.to_na( io.read(_len*NUM_BYTE_SIZE), 'sfloat' )
+      end
+      @mat = NArray.to_na(io.read, 'sfloat', @nvec.size, @mvec.size)
     end
-    @mat = rows
     self
   end
 
@@ -138,6 +142,18 @@ class Lmat
 
   def ==(other)
      other != nil && self.class == other.class && @nvec == other.nvec && @mvec == other.mvec && @mat == other.mat
+  end
+
+  # warps the actual data in other based on interpolation of the time points
+  # currently warps down each column.
+  # it is assumed that other's m points have been aligned to those of self.
+  def warp(other)
+    (0...self.nvec).each do |n|
+      col = self[n, true]
+      spline = Spline.alloc('akima',       
+
+    end
+
   end
 
   def write(file=nil)
