@@ -12,9 +12,11 @@ class Lmat
 
   NUM_BYTE_SIZE = 4
 
+  # an narray object numerically labelling the m-axis
   attr_accessor :mvec
+  # an narray object numerically labelling the n-axis
   attr_accessor :nvec
-  # an array of narray objects
+  # an mvec.size X nvec.size narray
   attr_accessor :mat
 
   ## Takes an array of narray objects
@@ -24,14 +26,47 @@ class Lmat
     @nvec = nvec
   end
 
-  def max
-    max = mat[0][0]
-    mat.each do |row|
-      row.each do |v|
-        max = v if v > max
-      end
+  class << self
+    def [](*args)
+      mat = NArray[*args]
+      (nlen, mlen) = mat.shape
+      obj = new(mat)
+      obj.mvec = NArray[0...mlen]
+      obj.nvec = NArray[0...nlen]
+      obj
     end
-    max
+  end
+
+  def [](*args)
+    @mat[*args]
+  end
+
+  def []=(*args)
+    @mat.send('[]='.to_sym, *args)
+  end
+
+  def slice=(*args)
+    @mat.send('slice'.to_sym, *args)
+  end
+
+  def slice(*args)
+    @mat.slice(*args)
+  end
+
+  def inspect
+    ["nvec=#{@nvec.inspect}", "mvec=#{@mvec.inspect}", "mat=#{@mat.inspect}"].join("\n")
+  end
+
+  def max
+    @mat.max
+  end
+
+  def dup
+    a = Lmat.new
+    a.mvec = self.mvec[]
+    a.nvec = self.nvec[]
+    a.mat = self.mat[]
+    a
   end
 
   # returns self
@@ -52,17 +87,16 @@ class Lmat
     File.open(file) do |io|
       num_m = io.readline.to_i
       mline = io.readline.chomp
-      @mvec = NArray.new( mline.split(' ').map {|v| v.to_f } )
+      @mvec = NArray.to_na( mline.split(' ').map {|v| v.to_f } )
       raise RuntimeError, "bad m vec size" if mvec.size != num_m
       num_n = io.readline.to_i
       nline = io.readline.chomp
-      @nvec = NArray.new( nline.split(' ').map {|v| v.to_f } )
+      @nvec = NArray.to_na( nline.split(' ').map {|v| v.to_f } )
       raise RuntimeError, "bad n vec size" if nvec.size != num_n
-      @mat = NArray.new(num_m)
+      @mat = NArray.float(num_n, num_m)
       num_m.times do |m|
-        line = io.readline
-        line.chomp!
-        @mat[m] = NArray.new(line.split(' ').map {|v| v.to_f })
+        line = io.readline.chomp!
+        @mat[true, m] = line.split(' ').map {|v| v.to_f }
       end
     end
     self
@@ -144,27 +178,34 @@ class Lmat
      other != nil && self.class == other.class && @nvec == other.nvec && @mvec == other.mvec && @mat == other.mat
   end
 
-  # warps the actual data in other based on interpolation of the time points
-  # currently warps down each column.
-  # it is assumed that other's m points have been aligned to those of self.
-  def warp(other)
-    (0...self.nvec).each do |n|
-      col = self[n, true]
-      spline = Spline.alloc('akima',       
-
-    end
-
+  # returns a fresh lmat object
+  def warp_cols(new_m_values, deep_copy=false)
+    new_guy = self.dup
+    new_guy.warp_cols!(new_m_values, deep_copy)
+    new_guy
   end
 
-  def write(file=nil)
+  # warps the data in self based on interpolation of the cols.  Evaluates the
+  # new_m_values for each column and returns a new lmat object with the m
+  # values set to new_m_values.  nvec will be the same is in self.
+  def warp_cols!(new_m_values, deep_copy=false)
+    (0...self.nvec).each do |n|
+      self[n,true] = Spline.alloc(Interp::AKIMA, mvec, self[n, true]).eval(new_m_values)
+    end
+    self.nvec = deep_copy ? self.nvec[] : self.nvec
+    self.mvec = deep_copy ? new_m_values[] : new_m_values
+    self
+  end
+
+  def write(file=nil, int_format_string='i')
     handle = $>
     if file; handle = File.open(file, "wb") end
     bin_string = ""
-    bin_string << [@mvec.size].pack("i")
-    bin_string << @mvec.pack("f*")
-    bin_string << [@nvec.size].pack("i")
-    bin_string << @nvec.pack("f*")
-    bin_string << @mat.flatten.pack("f*")
+    bin_string << [@mvec.size].pack(int_format_string)
+    bin_string << @mvec.to_s
+    bin_string << [@nvec.size].pack(int_format_string)
+    bin_string << @nvec.to_s
+    bin_string << @mat.to_s
     handle.print bin_string
     if file; handle.close end
   end
