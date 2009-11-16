@@ -1,18 +1,19 @@
-require 'rake'
 require 'rubygems'
-require 'rake/rdoctask'
-require 'rake/gempackagetask'
-require 'rake/testtask'
-require 'rake/clean'
+require 'rake'
+
+require 'jeweler'
 require 'fileutils'
+
+#require 'rake/rdoctask'
+#require 'rake/gempackagetask'
+#require 'rake/testtask'
+#require 'rake/clean'
 
 ###############################################
 # GLOBAL
 ###############################################
 
-FL = FileList
 NAME = "ms-msrun"
-FU = FileUtils
 
 readme = "README"
 
@@ -20,9 +21,48 @@ rdoc_dir = 'rdoc'
 rdoc_extra_includes = [readme, "LICENSE"]
 rdoc_options = ['--main', readme, '--title', NAME, '--line-numbers', '--inline-source']
 
-lib_files = FL["lib/**/*.rb"]
-dist_files = lib_files + FL[readme, "LICENSE", "Rakefile", "{specs}/**/*"]
-changelog = 'CHANGELOG'
+lib_files = FileList["lib/**/*.rb"]
+dist_files = lib_files + FileList[readme, "LICENSE", "Rakefile", "{specs}/**/*"]
+history = 'History'
+
+
+Jeweler::Tasks.new do |gem|
+  tm = Time.now
+  gem.name = NAME
+  gem.summary = "an mspire library for working with LC/MS runs (mzxml, mzData, mzML)"
+  gem.description = 'A library for working with LC/MS runs. Part of mspire.  Has parsers for mzXML v1, 2, and 3, mzData (currently broken) and mzML (planned).  Can convert to commonly desired search output (such as mgf).  Fast random access of scans, and fast reading of the entire file.'
+  gem.email = "jtprince@gmail.com"
+  gem.homepage = 'http://mspire.rubyforge.org/projects/ms-msrun'
+  gem.authors = ["John Prince"]
+  t.version =  IO.readlines(history).grep(/##.*version/).pop.split(/\s+/).last.chomp
+    t.homepage = 'http://mspire.rubyforge.org/projects/ms-msrun'
+  t.rubyforge_project = 'mspire'
+  t.summary = summary
+  t.date = "#{tm.year}-#{tm.month}-#{tm.day}"
+  t.email = "jtprince@gmail.com"
+  t.description = description
+  t.has_rdoc = true
+  t.authors = ["John Prince"]
+  t.files = dist_files
+  t.add_dependency 'ms-core'
+  t.add_dependency 'nokogiri'
+  t.add_dependency 'runarray'
+  t.rdoc_options = rdoc_options
+  t.extra_rdoc_files = rdoc_extra_includes
+  t.executables = FileList["bin/*"].map {|file| File.basename(file) }
+  t.test_files = FileList["spec/**/*_spec.rb"]
+
+end
+
+
+
+
+
+
+
+
+
+
 
 ###############################################
 # DOC
@@ -76,13 +116,11 @@ end
 # PACKAGE / INSTALL / UNINSTALL
 ###############################################
 
-tm = Time.now
 gemspec = Gem::Specification.new do |t|
-  description = 'A library for working with LC/MS runs. Part of mspire.  Has parsers for mzXML v1, 2, and 3, mzData and mzML.  Can convert to commonly desired search output (such as mgf)'
   summary = "A library for working with LC/MS runs"
   t.platform = Gem::Platform::RUBY
   t.name = NAME
-  t.version =  IO.readlines(changelog).grep(/##.*version/).pop.split(/\s+/).last.chomp
+  t.version =  IO.readlines(history).grep(/##.*version/).pop.split(/\s+/).last.chomp
   t.homepage = 'http://mspire.rubyforge.org/projects/ms-msrun'
   t.rubyforge_project = 'mspire'
   t.summary = summary
@@ -97,8 +135,8 @@ gemspec = Gem::Specification.new do |t|
   t.add_dependency 'runarray'
   t.rdoc_options = rdoc_options
   t.extra_rdoc_files = rdoc_extra_includes
-  t.executables = FL["bin/*"].map {|file| File.basename(file) }
-  t.test_files = FL["spec/**/*_spec.rb"]
+  t.executables = FileList["bin/*"].map {|file| File.basename(file) }
+  t.test_files = FileList["spec/**/*_spec.rb"]
 end
 
 desc "Create packages."
