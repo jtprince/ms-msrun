@@ -2,7 +2,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 
 require 'ms/msrun'
 
-class SearchSpec < MiniTest::Spec
+
+describe 'mzxml to search formats' do
 
   it 'creates mgf formatted files' do
     @file = TESTFILES + '/opd1/000.v1.mzXML'
@@ -27,7 +28,7 @@ class SearchSpec < MiniTest::Spec
     ]
     Ms::Msrun.open(@file) do |ms|
       no_scans.each do |k,v|
-        ms.to_mgf( k => v).must_equal ""
+        ms.to_mgf( k => v).is ""
       end
     end
 
@@ -45,8 +46,8 @@ class SearchSpec < MiniTest::Spec
     Ms::Msrun.open(@file) do |ms|
       some_scans.each do |k,v|
         reply = ms.to_mgf(k => v)
-        reply.must_match(/BEGIN.IONS/)
-        reply.must_match(/END.IONS/)
+        reply.should.match(/BEGIN.IONS/)
+        reply.should.match(/END.IONS/)
       end
     end
     # TODO: should write some more specs here

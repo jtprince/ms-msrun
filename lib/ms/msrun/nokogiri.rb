@@ -1,4 +1,5 @@
 
+require 'nokogiri'
 
 module Ms
   class Msrun

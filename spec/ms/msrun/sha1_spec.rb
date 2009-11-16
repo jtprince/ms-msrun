@@ -2,12 +2,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 
 require 'ms/msrun/sha1'
 
-class Sha1Spec < MiniTest::Spec
-  def initialize(*args)
-    @files = %w(000.v1.mzXML 020.v2.0.readw.mzXML 000.v2.1.mzXML).map do |file|
-      TESTFILES + "/opd1/#{file}"
-    end
-    super(*args)
+describe 'sha1 creation from mzXML' do
+  @files = %w(000.v1.mzXML 020.v2.0.readw.mzXML 000.v2.1.mzXML).map do |file|
+    TESTFILES + "/opd1/#{file}"
   end
 
   ## NOTE: this does NOT match up to real files yet!
