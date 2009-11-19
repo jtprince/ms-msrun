@@ -1,166 +1,113 @@
 require 'rubygems'
 require 'rake'
-
 require 'jeweler'
-require 'fileutils'
-
-#require 'rake/rdoctask'
-#require 'rake/gempackagetask'
-#require 'rake/testtask'
-#require 'rake/clean'
-
-###############################################
-# GLOBAL
-###############################################
+require 'rake/testtask'
+require 'rcov/rcovtask'
 
 NAME = "ms-msrun"
+WEBSITE_BASE = "website"
+WEBSITE_OUTPUT = WEBSITE_BASE + "/output"
 
-readme = "README"
+gemspec = Gem::Specification.new do |s|
+  s.name = NAME
+  s.authors = ["John T. Prince"]
+  s.email = "jtprince@gmail.com"
+  s.homepage = "http://jtprince.github.com/" + NAME + "/"
+  s.summary = "an mspire library for working with LC/MS runs (mzxml, mzData, mzML)"
+  s.description = 'A library for working with LC/MS runs. Part of mspire.  Has parsers for mzXML v1, 2, and 3, mzData (currently broken) and mzML (planned).  Can convert to commonly desired search output (such as mgf).  Fast random access of scans, and fast reading of the entire file.'
+  s.rubyforge_project = 'mspire'
+  s.add_dependency 'ms-core'
+  s.add_dependency 'nokogiri'
+  s.add_dependency 'runarray'
+  s.add_development_dependency("spec-more")
+end
 
-rdoc_dir = 'rdoc'
-rdoc_extra_includes = [readme, "LICENSE"]
-rdoc_options = ['--main', readme, '--title', NAME, '--line-numbers', '--inline-source']
+Jeweler::Tasks.new(gemspec)
 
-lib_files = FileList["lib/**/*.rb"]
-dist_files = lib_files + FileList[readme, "LICENSE", "Rakefile", "{specs}/**/*"]
-history = 'History'
+Rake::TestTask.new(:spec) do |spec|
+  spec.libs << 'lib' << 'spec'
+  spec.pattern = 'spec/**/*_spec.rb'
+  spec.verbose = true
+end
 
+Rcov::RcovTask.new do |spec|
+  spec.libs << 'spec'
+  spec.pattern = 'spec/**/*_spec.rb'
+  spec.verbose = true
+end
 
-Jeweler::Tasks.new do |gem|
-  tm = Time.now
-  gem.name = NAME
-  gem.summary = "an mspire library for working with LC/MS runs (mzxml, mzData, mzML)"
-  gem.description = 'A library for working with LC/MS runs. Part of mspire.  Has parsers for mzXML v1, 2, and 3, mzData (currently broken) and mzML (planned).  Can convert to commonly desired search output (such as mgf).  Fast random access of scans, and fast reading of the entire file.'
-  gem.email = "jtprince@gmail.com"
-  gem.homepage = 'http://mspire.rubyforge.org/projects/ms-msrun'
-  gem.authors = ["John Prince"]
-  t.version =  IO.readlines(history).grep(/##.*version/).pop.split(/\s+/).last.chomp
-    t.homepage = 'http://mspire.rubyforge.org/projects/ms-msrun'
-  t.rubyforge_project = 'mspire'
-  t.summary = summary
-  t.date = "#{tm.year}-#{tm.month}-#{tm.day}"
-  t.email = "jtprince@gmail.com"
-  t.description = description
-  t.has_rdoc = true
-  t.authors = ["John Prince"]
-  t.files = dist_files
-  t.add_dependency 'ms-core'
-  t.add_dependency 'nokogiri'
-  t.add_dependency 'runarray'
-  t.rdoc_options = rdoc_options
-  t.extra_rdoc_files = rdoc_extra_includes
-  t.executables = FileList["bin/*"].map {|file| File.basename(file) }
-  t.test_files = FileList["spec/**/*_spec.rb"]
+def rdoc_redirect(base_rdoc_output_dir, package_website_page, version)
+  content = %Q{
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>mspire: } + NAME + %Q{rdoc</title>
+<meta http-equiv="REFRESH" content="0;url=#{package_website_page}/rdoc/#{version}/">
+</head> </html> 
+  }
+  FileUtils.mkpath(base_rdoc_output_dir)
+  File.open(base_rdoc_output_dir + "/index.html", 'w') {|out| out.print content }
+end
+
+require 'rake/rdoctask'
+Rake::RDocTask.new do |rdoc|
+  base_rdoc_output_dir = WEBSITE_OUTPUT + '/rdoc'
+  version = File.read('VERSION')
+  rdoc.rdoc_dir = 'rdoc'
+  rdoc.title = NAME + ' ' + version
+  rdoc.rdoc_files.include('README*')
+  rdoc.rdoc_files.include('lib/**/*.rb')
+end
+
+task :create_redirect do
+  base_rdoc_output_dir = WEBSITE_OUTPUT + '/rdoc'
+  rdoc_redirect(base_rdoc_output_dir, gemspec.homepage,version)
+end
+
+namespace :website do
+  desc "checkout and configure the gh-pages submodule (assumes you have it)"
+  task :submodule_update do
+    if File.exist?(WEBSITE_OUTPUT + "/.git")
+      puts "!! not doing anything, #{WEBSITE_OUTPUT + "/.git"} already exists !!"
+    else
+
+      puts "(not sure why this won't work programmatically)"
+      puts "################################################"
+      puts "[Execute these commands]"
+      puts "################################################"
+      puts "git submodule init"
+      puts "git submodule update"
+      puts "pushd #{WEBSITE_OUTPUT}"
+      puts "git co --track -b gh-pages origin/gh-pages ;"
+      puts "popd"
+      puts "################################################"
+
+      # not sure why this won't work!
+      #%x{git submodule init}
+      #%x{git submodule update}
+      #Dir.chdir(WEBSITE_OUTPUT) do
+      #  %x{git co --track -b gh-pages origin/gh-pages ;}
+      #end
+    end
+  end
+
+  desc "setup your initial gh-pages"
+  task :init_ghpages do
+    puts "################################################"
+    puts "[Execute these commands]"
+    puts "################################################"
+    puts "git symbolic-ref HEAD refs/heads/gh-pages"
+    puts "rm .git/index"
+    puts "git clean -fdx"
+    puts 'echo "Hello" > index.html'
+    puts "git add ."
+    puts 'git commit -a -m "my first gh-page"'
+    puts "git push origin gh-pages"
+  end
 
 end
 
-
-
-
-
-
-
-
-
-
-
-###############################################
-# DOC
-###############################################
-Rake::RDocTask.new do |rd|
-  rd.rdoc_dir = rdoc_dir
-  rd.main = readme
-  rd.rdoc_files.include( rdoc_extra_includes )
-  rd.rdoc_files.include( lib_files.uniq )
-  rd.options.push( *rdoc_options )
-end
-
-
-desc "Publish RDoc to RubyForge"
-task :publish_rdoc => [:rdoc] do
-  require 'yaml'
-  
-  config = YAML.load(File.read(File.expand_path("~/.rubyforge/user-config.yml")))
-  host = "#{config["username"]}@rubyforge.org"
-  
-  rsync_args = "-v -c -r"
-  remote_dir = "/var/www/gforge-projects/mspire/projects/#{NAME}"
-  local_dir = "rdoc"
- 
-  sh %{rsync #{rsync_args} #{local_dir}/ #{host}:#{remote_dir}}
-end
-
-#desc "create and upload docs to server"
-#task :upload_docs => [:rdoc] do
-#  sh "scp -r #{rdoc_dir}/* jtprince@rubyforge.org:/var/www/gforge-projects/mspire/projects/ms-msrun/"
-#end
-
-###############################################
-# TESTS
-###############################################
-
-desc 'Default: Run specs.'
 task :default => :spec
 
-desc 'Run specs.'
-Rake::TestTask.new(:spec) do |t|
-  #t.verbose = true
-  #t.warning = true
-  ENV['TEST'] = ENV['SPEC'] if ENV['SPEC']
-  t.libs = ['lib']
-  t.test_files = Dir.glob( File.join('spec', ENV['pattern'] || '**/*_spec.rb') )
-  #t.options = "-v"
-end
+task :build => :gemspec
 
-###############################################
-# PACKAGE / INSTALL / UNINSTALL
-###############################################
-
-gemspec = Gem::Specification.new do |t|
-  summary = "A library for working with LC/MS runs"
-  t.platform = Gem::Platform::RUBY
-  t.name = NAME
-  t.version =  IO.readlines(history).grep(/##.*version/).pop.split(/\s+/).last.chomp
-  t.homepage = 'http://mspire.rubyforge.org/projects/ms-msrun'
-  t.rubyforge_project = 'mspire'
-  t.summary = summary
-  t.date = "#{tm.year}-#{tm.month}-#{tm.day}"
-  t.email = "jtprince@gmail.com"
-  t.description = description
-  t.has_rdoc = true
-  t.authors = ["John Prince"]
-  t.files = dist_files
-  t.add_dependency 'ms-core'
-  t.add_dependency 'nokogiri'
-  t.add_dependency 'runarray'
-  t.rdoc_options = rdoc_options
-  t.extra_rdoc_files = rdoc_extra_includes
-  t.executables = FileList["bin/*"].map {|file| File.basename(file) }
-  t.test_files = FileList["spec/**/*_spec.rb"]
-end
-
-desc "Create packages."
-Rake::GemPackageTask.new(gemspec) do |pkg|
-  #pkg.need_zip = true
-  #pkg.need_tar = true
-end
-
-task :remove_pkg do 
-  FileUtils.rm_rf "pkg"
-end
-
-task :install => [:reinstall]
-
-desc "uninstalls the package, packages a fresh one, and installs"
-task :reinstall => [:remove_pkg, :clean, :package] do
-  reply = `#{$gemcmd} list -l #{NAME}`
-  if reply.include?(NAME + " (")
-    %x( #{$gemcmd} uninstall -a -x #{NAME} )
-  end
-  FileUtils.cd("pkg") do
-    cmd = "#{$gemcmd} install #{NAME}*.gem"
-    puts "EXECUTING: #{cmd}" 
-    system cmd
-  end
-end
+# credit: Rakefile modeled after Jeweler's
 

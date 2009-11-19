@@ -37,7 +37,7 @@ describe 'an lmat' do
     x.mat.shape.is [30,40]
   end
 
-  xit 'can write an lmat file' do
+  it 'can write an lmat file' do
     output = @lmatfile + ".TMP"
     @lmat.from_lmat(@lmatfile) 
     @lmat.write(output)

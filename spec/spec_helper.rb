@@ -17,6 +17,14 @@ class Object
     should.equal other
   end
 
+  def isnt(other)
+    should.not.equal.other
+  end
+
+  def isa(other)
+    self.class.should.equal other
+  end
+
   def matches(other)
     should.match other
   end
