@@ -18,7 +18,7 @@ gemspec = Gem::Specification.new do |s|
   s.rubyforge_project = 'mspire'
   s.add_dependency 'ms-core'
   s.add_dependency 'nokogiri'
-  s.add_dependency 'runarray'
+  s.add_dependency 'narray'
   s.add_development_dependency("spec-more")
 end
 
