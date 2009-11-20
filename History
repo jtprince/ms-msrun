@@ -16,5 +16,3 @@
 *   cleaned up code a lot
 *   uses Struct instead of Arrayclass to minimize dependencies
 *   bumps task of providing indices for peak data onto AXML 
-
-
