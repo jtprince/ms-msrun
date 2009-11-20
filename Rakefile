@@ -25,6 +25,7 @@ end
 Jeweler::Tasks.new(gemspec)
 
 Rake::TestTask.new(:spec) do |spec|
+  ENV['TEST'] = ENV['SPEC'] if ENV['SPEC']  
   spec.libs << 'lib' << 'spec'
   spec.pattern = 'spec/**/*_spec.rb'
   spec.verbose = true

@@ -42,11 +42,11 @@ class Lmat
   end
 
   def []=(*args)
-    @mat.send('[]='.to_sym, *args)
+    @mat.send('[]=', *args)
   end
 
   def slice=(*args)
-    @mat.send('slice'.to_sym, *args)
+    @mat.send(:slice, *args)
   end
 
   def slice(*args)
@@ -54,7 +54,15 @@ class Lmat
   end
 
   def inspect
+    # TODO: needs work (see ruport pivotted table output)
     ["nvec=#{@nvec.inspect}", "mvec=#{@mvec.inspect}", "mat=#{@mat.inspect}"].join("\n")
+
+    start = '   ' << nvec.to_a.join(", ") << "\n"
+    start << ("    " + ("-" * (start.size - 4))) << "\n"
+    mvec[].indgen!.each do |i|
+      start << "#{mvec[i]} | " << @mat[true, i].to_a.join(" ") << "\n"
+    end
+    start
   end
 
   def max
@@ -168,10 +176,14 @@ class Lmat
   # outputs vec lengths if set to true
   def to_s(with_vec_lengths=false)
     arr = []
-    if with_vec_lengths; arr.push(@mvec.size) end
-    arr.push(@mvec.join(" "))
-    if with_vec_lengths; arr.push(@nvec.size) end
-    arr.push(@nvec.join(" "), @mat.map {|v| v.join(" " ) }.join("\n")).join("\n")
+    arr.push(@mvec.size) if with_vec_lengths
+    arr.push(@mvec.to_a.join(" "))
+    arr.push(@nvec.size) if with_vec_lengths
+    arr.push(@nvec.to_a.join(" "))
+    (0...@mvec.size).each do |m_index|
+      arr.push(@mat[true, m_index].to_a.join(" "))
+    end
+    arr.join("\n")
   end
 
   def ==(other)
@@ -189,7 +201,7 @@ class Lmat
   # new_m_values for each column and returns a new lmat object with the m
   # values set to new_m_values.  nvec will be the same is in self.
   def warp_cols!(new_m_values, deep_copy=false)
-    (0...self.nvec).each do |n|
+    nvec[].indgen.each do |n|
       self[n,true] = Spline.alloc(Interp::AKIMA, mvec, self[n, true]).eval(new_m_values)
     end
     self.nvec = deep_copy ? self.nvec[] : self.nvec
@@ -212,11 +224,44 @@ class Lmat
 
   def print(file=nil)
     handle = $>
-    if file; handle = File.new(file, "w") end
+    handle = File.new(file, "w") if file
     handle.print( self.to_s(true) )
-    #$stdout.print( self.to_s(true) )
-    if file; handle.close end
+    handle.close if file
   end
+end
 
+class Lmat
+  module Gnuplot
+
+    # png output only right now, given no outfile, plot to X11
+    def plot(outfile=nil)
+      # modified from Hornet's eye
+      require 'gnuplot'
+      ::Gnuplot.open do |gp| 
+        ::Gnuplot::SPlot.new(gp) do |plot|
+          if outfile
+            plot.terminal 'png'
+            plot.output outfile
+          end
+          plot.pm3d
+          plot.hidden3d
+          plot.palette 'defined ( 0 "black", 51 "blue", 102 "green", ' +
+            '153 "yellow", 204 "red", 255 "white" )'
+          plot.xlabel 'n'
+          plot.ylabel 'm'
+          plot.data << ::Gnuplot::DataSet.new( self ) do |ds|
+            ds.with = 'pm3d'
+            ds.matrix = true
+          end
+        end
+      end
+    end
+
+    def to_gsplot
+      require 'gnuplot'
+      [@mvec.to_a, @nvec.to_a, @mat.to_a].to_gsplot
+    end
+  end
+  include Gnuplot
 end
 
