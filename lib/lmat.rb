@@ -149,7 +149,7 @@ class Lmat
       num_scans = msrun.scan_count
       printf "Reading #{num_scans} spectra [.=100]" if $VERBOSE
       spectrum_cnt = 0
-      msrun.each do |scan|
+      msrun.each(:ms_level => 1) do |scan|
         spectrum = scan.spectrum
         times << scan.time
         #(mz,inten) = spectrum_to_mz_and_inten(spectrum, VecD)
