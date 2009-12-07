@@ -153,7 +153,7 @@ class Ms::Msrun
   end
 
 
-  # returns [start_mz, end_mz] or [nil,nil] if unknown
+  # returns [start_mz, end_mz] for ms level 1 scans or [nil,nil] if unknown
   def start_and_end_mz
     scan = first(:ms_level => 1, :spectrum => false, :precursor => false)
     [scan.start_mz, scan.end_mz]
