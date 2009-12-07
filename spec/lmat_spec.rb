@@ -74,7 +74,7 @@ describe 'an lmat' do
     end
   end
 
-  it 'can warp data columns' do
+  xit 'can warp data columns' do
     @lmat.from_lmata(@lmatafile_small)
     puts "Warp before"
     p @lmat
@@ -88,10 +88,18 @@ describe 'an lmat' do
     ## TODO: NEEEED tests HERE
   end
 
-  it 'can plot' do
-    @lmat.from_lmata(@lmatafile_small)
-    @lmat.plot("mypng.png")
-    @lmat.isa Lmat
+  begin
+    require 'gnuplot'
+    it 'can plot' do
+      file = "mypng.png"
+      @lmat.from_lmata(@lmatafile_small)
+      @lmat.plot(file)
+      @lmat.isa Lmat
+      ok File.exist?(file)
+      File.unlink(file) if File.exist?(file)
+    end
+  rescue
+    puts "SKIPPING: plotting (since gnuplot gem not found)"
   end
 
 end
