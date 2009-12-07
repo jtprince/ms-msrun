@@ -4,8 +4,7 @@ A library for working with LC/MS runs.
 
 == Examples
 
-The following example will work on *mzXML*, *mzData* (and hope to support mzML
-in the future)
+The following example works on any version of *mzXML*.
 
     require "ms/msrun" 
 
@@ -61,6 +60,8 @@ in the future)
     # Quicker way to get at scans:
     Ms::Msrun.foreach("file.mzXML") {|scan|  scan <do something> }
 
+mzData support to be re-included in the future and mzML support planned.
+
 == Features
 
 [<b>Fast</b>] uses Nokogiri and a dash of regular expressions to achieve very
@@ -75,3 +76,7 @@ fast random access of scans and full access.
 == Copying
 
     See LICENSE
+
+== See also
+
+    mzml{http://github.com/delagoya/mzml}
