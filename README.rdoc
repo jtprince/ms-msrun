@@ -64,8 +64,7 @@ mzData support to be re-included in the future and mzML support planned.
 
 == Features
 
-[<b>Fast</b>] uses Nokogiri and a dash of regular expressions to achieve very
-fast random access of scans and full access.
+[<b>Fast</b>] uses Nokogiri and a dash of regular expressions to achieve very fast random access of scans and full access.
 [<b>Unified</b>] one interface for all formats.
 [<b>Lazy evaluation at scan and spectrum level</b>] Scans are only read from IO when requested.  Spectra are also decoded only when explicitly accessed.
 
