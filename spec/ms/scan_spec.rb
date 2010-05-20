@@ -28,6 +28,6 @@ describe 'a scan' do
       @scan.precursor.mz = prec_mz
       @scan.plus1?(0.5)
     end
-    reply.vals_are [false, false, true, true]
+    reply.enums [false, false, true, true]
   end
 end

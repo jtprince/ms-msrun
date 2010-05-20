@@ -4,11 +4,13 @@ A library for working with LC/MS runs.
 
 == Examples
 
-The following example will work on *mzXML*, *mzData* ( and *mzML* files in near future)!
+The following example works on any version of *mzXML*.
 
     require "ms/msrun" 
 
     Ms::Msrun.open("file.mzXML") do |ms|
+      
+      # Run level information:
       ms.start_time       # in seconds
       ms.end_time         # in seconds 
 
@@ -19,7 +21,11 @@ The following example will work on *mzXML*, *mzData* ( and *mzML* files in near 
       ms.parent_basename_noext   # "file" (as recorded _in the xml_)
       ms.filename                # "file.mzXML"
 
-      ms.scans.each do |scan|
+      # Random scan access (very fast)
+      ms.scan(22)         # a scan object
+
+      # Complete scan access
+      ms.each do |scan|
         scan.num          # scan number
         scan.ms_level     # ms_level
         scan.time         # retention time in seconds
@@ -41,21 +47,35 @@ The following example will work on *mzXML*, *mzData* ( and *mzML* files in near 
           puts "#{mz} #{inten}"   # print each peak on own line
         end
       end
+
+      # supports pre-filtering for faster access
+
+      ## get just precursor info:
+      ms.each(:ms_level => 2, :spectrum => false) {|scan| scan.precursor }
+
+      ## get just level one spectra:
+      ms.each(:ms_level => 1, :precursor => false) {|scan| scan.spectrum }
     end
+
+    # Quicker way to get at scans:
+    Ms::Msrun.foreach("file.mzXML") {|scan|  scan <do something> }
+
+mzData support to be re-included in the future and mzML support planned.
 
 == Features
 
-[*Fast*] uses xmlparser under the hood.
-[*Unified*] one interface for all formats
-[<b>Lazy evaluation of spectra</b>] By default, reads from IO when data is required.
-[<b>Minimal Dependencies</b>] xmlparser (available for most distros and windows one-click installer) and axml.  Very nearly have supoort for LibXML.
+[<b>Fast</b>] uses Nokogiri and a dash of regular expressions to achieve very fast random access of scans and full access.
+[<b>Unified</b>] one interface for all formats.
+[<b>Lazy evaluation at scan and spectrum level</b>] Scans are only read from IO when requested.  Spectra are also decoded only when explicitly accessed.
 
 == Installation
 
     gem install ms-msrun
 
-The library currently relies on xmlparser (though LibXML is close to being
-supported).  After installation of ms-msrun (which should automatically install
-`axml`) issue this command to get instructions on installing xmlparser:
+== Copying
 
-    ruby -rubygems -e 'require "axml"; puts AXML::Autoload.install_instructions(:xmlparser)'
+    See LICENSE
+
+== See also
+
+mzml[http://github.com/delagoya/mzml]

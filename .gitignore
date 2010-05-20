@@ -1,3 +1,5 @@
 rdoc
 *.swp
 pkg
+*.gemspec
+doc
