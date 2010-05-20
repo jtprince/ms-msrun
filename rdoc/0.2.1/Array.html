@@ -1,0 +1,403 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+
+	<title>Class: Array</title>
+
+	<link rel="stylesheet" href="./rdoc.css" type="text/css" media="screen" />
+
+	<script src="./js/jquery.js" type="text/javascript" 
+		charset="utf-8"></script>
+	<script src="./js/thickbox-compressed.js" type="text/javascript" 
+		charset="utf-8"></script>
+	<script src="./js/quicksearch.js" type="text/javascript" 
+		charset="utf-8"></script>
+	<script src="./js/darkfish.js" type="text/javascript" 
+		charset="utf-8"></script>
+
+</head>
+<body class="class">
+	
+	<div id="metadata">
+		<div id="file-metadata">
+			<div id="file-list-section" class="section">
+				<h3 class="section-header">In Files</h3>
+				<div class="section-body">
+					<ul>
+					
+						<li><a href="./spec/ms/spectrum/compare_spec.rb.html?TB_iframe=true&amp;height=550&amp;width=785"
+							class="thickbox" title="spec/ms/spectrum/compare_spec.rb">spec/ms/spectrum/compare_spec.rb</a></li>
+					
+						<li><a href="./spec/ms/spectrum/filter_spec.rb.html?TB_iframe=true&amp;height=550&amp;width=785"
+							class="thickbox" title="spec/ms/spectrum/filter_spec.rb">spec/ms/spectrum/filter_spec.rb</a></li>
+					
+						<li><a href="./lib/ms/spectrum/compare.rb.html?TB_iframe=true&amp;height=550&amp;width=785"
+							class="thickbox" title="lib/ms/spectrum/compare.rb">lib/ms/spectrum/compare.rb</a></li>
+					
+					</ul>
+				</div>
+			</div>
+			
+			
+		</div>
+
+		<div id="class-metadata">
+
+			<!-- Parent Class -->
+			
+			<div id="parent-class-section" class="section">
+				<h3 class="section-header">Parent</h3>
+				
+				<p class="link">Object</p>
+				
+			</div>
+			
+
+			<!-- Namespace Contents -->
+			
+
+			<!-- Method Quickref -->
+			
+			<div id="method-list-section" class="section">
+				<h3 class="section-header">Methods</h3>
+				<ul class="link-list">
+					
+					<li><a href="#rev_ab">rev_ab</a></li>
+					
+					<li><a href="#rev_ab">rev_ab</a></li>
+					
+					<li><a href="#sum">sum</a></li>
+					
+				</ul>
+			</div>
+			
+
+			<!-- Included Modules -->
+			
+		</div>
+	
+		<div id="project-metadata">
+			
+			
+			<div id="fileindex-section" class="section project-section">
+				<h3 class="section-header">Files</h3>
+				<ul>
+				
+					<li class="file"><a href="./History.html">History</a></li>
+				
+					<li class="file"><a href="./LICENSE.html">LICENSE</a></li>
+				
+					<li class="file"><a href="./README.rdoc.html">README.rdoc</a></li>
+				
+					<li class="file"><a href="./Rakefile.html">Rakefile</a></li>
+				
+					<li class="file"><a href="./VERSION.html">VERSION</a></li>
+				
+					<li class="file"><a href="./search_dev_notes.txt.html">search_dev_notes.txt</a></li>
+				
+					<li class="file"><a href="./000.v1.mzXML.yml.html">000.v1.mzXML.yml</a></li>
+				
+					<li class="file"><a href="./000.v2.1.mzXML.yml.html">000.v2.1.mzXML.yml</a></li>
+				
+					<li class="file"><a href="./020.mzData.xml.yml.html">020.mzData.xml.yml</a></li>
+				
+					<li class="file"><a href="./020.v2.0.readw.mzXML.yml.html">020.v2.0.readw.mzXML.yml</a></li>
+				
+					<li class="file"><a href="./test1.xml.html">test1.xml</a></li>
+				
+					<li class="file"><a href="./test2.xml.html">test2.xml</a></li>
+				
+					<li class="file"><a href="./test3.xml.html">test3.xml</a></li>
+				
+					<li class="file"><a href="./test4.xml.html">test4.xml</a></li>
+				
+					<li class="file"><a href="./tmp1.lmata.html">tmp1.lmata</a></li>
+				
+					<li class="file"><a href="./tmp2.lmata.html">tmp2.lmata</a></li>
+				
+					<li class="file"><a href="./000.v1.mzXML.html">000.v1.mzXML</a></li>
+				
+					<li class="file"><a href="./000.v1.mzXML.key.yml.html">000.v1.mzXML.key.yml</a></li>
+				
+					<li class="file"><a href="./000.v2.1.mzXML.html">000.v2.1.mzXML</a></li>
+				
+					<li class="file"><a href="./000.v2.1.mzXML.key.yml.html">000.v2.1.mzXML.key.yml</a></li>
+				
+					<li class="file"><a href="./020.mzData.xml.html">020.mzData.xml</a></li>
+				
+					<li class="file"><a href="./020.mzData.xml.key.yml.html">020.mzData.xml.key.yml</a></li>
+				
+					<li class="file"><a href="./020.v2.0.readw.mzXML.html">020.v2.0.readw.mzXML</a></li>
+				
+					<li class="file"><a href="./020.v2.0.readw.mzXML.key.yml.html">020.v2.0.readw.mzXML.key.yml</a></li>
+				
+				</ul>
+			</div>
+			
+			
+			<div id="classindex-section" class="section project-section">
+				<h3 class="section-header">Class Index 
+					<span class="search-toggle"><img src="./images/find.png" 
+						height="16" width="16" alt="[+]" 
+						title="show/hide quicksearch" /></span></h3>
+				<form action="#" method="get" accept-charset="utf-8" class="initially-hidden">
+				<fieldset>
+					<legend>Quicksearch</legend>
+					<input type="text" name="quicksearch" value="" 
+						class="quicksearch-field" />
+				</fieldset>
+				</form>
+
+				<ul class="link-list">
+				
+				
+					<li><a href="./Ms.html">Ms</a></li>
+				
+				
+					<li><a href="./Ms/Msrun.html">Ms::Msrun</a></li>
+				
+				
+					<li><a href="./Ms/Msrun/Axml.html">Ms::Msrun::Axml</a></li>
+				
+				
+					<li><a href="./Ms/Msrun/Axml/Mzxml.html">Ms::Msrun::Axml::Mzxml</a></li>
+				
+				
+					<li><a href="./Ms/Msrun/Index.html">Ms::Msrun::Index</a></li>
+				
+				
+					<li><a href="./Ms/Msrun/Nokogiri.html">Ms::Msrun::Nokogiri</a></li>
+				
+				
+					<li><a href="./Ms/Msrun/Nokogiri/Mzxml.html">Ms::Msrun::Nokogiri::Mzxml</a></li>
+				
+				
+					<li><a href="./Ms/Msrun/Regexp.html">Ms::Msrun::Regexp</a></li>
+				
+				
+					<li><a href="./Ms/Msrun/Regexp/Mzxml.html">Ms::Msrun::Regexp::Mzxml</a></li>
+				
+				
+					<li><a href="./Ms/Msrun/Search.html">Ms::Msrun::Search</a></li>
+				
+				
+					<li><a href="./Ms/Msrun/Sha1.html">Ms::Msrun::Sha1</a></li>
+				
+				
+					<li><a href="./Ms/Mzxml.html">Ms::Mzxml</a></li>
+				
+				
+					<li><a href="./Ms/Precursor.html">Ms::Precursor</a></li>
+				
+				
+					<li><a href="./Ms/Precursor/LazyParent.html">Ms::Precursor::LazyParent</a></li>
+				
+				
+					<li><a href="./Ms/Spectrum.html">Ms::Spectrum</a></li>
+				
+				
+					<li><a href="./Ms/Spectrum/Compare.html">Ms::Spectrum::Compare</a></li>
+				
+				
+					<li><a href="./Ms/Spectrum/Filter.html">Ms::Spectrum::Filter</a></li>
+				
+				
+					<li><a href="./Bacon.html">Bacon</a></li>
+				
+				
+					<li><a href="./Bacon/Context.html">Bacon::Context</a></li>
+				
+				
+					<li><a href="./Lmat.html">Lmat</a></li>
+				
+				
+					<li><a href="./Lmat/Gnuplot.html">Lmat::Gnuplot</a></li>
+				
+				
+					<li><a href="./Array.html">Array</a></li>
+				
+				
+					<li><a href="./CompareSpec.html">CompareSpec</a></li>
+				
+				
+					<li><a href="./FilterSpec.html">FilterSpec</a></li>
+				
+				
+					<li><a href="./HpricotSpec.html">HpricotSpec</a></li>
+				
+				
+					<li><a href="./Kernel.html">Kernel</a></li>
+				
+				
+					<li><a href="./MsrunSpec.html">MsrunSpec</a></li>
+				
+				
+					<li><a href="./MyDoc.html">MyDoc</a></li>
+				
+				</ul>
+				<div id="no-class-search-results" style="display: none;">No matching classes.</div>
+			</div>
+			
+			
+		</div>
+	</div>
+
+	<div id="documentation">
+		
+		<h1 class="class">Array</h1>
+		
+
+		<div id="description">
+			<p>
+when you switch order the return intensities are swapped:
+</p>
+
+		</div>
+
+
+		<!-- Constants -->
+		
+
+		<!-- Attributes -->
+		
+
+		<!-- Methods -->
+		
+		
+		<div id="public-instance-method-details" class="method-section section">
+			<h3 class="section-header">Public Instance Methods</h3>
+
+		
+
+		
+			
+			<div id="rev-ab-method" class="method-detail">
+			
+				<a name="rev_ab"></a>
+
+				<div class="method-heading">
+				
+					<span class="method-name">rev_ab</span><span 
+						class="method-args">()</span>
+					<span class="method-click-advice">click to toggle source</span>
+				
+				</div>
+
+				<div class="method-description">
+					
+					<p class="missing-docs">(Not documented)</p>
+					
+					
+					
+					<div class="method-source-code" 
+						id="rev-ab-source">
+<pre>
+<span class="ruby-comment cmt"># File spec/ms/spectrum/compare_spec.rb, line 7</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">rev_ab</span>
+    <span class="ruby-identifier">each</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> (<span class="ruby-identifier">v</span>[<span class="ruby-value">0</span>], <span class="ruby-identifier">v</span>[<span class="ruby-value">1</span>]) = <span class="ruby-identifier">v</span>[<span class="ruby-value">1</span>], <span class="ruby-identifier">v</span>[<span class="ruby-value">0</span>] }
+  <span class="ruby-keyword kw">end</span></pre>
+					</div>
+					
+				</div>
+
+				
+			</div>
+
+		
+
+		
+			
+			<div id="rev-ab-method" class="method-detail">
+			
+				<a name="rev_ab"></a>
+
+				<div class="method-heading">
+				
+					<span class="method-name">rev_ab</span><span 
+						class="method-args">()</span>
+					<span class="method-click-advice">click to toggle source</span>
+				
+				</div>
+
+				<div class="method-description">
+					
+					<p class="missing-docs">(Not documented)</p>
+					
+					
+					
+					<div class="method-source-code" 
+						id="rev-ab-source">
+<pre>
+<span class="ruby-comment cmt"># File spec/ms/spectrum/filter_spec.rb, line 8</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">rev_ab</span>
+    <span class="ruby-identifier">each</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> (<span class="ruby-identifier">v</span>[<span class="ruby-value">0</span>], <span class="ruby-identifier">v</span>[<span class="ruby-value">1</span>]) = <span class="ruby-identifier">v</span>[<span class="ruby-value">1</span>], <span class="ruby-identifier">v</span>[<span class="ruby-value">0</span>] }
+  <span class="ruby-keyword kw">end</span></pre>
+					</div>
+					
+				</div>
+
+				
+			</div>
+
+		
+
+		
+			
+			<div id="sum-method" class="method-detail">
+			
+				<a name="sum"></a>
+
+				<div class="method-heading">
+				
+					<span class="method-name">sum</span><span 
+						class="method-args">()</span>
+					<span class="method-click-advice">click to toggle source</span>
+				
+				</div>
+
+				<div class="method-description">
+					
+					<p class="missing-docs">(Not documented)</p>
+					
+					
+					
+					<div class="method-source-code" 
+						id="sum-source">
+<pre>
+<span class="ruby-comment cmt"># File lib/ms/spectrum/compare.rb, line 12</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">sum</span>
+    <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">inject</span>(<span class="ruby-value">0</span><span class="ruby-value">.0</span>) {<span class="ruby-operator">|</span><span class="ruby-identifier">_sum</span>, <span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">_sum</span> <span class="ruby-operator">+=</span> <span class="ruby-identifier">v</span> }
+  <span class="ruby-keyword kw">end</span></pre>
+					</div>
+					
+				</div>
+
+				
+			</div>
+
+		
+		</div>
+	
+	
+
+	</div>
+
+
+	<div id="rdoc-debugging-section-dump" class="debugging-section">
+	
+		<p>Disabled; run with $DEBUG to generate this.</p>
+	
+	</div>
+
+	<div id="validator-badges">
+		<p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+		<p><small>Generated with the <a href="http://deveiate.org/projects/Darkfish-Rdoc/">Darkfish 
+			Rdoc Generator</a> 1.1.6</small>.</p>
+	</div>
+
+</body>
+</html>
+
