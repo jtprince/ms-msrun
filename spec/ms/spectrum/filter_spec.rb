@@ -11,12 +11,11 @@ class Array
 end
 
 class FilterSpec
-  include Ms
 
   describe 'filtering spectra' do
     before do
-      @a = Spectrum.new([[0,5,10, 15,16,17,18, 20.1], [0,1,2, 3,8,10,4, 0]])
-      @null = Spectrum.new([[],[]])
+      @a = Ms::Spectrum.new([[0,5,10, 15,16,17,18, 20.1], [0,1,2, 3,8,10,4, 0]])
+      @null = Ms::Spectrum.new([[],[]])
     end
 
     it 'filters spectra' do

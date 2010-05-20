@@ -35,8 +35,8 @@ class Ms::Msrun::Index < Array
   def initialize(filename_or_io)
     (ft, version) = Ms::Msrun.filetype_and_version(filename_or_io)
     tag = case ft
-          when :mzml : MZML_INDEX_TAG
-          when :mzxml : MZXML_INDEX_TAG
+          when :mzml ; MZML_INDEX_TAG
+          when :mzxml ; MZXML_INDEX_TAG
           end
     fn = 
       if filename_or_io.is_a? String

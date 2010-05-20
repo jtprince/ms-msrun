@@ -55,7 +55,7 @@ module MsrunSpec
     end
 
     it 'can avoid reading spectra' do 
-      nums = @nums.map
+      nums = @nums.dup
       Ms::Msrun.foreach(@file, :spectrum => false) do |scan|
         scan.spectrum.nil?.ok
         scan.num.is nums.shift

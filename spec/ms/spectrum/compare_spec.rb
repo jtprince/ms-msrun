@@ -10,16 +10,15 @@ class Array
 end
 
 module CompareSpec
-  include Ms
 
   describe 'comparison of spectra' do
 
     before do
-      @a = Spectrum.new([[0,2,3,4], [5,6,7,8]])
-      @b = Spectrum.new([[0, 1.5, 3.5, 5.5], [9,10,11,12]])
+      @a = Ms::Spectrum.new([[0,2,3,4], [5,6,7,8]])
+      @b = Ms::Spectrum.new([[0, 1.5, 3.5, 5.5], [9,10,11,12]])
 
-      @c = Spectrum.new([[0, 1], [8,9]])
-      @d = Spectrum.new([[0.6, 0.75], [10,11]])
+      @c = Ms::Spectrum.new([[0, 1], [8,9]])
+      @d = Ms::Spectrum.new([[0.6, 0.75], [10,11]])
     end
 
     it 'compares spectra' do
