@@ -1,0 +1,130 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>File: Rakefile [RDoc Documentation]</title>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+    <link href='../rdoc-style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>Rakefile</h1>
+        <div class='paths'>
+          Rakefile
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2010-05-20 10:21:58 -0600</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            <p>
+            require &#8216;rubygems&#8217; require &#8216;rake&#8217; require
+            &#8216;jeweler&#8217; require &#8216;rake/testtask&#8217; require
+            &#8216;rcov/rcovtask&#8216;
+            </p>
+            <p>
+            NAME = &#8220;ms-msrun&#8221; WEBSITE_BASE = &#8220;website&#8221;
+            WEBSITE_OUTPUT = WEBSITE_BASE + &#8220;/output&#8220;
+            </p>
+            <p>
+            gemspec = Gem::Specification.new do |s|
+            </p>
+            <pre>s.name = NAME&#x000A;s.authors = [&quot;John T. Prince&quot;]&#x000A;s.email = &quot;jtprince@gmail.com&quot;&#x000A;s.homepage = &quot;http://jtprince.github.com/&quot; + NAME + &quot;/rdoc&quot;&#x000A;s.summary = &quot;an mspire library for working with LC/MS runs (mzxml, mzData, mzML)&quot;&#x000A;s.description = 'A library for working with LC/MS runs. Part of mspire.  Has parsers for mzXML v1, 2, and 3, mzData (currently broken) and mzML (planned).  Can convert to commonly desired search output (such as mgf).  Fast random access of scans, and fast reading of the entire file.'&#x000A;s.rubyforge_project = 'mspire'&#x000A;s.add_dependency 'ms-core'&#x000A;s.add_dependency 'nokogiri'&#x000A;s.add_dependency 'narray'&#x000A;s.add_development_dependency(&quot;spec-more&quot;)</pre>
+            <p>
+            end
+            </p>
+            <p>
+            Jeweler::Tasks.new(gemspec)
+            </p>
+            <p>
+            Rake::TestTask.new(:spec) do |spec|
+            </p>
+            <pre>ENV['TEST'] = ENV['SPEC'] if ENV['SPEC']&#x000A;spec.libs &lt;&lt; 'lib' &lt;&lt; 'spec'&#x000A;spec.pattern = 'spec/**/*_spec.rb'&#x000A;spec.verbose = true</pre>
+            <p>
+            end
+            </p>
+            <p>
+            Rcov::RcovTask.new do |spec|
+            </p>
+            <pre>spec.libs &lt;&lt; 'spec'&#x000A;spec.pattern = 'spec/**/*_spec.rb'&#x000A;spec.verbose = true</pre>
+            <p>
+            end
+            </p>
+            <p>
+            def rdoc_redirect(base_rdoc_output_dir, package_website_page, version)
+            </p>
+            <pre>content = %Q{</pre>
+            <p>
+            <!DOCTYPE HTML PUBLIC &#8220;-//W3C//DTD HTML 4.0 Transitional//EN&#8220;>
+            <html><head><title>mspire: } + NAME + %Q{rdoc</title> <meta
+            http-equiv=&#8220;REFRESH&#8221;
+            content=&#8220;0;url=#{package_website_page}/rdoc/#{version}/&#8221;>
+            </head> </html>
+            </p>
+            <pre>}&#x000A;FileUtils.mkpath(base_rdoc_output_dir)&#x000A;File.open(base_rdoc_output_dir + &quot;/index.html&quot;, 'w') {|out| out.print content }</pre>
+            <p>
+            end
+            </p>
+            <p>
+            require &#8216;rake/rdoctask&#8217; Rake::RDocTask.new do |rdoc|
+            </p>
+            <pre>base_rdoc_output_dir = WEBSITE_OUTPUT + '/rdoc'&#x000A;version = File.read('VERSION')&#x000A;rdoc.rdoc_dir = 'rdoc'&#x000A;rdoc.title = NAME + ' ' + version&#x000A;rdoc.rdoc_files.include('README*')&#x000A;rdoc.rdoc_files.include('lib/**/*.rb')</pre>
+            <p>
+            end
+            </p>
+            <p>
+            task :create_redirect do
+            </p>
+            <pre>base_rdoc_output_dir = WEBSITE_OUTPUT + '/rdoc'&#x000A;rdoc_redirect(base_rdoc_output_dir, gemspec.homepage,version)</pre>
+            <p>
+            end
+            </p>
+            <p>
+            namespace :website do
+            </p>
+            <pre>desc &quot;checkout and configure the gh-pages submodule (assumes you have it)&quot;&#x000A;task :submodule_update do&#x000A;  if File.exist?(WEBSITE_OUTPUT + &quot;/.git&quot;)&#x000A;    puts &quot;!! not doing anything, #{WEBSITE_OUTPUT + &quot;/.git&quot;} already exists !!&quot;&#x000A;  else&#x000A;&#x000A;    puts &quot;(not sure why this won't work programmatically)&quot;&#x000A;    puts &quot;################################################&quot;&#x000A;    puts &quot;[Execute these commands]&quot;&#x000A;    puts &quot;################################################&quot;&#x000A;    puts &quot;git submodule init&quot;&#x000A;    puts &quot;git submodule update&quot;&#x000A;    puts &quot;pushd #{WEBSITE_OUTPUT}&quot;&#x000A;    puts &quot;git co --track -b gh-pages origin/gh-pages ;&quot;&#x000A;    puts &quot;popd&quot;&#x000A;    puts &quot;################################################&quot;&#x000A;&#x000A;    # not sure why this won't work!&#x000A;    #%x{git submodule init}&#x000A;    #%x{git submodule update}&#x000A;    #Dir.chdir(WEBSITE_OUTPUT) do&#x000A;    #  %x{git co --track -b gh-pages origin/gh-pages ;}&#x000A;    #end&#x000A;  end&#x000A;end&#x000A;&#x000A;desc &quot;setup your initial gh-pages&quot;&#x000A;task :init_ghpages do&#x000A;  puts &quot;################################################&quot;&#x000A;  puts &quot;[Execute these commands]&quot;&#x000A;  puts &quot;################################################&quot;&#x000A;  puts &quot;git symbolic-ref HEAD refs/heads/gh-pages&quot;&#x000A;  puts &quot;rm .git/index&quot;&#x000A;  puts &quot;git clean -fdx&quot;&#x000A;  puts 'echo &quot;Hello&quot; &gt; index.html'&#x000A;  puts &quot;git add .&quot;&#x000A;  puts 'git commit -a -m &quot;my first gh-page&quot;'&#x000A;  puts &quot;git push origin gh-pages&quot;&#x000A;end</pre>
+            <p>
+            end
+            </p>
+            <p>
+            task :default => :spec
+            </p>
+            <p>
+            task :build => :gemspec
+            </p>
+            <p>
+            # credit: <a href="Rakefile.html">Rakefile</a> modeled after
+            Jeweler&#8217;s
+            </p>
+          </div>
+          <div id='section'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,199 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>: Ms::Msrun::Index [RDoc Documentation]</title>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+    <link href='../../../rdoc-style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>Class</span>
+          Ms::Msrun::Index
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a href="../../../files/lib/ms/msrun/index_rb.html">lib/ms/msrun/index.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a href="../../Array.html">Array</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            <p>
+            an index by scan number of the doublets where each doublet = [start_byte,
+            length] for the scan. <a href="Index.html">Index</a> objects are enumerable
+            and yield doublets. Index#scan_nums gives an array of the scan numbers. <a
+            href="Index.html#M000071">Index#first</a> and <a
+            href="Index.html#M000072">Index#last</a> return the first and the last
+            scan, regardless of the scan numbers.
+            </p>
+            <pre>index.scan_nums  # -&gt; [1,2,3,4]&#x000A;index.each do |starting_byte, length|&#x000A;  IO.read(myfile.mzXML, length, starting_byte) # -&gt; xml for each scan&#x000A;end&#x000A;index[0]         # -&gt; nil&#x000A;index.first      # -&gt; [&lt;start_byte&gt;, &lt;length&gt;] # for scan number 1</pre>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>public class</h3>
+            <ol>
+              <li><a href="#M000069">new</a></li>
+            </ol>
+            <h3>public instance</h3>
+            <ol>
+              <li><a href="#M000070">each</a></li>
+              <li><a href="#M000071">first</a></li>
+              <li><a href="#M000068">header_length</a></li>
+              <li><a href="#M000072">last</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+            <div id='includes'>
+              <h2>Included modules</h2>
+              <ol>
+                <li>Enumerable</li>
+              </ol>
+            </div>
+          </div>
+          <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>MZXML_INDEX_TAG</td>
+                    <td>=</td>
+                    <td class='context-item-value'>'indexOffset'</td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>MZML_INDEX_TAG</td>
+                    <td>=</td>
+                    <td class='context-item-value'>'indexListOffset'</td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='attribute-list'>
+              <h2 class='section-bar'>Attributes</h2>
+              <div class='name-list'>
+                <table>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>scan_nums</td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      returns an array of the scan numbers
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public class methods</h2>
+              <div class='method public-class' id='method-M000069'>
+                <a name='M000069'></a>
+                <div class='synopsis'>
+                  <span class='name'>new</span>
+                  <span class='arguments'>(filename_or_io)</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  takes an mzxml filename or io object and returns an array of offsets and
+                  lengths for the scans note that the offset
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000069-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000069-source'><span class="ruby-comment cmt"># File lib/ms/msrun/index.rb, line 35</span>&#x000A;  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">filename_or_io</span>)&#x000A;    (<span class="ruby-identifier">ft</span>, <span class="ruby-identifier">version</span>) = <span class="ruby-constant">Ms</span><span class="ruby-operator">::</span><span class="ruby-constant">Msrun</span>.<span class="ruby-identifier">filetype_and_version</span>(<span class="ruby-identifier">filename_or_io</span>)&#x000A;    <span class="ruby-identifier">tag</span> = <span class="ruby-keyword kw">case</span> <span class="ruby-identifier">ft</span>&#x000A;          <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:mzml</span> <span class="ruby-operator">:</span> <span class="ruby-constant">MZML_INDEX_TAG</span>&#x000A;          <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:mzxml</span> <span class="ruby-operator">:</span> <span class="ruby-constant">MZXML_INDEX_TAG</span>&#x000A;          <span class="ruby-keyword kw">end</span>&#x000A;    <span class="ruby-identifier">fn</span> = &#x000A;      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">filename_or_io</span>.<span class="ruby-identifier">is_a?</span> <span class="ruby-constant">String</span>&#x000A;        <span class="ruby-identifier">filename_or_io</span>  <span class="ruby-comment cmt"># a filename</span>&#x000A;      <span class="ruby-keyword kw">else</span> <span class="ruby-comment cmt"># a File object</span>&#x000A;        <span class="ruby-identifier">filename_or_io</span>.<span class="ruby-identifier">path</span>&#x000A;      <span class="ruby-keyword kw">end</span>&#x000A;    <span class="ruby-identifier">size</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">size</span>(<span class="ruby-identifier">fn</span>)&#x000A;    <span class="ruby-identifier">io</span> =&#x000A;      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">filename_or_io</span>.<span class="ruby-identifier">is_a?</span> <span class="ruby-constant">String</span>&#x000A;        <span class="ruby-constant">File</span>.<span class="ruby-identifier">open</span>(<span class="ruby-identifier">filename_or_io</span>)&#x000A;      <span class="ruby-keyword kw">else</span>&#x000A;        <span class="ruby-identifier">filename_or_io</span>&#x000A;      <span class="ruby-keyword kw">end</span>&#x000A;    (<span class="ruby-identifier">offset</span>, <span class="ruby-identifier">length</span>) = <span class="ruby-identifier">index_offset</span>(<span class="ruby-identifier">io</span>, <span class="ruby-identifier">size</span>, <span class="ruby-identifier">tag</span>)&#x000A;    <span class="ruby-identifier">io</span>.<span class="ruby-identifier">pos</span> = <span class="ruby-identifier">offset</span>&#x000A;    <span class="ruby-identifier">xml</span> = <span class="ruby-identifier">io</span>.<span class="ruby-identifier">read</span>(<span class="ruby-identifier">length</span>)&#x000A;    <span class="ruby-identifier">io</span>.<span class="ruby-identifier">close</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">filename_or_io</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">String</span>)&#x000A;    <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">replace</span>( <span class="ruby-identifier">index_to_array</span>(<span class="ruby-identifier">xml</span>, <span class="ruby-identifier">offset</span>, <span class="ruby-identifier">ft</span>) )&#x000A;    <span class="ruby-keyword kw">self</span>&#x000A;  <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <h2>Public instance methods</h2>
+              <div class='method public-instance' id='method-M000070'>
+                <a name='M000070'></a>
+                <div class='synopsis'>
+                  <span class='name'>each</span>
+                  <span class='arguments'>(&amp;block)</span>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000070-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000070-source'><span class="ruby-comment cmt"># File lib/ms/msrun/index.rb, line 62</span>&#x000A;  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;    <span class="ruby-identifier">scan_nums</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">scan_num</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">block</span>.<span class="ruby-identifier">call</span>( <span class="ruby-keyword kw">self</span>[<span class="ruby-identifier">scan_num</span>] )&#x000A;    <span class="ruby-keyword kw">end</span>&#x000A;  <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-M000071'>
+                <a name='M000071'></a>
+                <div class='synopsis'>
+                  <span class='name'>first</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000071-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000071-source'><span class="ruby-comment cmt"># File lib/ms/msrun/index.rb, line 68</span>&#x000A;  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">first</span>&#x000A;    <span class="ruby-keyword kw">self</span>[<span class="ruby-identifier">scan_nums</span>.<span class="ruby-identifier">first</span>]&#x000A;  <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-M000068'>
+                <a name='M000068'></a>
+                <div class='synopsis'>
+                  <span class='name'>header_length</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  returns the length from the start to the first scan
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000068-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000068-source'><span class="ruby-comment cmt"># File lib/ms/msrun/index.rb, line 25</span>&#x000A;  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">header_length</span>&#x000A;    <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">each</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">pair</span><span class="ruby-operator">|</span> <span class="ruby-keyword kw">return</span> (<span class="ruby-identifier">pair</span>.<span class="ruby-identifier">first</span>) }&#x000A;  <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-M000072'>
+                <a name='M000072'></a>
+                <div class='synopsis'>
+                  <span class='name'>last</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000072-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000072-source'><span class="ruby-comment cmt"># File lib/ms/msrun/index.rb, line 72</span>&#x000A;  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">last</span>&#x000A;    <span class="ruby-keyword kw">self</span>[<span class="ruby-identifier">scan_nums</span>.<span class="ruby-identifier">last</span>]&#x000A;  <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

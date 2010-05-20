@@ -1,0 +1,85 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>File: README.rdoc [RDoc Documentation]</title>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+    <link href='../rdoc-style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <div class='name'>README.rdoc</div>
+        <div class='paths'>
+          README.rdoc
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2010-05-20 10:21:58 -0600</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            <h1><a href="http://mspire.rubyforge.org/projects/ms-msrun">ms-msrun</a></h1>
+            <p>
+            A library for working with LC/MS runs.
+            </p>
+            <h2>Examples</h2>
+            <p>
+            The following example works on any version of <b>mzXML</b>.
+            </p>
+            <pre>require &quot;ms/msrun&quot;&#x000A;&#x000A;Ms::Msrun.open(&quot;file.mzXML&quot;) do |ms|&#x000A;&#x000A;  # Run level information:&#x000A;  ms.start_time       # in seconds&#x000A;  ms.end_time         # in seconds&#x000A;&#x000A;  ms.scan_count       # number of scans&#x000A;  ms.scan_count(1)    # number of MS scans&#x000A;  ms.scan_count(2)    # number of MS/MS scans, etc.&#x000A;&#x000A;  ms.parent_basename_noext   # &quot;file&quot; (as recorded _in the xml_)&#x000A;  ms.filename                # &quot;file.mzXML&quot;&#x000A;&#x000A;  # Random scan access (very fast)&#x000A;  ms.scan(22)         # a scan object&#x000A;&#x000A;  # Complete scan access&#x000A;  ms.each do |scan|&#x000A;    scan.num          # scan number&#x000A;    scan.ms_level     # ms_level&#x000A;    scan.time         # retention time in seconds&#x000A;    scan.start_mz     # the first m/z value&#x000A;    scan.end_mz       # the last m/z value&#x000A;&#x000A;    # Precursor information&#x000A;    pr = scan.precursor  # an Ms::Precursor object&#x000A;    pr.mz&#x000A;    pr.intensity      # does fast binary search if info not already given&#x000A;    pr.parent         # the parent scan&#x000A;    pr.charge_states  # Array of possible charge states&#x000A;&#x000A;    # Spectral information&#x000A;    spectrum = scan.spectrum&#x000A;    spectrum.mzs          # Array of m/z values&#x000A;    spectrum.intensities  # Array of m/z values&#x000A;    spectrum.peaks do |mz, inten|&#x000A;      puts &quot;#{mz} #{inten}&quot;   # print each peak on own line&#x000A;    end&#x000A;  end&#x000A;&#x000A;  # supports pre-filtering for faster access&#x000A;&#x000A;  ## get just precursor info:&#x000A;  ms.each(:ms_level =&gt; 2, :spectrum =&gt; false) {|scan| scan.precursor }&#x000A;&#x000A;  ## get just level one spectra:&#x000A;  ms.each(:ms_level =&gt; 1, :precursor =&gt; false) {|scan| scan.spectrum }&#x000A;end&#x000A;&#x000A;# Quicker way to get at scans:&#x000A;Ms::Msrun.foreach(&quot;file.mzXML&quot;) {|scan|  scan &lt;do something&gt; }</pre>
+            <p>
+            mzData support to be re-included in the future and mzML support planned.
+            </p>
+            <h2>Features</h2>
+            <dl>
+            <dt><b>Fast</b></dt><dd>uses Nokogiri and a dash of regular expressions to achieve very fast random
+            access of scans and full access.
+            
+            </dd>
+            <dt><b>Unified</b></dt><dd>one interface for all formats.
+            
+            </dd>
+            <dt><b>Lazy evaluation at scan and spectrum level</b></dt><dd>Scans are only read from IO when requested. Spectra are also decoded only
+            when explicitly accessed.
+            
+            </dd>
+            </dl>
+            <h2>Installation</h2>
+            <pre>gem install ms-msrun</pre>
+            <h2>Copying</h2>
+            <pre>See LICENSE</pre>
+            <h2>See also</h2>
+            <p>
+            <a href="http://github.com/delagoya/mzml">mzml</a>
+            </p>
+          </div>
+          <div id='section'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

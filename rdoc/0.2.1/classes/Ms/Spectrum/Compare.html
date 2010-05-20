@@ -1,0 +1,139 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>: Ms::Spectrum::Compare [RDoc Documentation]</title>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+    <link href='../../../rdoc-style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>Module</span>
+          Ms::Spectrum::Compare
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a href="../../../files/lib/ms/spectrum/compare_rb.html">lib/ms/spectrum/compare.rb</a>
+          </li>
+        </ol>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>public instance</h3>
+            <ol>
+              <li><a href="#M000077">compare</a></li>
+              <li><a href="#M000075">pic_score</a></li>
+              <li><a href="#M000076">sim_score</a></li>
+            </ol>
+          </div>
+          <div id='section'>
+            <div id='methods'>
+              <h2>Public instance methods</h2>
+              <div class='method public-instance' id='method-M000077'>
+                <a name='M000077'></a>
+                <div class='synopsis'>
+                  <span class='name'>compare</span>
+                  <span class='arguments'>(other, opts={}) {|to_ret| ...}</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  opts[:type] == :mutual_best
+                  </p>
+                  <pre>will only return intensities on mutual best matches within radius.&#x000A;yields [self_intensity, other_intensity] for each match within&#x000A;the radius.</pre>
+                  <p>
+                  opts[:type] == :best
+                  </p>
+                  <pre>yields the best match in the radius peak.  If one peak is already&#x000A;spoken for, a different peak may still match a close peak if it is&#x000A;its best match (how to explain this?).</pre>
+                  <p>
+                  if opts[:yield_diff] == true then returns [&#8230;, diff] (d: true) if
+                  opts[:yield_mz] == true then returns [mz, mz, int, int] (d: false) if
+                  opts[:yield_indices] == true then returns [i,j] (d: false) assumes mzs are
+                  increasing
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000077-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000077-source'><span class="ruby-comment cmt"># File lib/ms/spectrum/compare.rb, line 84</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">compare</span>(<span class="ruby-identifier">other</span>, <span class="ruby-identifier">opts</span>={})&#x000A;        <span class="ruby-identifier">defaults</span> = {<span class="ruby-identifier">:radius</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">1.0</span>, <span class="ruby-identifier">:type=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">:mutual_best</span>, <span class="ruby-identifier">:yield_diff</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">true</span>, <span class="ruby-identifier">:yield_mz</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">false</span>, <span class="ruby-identifier">:yield_indices</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">false</span>}&#x000A;        (<span class="ruby-identifier">radius</span>, <span class="ruby-identifier">type</span>, <span class="ruby-identifier">yield_diff</span>, <span class="ruby-identifier">yield_mz</span>, <span class="ruby-identifier">yield_indices</span>) = <span class="ruby-identifier">defaults</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">opts</span>).<span class="ruby-identifier">values_at</span>(<span class="ruby-identifier">:radius</span>, <span class="ruby-identifier">:type</span>, <span class="ruby-identifier">:yield_diff</span>, <span class="ruby-identifier">:yield_mz</span>, <span class="ruby-identifier">:yield_indices</span>)&#x000A;        <span class="ruby-identifier">blk</span> = <span class="ruby-identifier">block_given?</span>&#x000A;        <span class="ruby-identifier">output</span> = [] <span class="ruby-keyword kw">if</span> <span class="ruby-operator">!</span><span class="ruby-identifier">blk</span>&#x000A;        <span class="ruby-identifier">s_ints</span> = <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">intensities</span>&#x000A;        <span class="ruby-identifier">s_size</span> = <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">mzs</span>.<span class="ruby-identifier">size</span>&#x000A;        <span class="ruby-identifier">o_mzs</span> = <span class="ruby-identifier">other</span>.<span class="ruby-identifier">mzs</span>&#x000A;        <span class="ruby-identifier">o_size</span> = <span class="ruby-identifier">o_mzs</span>.<span class="ruby-identifier">size</span>&#x000A;        <span class="ruby-identifier">o_ints</span> = <span class="ruby-identifier">other</span>.<span class="ruby-identifier">intensities</span>&#x000A;        <span class="ruby-identifier">oi</span> = <span class="ruby-value">0</span>&#x000A;        <span class="ruby-identifier">start_j</span> = <span class="ruby-value">0</span>&#x000A;        <span class="ruby-identifier">save</span> = []&#x000A;        <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">mzs</span>.<span class="ruby-identifier">each_with_index</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">mz</span>,<span class="ruby-identifier">i</span><span class="ruby-operator">|</span>&#x000A;          <span class="ruby-keyword kw">break</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">start_j</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-identifier">o_size</span>&#x000A;          <span class="ruby-identifier">hi</span> = <span class="ruby-identifier">mz</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">radius</span>&#x000A;          <span class="ruby-identifier">lo</span> = <span class="ruby-identifier">mz</span> <span class="ruby-operator">-</span> <span class="ruby-identifier">radius</span>&#x000A;          <span class="ruby-identifier">start_j</span>.<span class="ruby-identifier">upto</span>(<span class="ruby-identifier">o_size</span><span class="ruby-operator">-</span><span class="ruby-value">1</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">j</span><span class="ruby-operator">|</span>&#x000A;            <span class="ruby-identifier">diff</span> = <span class="ruby-identifier">mz</span> <span class="ruby-operator">-</span> <span class="ruby-identifier">o_mzs</span>[<span class="ruby-identifier">j</span>]&#x000A;            <span class="ruby-identifier">absdiff</span> = <span class="ruby-identifier">diff</span>.<span class="ruby-identifier">abs</span>&#x000A;            <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">absdiff</span> <span class="ruby-operator">&lt;=</span> <span class="ruby-identifier">radius</span>  <span class="ruby-comment cmt"># a potential hit!</span>&#x000A;              <span class="ruby-identifier">save</span> <span class="ruby-operator">&lt;&lt;</span> [<span class="ruby-identifier">absdiff</span>, <span class="ruby-identifier">i</span>, <span class="ruby-identifier">j</span>]&#x000A;            <span class="ruby-keyword kw">elsif</span> <span class="ruby-identifier">diff</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">0</span>  <span class="ruby-comment cmt"># we overshot</span>&#x000A;              <span class="ruby-keyword kw">break</span>  &#x000A;            <span class="ruby-keyword kw">else</span>  <span class="ruby-comment cmt"># undershot</span>&#x000A;              <span class="ruby-identifier">start_j</span> = <span class="ruby-identifier">j</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>  <span class="ruby-comment cmt"># this is for the benefit of the next search</span>&#x000A;            <span class="ruby-keyword kw">end</span>&#x000A;          <span class="ruby-keyword kw">end</span>&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;&#x000A;        <span class="ruby-comment cmt">#puts &quot;BEFORE SORT: &quot;</span>&#x000A;        <span class="ruby-comment cmt">#p save</span>&#x000A;        <span class="ruby-comment cmt">#save.sort!</span>&#x000A;        <span class="ruby-comment cmt">#puts &quot;AFTER SORT: &quot;</span>&#x000A;        <span class="ruby-comment cmt">#p save</span>&#x000A;        <span class="ruby-identifier">iset</span> = <span class="ruby-constant">Array</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">s_size</span>)&#x000A;        <span class="ruby-identifier">jset</span> = <span class="ruby-constant">Array</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">o_size</span>)&#x000A;        <span class="ruby-identifier">save</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">diff</span>, <span class="ruby-identifier">i</span>, <span class="ruby-identifier">j</span><span class="ruby-operator">|</span>&#x000A;          <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">iset</span>[<span class="ruby-identifier">i</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">jset</span>[<span class="ruby-identifier">j</span>]&#x000A;            <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">type</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">:best</span>&#x000A;              <span class="ruby-identifier">iset</span>[<span class="ruby-identifier">i</span>] = <span class="ruby-keyword kw">true</span>&#x000A;              <span class="ruby-identifier">jset</span>[<span class="ruby-identifier">j</span>] = <span class="ruby-keyword kw">true</span>&#x000A;            <span class="ruby-keyword kw">end</span>&#x000A;            <span class="ruby-identifier">to_ret</span> = &#x000A;              <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">yield_indices</span>&#x000A;                [<span class="ruby-identifier">i</span>,<span class="ruby-identifier">j</span>]&#x000A;              <span class="ruby-keyword kw">else</span>&#x000A;                [<span class="ruby-identifier">s_ints</span>[<span class="ruby-identifier">i</span>], <span class="ruby-identifier">o_ints</span>[<span class="ruby-identifier">j</span>]]&#x000A;              <span class="ruby-keyword kw">end</span>&#x000A;            <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">yield_mz</span>&#x000A;              <span class="ruby-identifier">to_ret</span>.<span class="ruby-identifier">unshift</span>( <span class="ruby-identifier">s_mzs</span>[<span class="ruby-identifier">i</span>], <span class="ruby-identifier">o_mzs</span>[<span class="ruby-identifier">j</span>] )&#x000A;            <span class="ruby-keyword kw">end</span>&#x000A;            <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">yield_diff</span>&#x000A;              <span class="ruby-identifier">to_ret</span>.<span class="ruby-identifier">push</span>( <span class="ruby-identifier">diff</span> )&#x000A;            <span class="ruby-keyword kw">end</span>&#x000A;            <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">blk</span>&#x000A;              <span class="ruby-keyword kw">yield</span> <span class="ruby-identifier">to_ret</span>&#x000A;            <span class="ruby-keyword kw">else</span>&#x000A;              <span class="ruby-identifier">output</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">to_ret</span>&#x000A;            <span class="ruby-keyword kw">end</span>&#x000A;          <span class="ruby-keyword kw">end</span>&#x000A;          <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">type</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">:mutual_best</span>&#x000A;            <span class="ruby-identifier">iset</span>[<span class="ruby-identifier">i</span>] = <span class="ruby-keyword kw">true</span>&#x000A;            <span class="ruby-identifier">jset</span>[<span class="ruby-identifier">j</span>] = <span class="ruby-keyword kw">true</span>&#x000A;          <span class="ruby-keyword kw">end</span>&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;        <span class="ruby-identifier">output</span>&#x000A;      <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-M000075'>
+                <a name='M000075'></a>
+                <div class='synopsis'>
+                  <span class='name'>pic_score</span>
+                  <span class='arguments'>(other, opts={})</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  percent ion current score: the percent of total ion current of the calling
+                  object that can be explained by other. Ranges from 0-100
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000075-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000075-source'><span class="ruby-comment cmt"># File lib/ms/spectrum/compare.rb, line 23</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">pic_score</span>(<span class="ruby-identifier">other</span>, <span class="ruby-identifier">opts</span>={})&#x000A;        <span class="ruby-identifier">opts</span>= {<span class="ruby-identifier">:normalize</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">true</span>}.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">opts</span>)&#x000A;        (<span class="ruby-identifier">a_spec</span>, <span class="ruby-identifier">b_spec</span>) = &#x000A;          <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-identifier">:normalize</span>] <span class="ruby-operator">==</span> <span class="ruby-keyword kw">true</span>&#x000A;            [<span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">normalize</span>, <span class="ruby-identifier">other</span>.<span class="ruby-identifier">normalize</span>]&#x000A;          <span class="ruby-keyword kw">else</span>&#x000A;            [<span class="ruby-keyword kw">self</span>, <span class="ruby-identifier">other</span>]&#x000A;          <span class="ruby-keyword kw">end</span>&#x000A;        <span class="ruby-identifier">overlapping_current</span> = <span class="ruby-value">0</span><span class="ruby-value">.0</span>&#x000A;        <span class="ruby-identifier">a_spec</span>.<span class="ruby-identifier">compare</span>(<span class="ruby-identifier">b_spec</span>, <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge</span>( {<span class="ruby-identifier">:yield_diff</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">false</span>} )) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">sint</span>, <span class="ruby-identifier">oint</span><span class="ruby-operator">|</span>&#x000A;          <span class="ruby-identifier">overlapping_current</span> <span class="ruby-operator">+=</span> [<span class="ruby-identifier">oint</span>, <span class="ruby-identifier">sint</span>].<span class="ruby-identifier">min</span>&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;        <span class="ruby-value">100.0</span> <span class="ruby-operator">*</span> (<span class="ruby-identifier">overlapping_current</span> <span class="ruby-operator">/</span> <span class="ruby-identifier">a_spec</span>.<span class="ruby-identifier">intensities</span>.<span class="ruby-identifier">sum</span>)&#x000A;      <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-M000076'>
+                <a name='M000076'></a>
+                <div class='synopsis'>
+                  <span class='name'>sim_score</span>
+                  <span class='arguments'>(other, opts={})</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Zhang Analytical Chemistry. 2004 76(14) &#8220;the ratio between the sum of
+                  geometric mean and sum of arithmetic mean of all ions, after the two
+                  spectra are normalized to the same total ion intensity&#8221; The score
+                  will be 1 for identical spectra (Σ (Ii*Ij)^½) / (ΣIi * ΣIj)^½
+                  </p>
+                  <p>
+                  options:
+                  </p>
+                  <pre>:normalize =&gt; true | false (d: true) normalizes intensities first</pre>
+                  <p>
+                  relevant options given for &#8216;compare&#8217; will be passed through:
+                  </p>
+                  <pre>:radius&#x000A;:type</pre>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000076-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000076-source'><span class="ruby-comment cmt"># File lib/ms/spectrum/compare.rb, line 54</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">sim_score</span>(<span class="ruby-identifier">other</span>, <span class="ruby-identifier">opts</span>={})&#x000A;        <span class="ruby-identifier">opts</span> = {<span class="ruby-identifier">:normalize</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">true</span>}.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">opts</span>)&#x000A;        (<span class="ruby-identifier">a_spec</span>, <span class="ruby-identifier">b_spec</span>) = &#x000A;          <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-identifier">:normalize</span>] <span class="ruby-operator">==</span> <span class="ruby-keyword kw">true</span>&#x000A;            [<span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">normalize</span>, <span class="ruby-identifier">other</span>.<span class="ruby-identifier">normalize</span>]&#x000A;          <span class="ruby-keyword kw">else</span>&#x000A;            [<span class="ruby-keyword kw">self</span>, <span class="ruby-identifier">other</span>]&#x000A;          <span class="ruby-keyword kw">end</span>&#x000A;        <span class="ruby-identifier">numer</span> = <span class="ruby-value">0</span><span class="ruby-value">.0</span>&#x000A;        &#x000A;        <span class="ruby-identifier">a_spec</span>.<span class="ruby-identifier">compare</span>(<span class="ruby-identifier">b_spec</span>, <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge</span>( {<span class="ruby-identifier">:yield_diff</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">false</span>} )) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">sint</span>, <span class="ruby-identifier">oint</span><span class="ruby-operator">|</span>&#x000A;          <span class="ruby-identifier">numer</span> <span class="ruby-operator">+=</span> <span class="ruby-constant">Math</span>.<span class="ruby-identifier">sqrt</span>(<span class="ruby-identifier">sint</span> <span class="ruby-operator">*</span> <span class="ruby-identifier">oint</span>)&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;        <span class="ruby-identifier">numer</span> <span class="ruby-operator">/</span> <span class="ruby-constant">Math</span>.<span class="ruby-identifier">sqrt</span>( <span class="ruby-identifier">a_spec</span>.<span class="ruby-identifier">intensities</span>.<span class="ruby-identifier">sum</span> <span class="ruby-operator">*</span> <span class="ruby-identifier">b_spec</span>.<span class="ruby-identifier">intensities</span>.<span class="ruby-identifier">sum</span> )&#x000A;      <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>File: scan_spec.rb [RDoc Documentation]</title>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+    <link href='../../../../rdoc-style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>scan_spec.rb</h1>
+        <div class='paths'>
+          spec/ms/msrun/scan_spec.rb
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2010-05-20 10:21:58 -0600</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='context'>
+            <div id='requires'>
+              <h2>Required files</h2>
+              <ol>
+                <li>ms/msrun</li>
+              </ol>
+            </div>
+          </div>
+          <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>Scan1</td>
+                    <td>=</td>
+                    <td class='context-item-value'>'&lt;scan num=&quot;4&quot;         msLevel=&quot;2&quot;         peaksCount=&quot;74&quot;         polarity=&quot;+&quot;         scanType=&quot;Full&quot;         retentionTime=&quot;PT3.64S&quot;         collisionEnergy=&quot;35&quot;         lowMz=&quot;325&quot;         highMz=&quot;2000&quot;         basePeakMz=&quot;1090.05&quot;         basePeakIntensity=&quot;789939&quot;         totIonCurrent=&quot;2.27206e+006&quot;&gt;     &lt;precursorMz precursorIntensity=&quot;1.52022e+006&quot;&gt;1222.033203&lt;/precursorMz&gt;     &lt;peaks precision=&quot;32&quot;            byteOrder=&quot;network&quot;            pairOrder=&quot;m/z-int&quot;&gt;Q7Rw2EUK8ABDuWjORQSgAEO5+NhFHLAAQ8gNTEU10ABD2QKcRLCAAEPcdCJFxBAAQ92bFkZzPABEAIucRSbQAEQJuBJFTyAARAqM7EX9+ABECsPMRT7QAEQPyWRF1LgARBoLhETLoABEHjlsRZQwAEQefjRE3yAARCERUkYvuABEIYiKRMMAAEQh01xFifAARCNEKEYpuABEI3kcRWrgAEQjvPhFHRAARCZm7EZtNABEJpXwRnyMAEQmy+pF4QAARCb/RkWfIABEKY28RZQIAEQ6gGBFyHAARDrIYEVEsABEPLuARXJgAEQ9RdREQ8AARD2BIEaV7ABEP7tcRdzoAERChMxHVPcAREK2gEZQAABEQwDkRa/gAEREyLxE3UAARFDwhEXwKABEUT7uRTPQAERTbZZFhfAARFQQvEaK9gBEVOfcRaDQAERWgBJGY5AARFh4ukcWmgBEWMAqRppEAERZgzhF+SgARFsBakXOKABEW4IiR8GBAERbw5pGUvwARFwJcEUooABEXat2RmUoAERegQRHibgARF7FmkU2AABEY6z2RgBIAERvwkxF/pgARHJ9YEYXEABEcrySRgFkAER0gDJINYsARHTFKEeJloBEdPgURoz8AER3hVhIlXggRHfIAEd2YgBEd/acRuh2AER4IiI/gAAARIW+tEVbkABEhdH8RnqcAESIQXhJQNswRIhimEecEgBEiH0cRvKMAESInkBGguYARIp9kEWm0ABEkUz6RdCQAESR//BFH5AARJQhYkYGbABEmxG2RjnYAA==&lt;/peaks&gt;   &lt;/scan&gt;   &lt;/scan&gt; '</td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>Scan2</td>
+                    <td>=</td>
+                    <td class='context-item-value'>'&lt;scan num=&quot;4&quot;         msLevel=&quot;2&quot;         peaksCount=&quot;74&quot;         polarity=&quot;+&quot;         scanType=&quot;Full&quot;         retentionTime=&quot;PT3.64S&quot;         collisionEnergy=&quot;35&quot;         lowMz=&quot;325&quot;         highMz=&quot;2000&quot;         basePeakMz=&quot;1090.05&quot;         basePeakIntensity=&quot;789939&quot;         totIonCurrent=&quot;2.27206e+006&quot;&gt;     &lt;precursorMz precursorIntensity=&quot;1.52022e+006&quot;&gt;1222.033203&lt;/precursorMz&gt;     &lt;peaks precision=&quot;32&quot;            byteOrder=&quot;network&quot;            pairOrder=&quot;m/z-int&quot;&gt;Q7Rw2EUK8ABDuWjORQSgAEO5+NhFHLAAQ8gNTEU10ABD2QKcRLCAAEPcdCJFxBAAQ92bFkZzPABEAIucRSbQAEQJuBJFTyAARAqM7EX9+ABECsPMRT7QAEQPyWRF1LgARBoLhETLoABEHjlsRZQwAEQefjRE3yAARCERUkYvuABEIYiKRMMAAEQh01xFifAARCNEKEYpuABEI3kcRWrgAEQjvPhFHRAARCZm7EZtNABEJpXwRnyMAEQmy+pF4QAARCb/RkWfIABEKY28RZQIAEQ6gGBFyHAARDrIYEVEsABEPLuARXJgAEQ9RdREQ8AARD2BIEaV7ABEP7tcRdzoAERChMxHVPcAREK2gEZQAABEQwDkRa/gAEREyLxE3UAARFDwhEXwKABEUT7uRTPQAERTbZZFhfAARFQQvEaK9gBEVOfcRaDQAERWgBJGY5AARFh4ukcWmgBEWMAqRppEAERZgzhF+SgARFsBakXOKABEW4IiR8GBAERbw5pGUvwARFwJcEUooABEXat2RmUoAERegQRHibgARF7FmkU2AABEY6z2RgBIAERvwkxF/pgARHJ9YEYXEABEcrySRgFkAER0gDJINYsARHTFKEeJloBEdPgURoz8AER3hVhIlXggRHfIAEd2YgBEd/acRuh2AER4IiI/gAAARIW+tEVbkABEhdH8RnqcAESIQXhJQNswRIhimEecEgBEiH0cRvKMAESInkBGguYARIp9kEWm0ABEkUz6RdCQAESR//BFH5AARJQhYkYGbABEmxG2RjnYAA==&lt;/peaks&gt; '</td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>Scan3</td>
+                    <td>=</td>
+                    <td class='context-item-value'>'&lt;scan num=&quot;4&quot;         msLevel=&quot;2&quot;         peaksCount=&quot;74&quot;         polarity=&quot;+&quot;         scanType=&quot;Full&quot;         retentionTime=&quot;PT3.64S&quot;         collisionEnergy=&quot;35&quot;         lowMz=&quot;325&quot;         highMz=&quot;2000&quot;         basePeakMz=&quot;1090.05&quot;         basePeakIntensity=&quot;789939&quot;         totIonCurrent=&quot;2.27206e+006&quot;&gt;     &lt;precursorMz precursorIntensity=&quot;1.52022e+006&quot;&gt;1222.033203&lt;/precursorMz&gt;     &lt;peaks precision=&quot;32&quot;            byteOrder=&quot;network&quot;            pairOrder=&quot;m/z-int&quot;&gt;Q7Rw2EUK8ABDuWjORQSgAEO5+NhFHLAAQ8gNTEU10ABD2QKcRLCAAEPcdCJFxBAAQ92bFkZzPABEAIucRSbQAEQJuBJFTyAARAqM7EX9+ABECsPMRT7QAEQPyWRF1LgARBoLhETLoABEHjlsRZQwAEQefjRE3yAARCERUkYvuABEIYiKRMMAAEQh01xFifAARCNEKEYpuABEI3kcRWrgAEQjvPhFHRAARCZm7EZtNABEJpXwRnyMAEQmy+pF4QAARCb/RkWfIABEKY28RZQIAEQ6gGBFyHAARDrIYEVEsABEPLuARXJgAEQ9RdREQ8AARD2BIEaV7ABEP7tcRdzoAERChMxHVPcAREK2gEZQAABEQwDkRa/gAEREyLxE3UAARFDwhEXwKABEUT7uRTPQAERTbZZFhfAARFQQvEaK9gBEVOfcRaDQAERWgBJGY5AARFh4ukcWmgBEWMAqRppEAERZgzhF+SgARFsBakXOKABEW4IiR8GBAERbw5pGUvwARFwJcEUooABEXat2RmUoAERegQRHibgARF7FmkU2AABEY6z2RgBIAERvwkxF/pgARHJ9YEYXEABEcrySRgFkAER0gDJINYsARHTFKEeJloBEdPgURoz8AER3hVhIlXggRHfIAEd2YgBEd/acRuh2AER4IiI/gAAARIW+tEVbkABEhdH8RnqcAESIQXhJQNswRIhimEecEgBEiH0cRvKMAESInkBGguYARIp9kEWm0ABEkUz6RdCQAESR//BFH5AARJQhYkYGbABEmxG2RjnYAA==&lt;/peaks&gt;            &lt;/scan&gt;            &lt;/scan&gt;            &lt;/msRun&gt; '</td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

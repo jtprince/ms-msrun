@@ -1,0 +1,115 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>: Ms::Msrun::Search [RDoc Documentation]</title>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+    <link href='../../../rdoc-style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>Module</span>
+          Ms::Msrun::Search
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a href="../../../files/lib/ms/msrun/search_rb.html">lib/ms/msrun/search.rb</a>
+          </li>
+        </ol>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            <p>
+            config :first_scan, 0, :short => &#8216;F&#8217;, &amp;c.integer # first
+            scan config :last_scan, 1e12, :short => &#8216;L&#8217;, &amp;c.integer #
+            last scan
+            </p>
+            <pre>if not determined to be +1, then create these charge states</pre>
+            <p>
+            config( :charge_states, [2,3], :short => &#8216;c&#8217;) {|v|
+            v.split(&#8217;,&#8217;) } config :bottom_mh, 0, :short => &#8216;B&#8217;,
+            &amp;c.float # bottom MH+ config :top_mh, -1.0, :short => &#8216;T&#8217;,
+            &amp;c.float # top MH+ config :min_peaks, 0, :short => &#8216;P&#8217;,
+            &amp;c.integer # minimum peak count config :ms_levels, 2..-1, :short =>
+            &#8216;M&#8217;, &amp;c.range # ms levels to export
+            </p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>public instance</h3>
+            <ol>
+              <li><a href="#M000067">any_output</a></li>
+              <li><a href="#M000066">to_mgf</a></li>
+            </ol>
+          </div>
+          <div id='section'>
+            <div id='methods'>
+              <h2>Public instance methods</h2>
+              <div class='method public-instance' id='method-M000067'>
+                <a name='M000067'></a>
+                <div class='synopsis'>
+                  <span class='name'>any_output</span>
+                  <span class='arguments'>(arg, &amp;block)</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  yields an IO object and the type input (:io, :filename, :string_io)
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000067-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000067-source'><span class="ruby-comment cmt"># File lib/ms/msrun/search.rb, line 103</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">any_output</span>(<span class="ruby-identifier">arg</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;        <span class="ruby-comment cmt"># this is pretty ugly, can we clean up?</span>&#x000A;          <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">arg</span>.<span class="ruby-identifier">is_a?</span> <span class="ruby-constant">IO</span>  <span class="ruby-comment cmt"># an IO object passed in</span>&#x000A;            <span class="ruby-identifier">block</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">arg</span>, <span class="ruby-identifier">:io</span>)&#x000A;          <span class="ruby-keyword kw">elsif</span> <span class="ruby-identifier">arg</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">arg</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">String</span>)  <span class="ruby-comment cmt"># open the file</span>&#x000A;            <span class="ruby-constant">File</span>.<span class="ruby-identifier">open</span>(<span class="ruby-identifier">arg</span>, <span class="ruby-value str">'w'</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">io</span><span class="ruby-operator">|</span>&#x000A;              <span class="ruby-identifier">block</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">io</span>, <span class="ruby-identifier">:filename</span>)&#x000A;            <span class="ruby-keyword kw">end</span>&#x000A;          <span class="ruby-keyword kw">else</span>  <span class="ruby-comment cmt"># nil</span>&#x000A;            <span class="ruby-identifier">st_io</span> = <span class="ruby-constant">StringIO</span>.<span class="ruby-identifier">new</span>&#x000A;            <span class="ruby-identifier">block</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">st_io</span>, <span class="ruby-identifier">:string_io</span>)&#x000A;          <span class="ruby-keyword kw">end</span>&#x000A;      <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-M000066'>
+                <a name='M000066'></a>
+                <div class='synopsis'>
+                  <span class='name'>to_mgf</span>
+                  <span class='arguments'>(opts={})</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  returns a string unless :output given (may be a String (filename) or a
+                  writeable IO object in which case the data is written to file or io and the
+                  number of spectra written is returned
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000066-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000066-source'><span class="ruby-comment cmt"># File lib/ms/msrun/search.rb, line 20</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">to_mgf</span>(<span class="ruby-identifier">opts</span>={})&#x000A;        <span class="ruby-identifier">opts</span> = {&#x000A;          <span class="ruby-identifier">:output</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">nil</span>,  <span class="ruby-comment cmt"># an output file or io object</span>&#x000A;          <span class="ruby-identifier">:bottom_mh</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span><span class="ruby-value">.0</span>,&#x000A;          <span class="ruby-identifier">:top_mh</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">nil</span>,&#x000A;          <span class="ruby-identifier">:ms_levels</span> =<span class="ruby-operator">&gt;</span> (<span class="ruby-value">2</span><span class="ruby-operator">..</span><span class="ruby-value">-1</span>),  <span class="ruby-comment cmt"># range or intger, -1 at end will be substituted for last level</span>&#x000A;          <span class="ruby-identifier">:min_peaks</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span>,&#x000A;          <span class="ruby-identifier">:first_scan</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span>,&#x000A;          <span class="ruby-identifier">:last_scan</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">nil</span>,&#x000A;          <span class="ruby-identifier">:prec_mz_precision</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">6</span>,&#x000A;          <span class="ruby-identifier">:prec_int_precision</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">2</span>,&#x000A;          <span class="ruby-identifier">:frag_mz_precision</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">5</span>,&#x000A;          <span class="ruby-identifier">:frag_int_precision</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>,&#x000A;          <span class="ruby-identifier">:charge_states_for_unknowns</span> =<span class="ruby-operator">&gt;</span> [<span class="ruby-value">2</span>,<span class="ruby-value">3</span>],&#x000A;          <span class="ruby-identifier">:determine_plus_ones</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">false</span>,&#x000A;        }.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">opts</span>)&#x000A;       (<span class="ruby-identifier">_first_scan</span>, <span class="ruby-identifier">_last_scan</span>, <span class="ruby-identifier">_bottom_mh</span>, <span class="ruby-identifier">_top_mh</span>, <span class="ruby-identifier">_ms_levels</span>, <span class="ruby-identifier">_min_peaks</span>, <span class="ruby-identifier">_charge_states_for_unknowns</span>, <span class="ruby-identifier">_prec_mz_precision</span>, <span class="ruby-identifier">_prec_int_precision</span>, <span class="ruby-identifier">_frag_mz_precision</span>, <span class="ruby-identifier">_frag_int_precision</span>, <span class="ruby-identifier">_determine_plus_ones</span>) = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">values_at</span>(<span class="ruby-identifier">:first_scan</span>, <span class="ruby-identifier">:last_scan</span>, <span class="ruby-identifier">:bottom_mh</span>, <span class="ruby-identifier">:top_mh</span>, <span class="ruby-identifier">:ms_levels</span>, <span class="ruby-identifier">:min_peaks</span>, <span class="ruby-identifier">:charge_states_for_unknowns</span>, <span class="ruby-identifier">:prec_mz_precision</span>, <span class="ruby-identifier">:prec_int_precision</span>, <span class="ruby-identifier">:frag_mz_precision</span>, <span class="ruby-identifier">:frag_int_precision</span>, <span class="ruby-identifier">:determine_plus_ones</span>)&#x000A;&#x000A;       <span class="ruby-identifier">sep</span> = <span class="ruby-value str">' '</span>&#x000A;&#x000A;       <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">_top_mh</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">_top_mh</span> <span class="ruby-operator">==</span> <span class="ruby-value">-1</span>&#x000A;         <span class="ruby-identifier">_top_mh</span> = <span class="ruby-keyword kw">nil</span>&#x000A;       <span class="ruby-keyword kw">end</span>&#x000A;&#x000A;       <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">_last_scan</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-keyword kw">or</span> <span class="ruby-identifier">_last_scan</span> <span class="ruby-operator">==</span> <span class="ruby-value">-1</span>&#x000A;         <span class="ruby-identifier">_last_scan</span> = <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">scan_nums</span>.<span class="ruby-identifier">last</span>&#x000A;       <span class="ruby-keyword kw">end</span>&#x000A;&#x000A;       <span class="ruby-keyword kw">if</span> <span class="ruby-operator">!</span><span class="ruby-identifier">_ms_levels</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Integer</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">_ms_levels</span>.<span class="ruby-identifier">last</span> <span class="ruby-operator">==</span> <span class="ruby-value">-1</span>&#x000A;         <span class="ruby-identifier">_ms_levels</span> = ((<span class="ruby-identifier">_ms_levels</span>.<span class="ruby-identifier">first</span>)<span class="ruby-operator">..</span>(<span class="ruby-identifier">scan_counts</span>.<span class="ruby-identifier">size</span><span class="ruby-operator">-</span><span class="ruby-value">1</span>))&#x000A;       <span class="ruby-keyword kw">end</span>&#x000A;&#x000A;        <span class="ruby-identifier">prec_string</span> = <span class="ruby-node">&quot;PEPMASS=%0.#{_prec_mz_precision}f %0.#{_prec_int_precision}f\n&quot;</span>&#x000A;        <span class="ruby-identifier">frag_string</span> = <span class="ruby-node">&quot;%0.#{_frag_mz_precision}f%s%0.#{_frag_int_precision}f\n&quot;</span>&#x000A;&#x000A;        <span class="ruby-identifier">any_output</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-identifier">:output</span>]) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">out</span>, <span class="ruby-identifier">out_type</span><span class="ruby-operator">|</span>&#x000A;          <span class="ruby-identifier">each_scan</span>(<span class="ruby-identifier">:ms_level</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">_ms_levels</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">scan</span><span class="ruby-operator">|</span>&#x000A;            <span class="ruby-identifier">sn</span> = <span class="ruby-identifier">scan</span>.<span class="ruby-identifier">num</span>&#x000A;&#x000A;            <span class="ruby-keyword kw">next</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">sn</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-identifier">_first_scan</span> <span class="ruby-keyword kw">and</span> <span class="ruby-identifier">sn</span> <span class="ruby-operator">&lt;=</span> <span class="ruby-identifier">_last_scan</span>&#x000A;            <span class="ruby-keyword kw">next</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">scan</span>.<span class="ruby-identifier">num_peaks</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-identifier">_min_peaks</span>&#x000A;&#x000A;            &#x000A;            <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">_determine_plus_ones</span>&#x000A;              <span class="ruby-comment cmt"># tic under precursor &gt; 95% and true = save the spectrum info</span>&#x000A;              <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">scan</span>.<span class="ruby-identifier">plus1?</span>(<span class="ruby-value">0</span><span class="ruby-value">.95</span>)&#x000A;                <span class="ruby-identifier">_charge_states</span> = [<span class="ruby-value">1</span>]&#x000A;              <span class="ruby-keyword kw">end</span>&#x000A;            <span class="ruby-keyword kw">end</span>&#x000A;&#x000A;            <span class="ruby-identifier">chrg_sts</span> = <span class="ruby-identifier">scan</span>.<span class="ruby-identifier">precursor</span>.<span class="ruby-identifier">charge_states</span>&#x000A;            <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">chrg_sts</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">||</span> <span class="ruby-operator">!</span><span class="ruby-identifier">chrg_sts</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Integer</span>)&#x000A;              <span class="ruby-identifier">chrg_sts</span> = <span class="ruby-identifier">_charge_states_for_unknowns</span>&#x000A;            <span class="ruby-keyword kw">end</span>&#x000A;&#x000A;            <span class="ruby-identifier">pmz</span> = <span class="ruby-identifier">scan</span>.<span class="ruby-identifier">precursor</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">scan</span>.<span class="ruby-identifier">precursor</span>.<span class="ruby-identifier">mz</span>&#x000A;&#x000A;            <span class="ruby-identifier">chrg_sts</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">z</span><span class="ruby-operator">|</span>&#x000A;              <span class="ruby-identifier">mh</span> = (<span class="ruby-identifier">pmz</span> <span class="ruby-operator">*</span> <span class="ruby-identifier">z</span>) <span class="ruby-operator">-</span> (<span class="ruby-identifier">z</span> <span class="ruby-operator">-</span> <span class="ruby-value">1</span>)<span class="ruby-operator">*</span><span class="ruby-constant">Ms</span><span class="ruby-operator">::</span><span class="ruby-constant">Mass</span><span class="ruby-operator">::</span><span class="ruby-constant">PROTON</span>&#x000A;              <span class="ruby-keyword kw">next</span> <span class="ruby-keyword kw">unless</span> (<span class="ruby-identifier">mh</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-identifier">_bottom_mh</span>) &#x000A;              <span class="ruby-keyword kw">next</span> <span class="ruby-keyword kw">unless</span> (<span class="ruby-identifier">mh</span> <span class="ruby-operator">&lt;=</span> <span class="ruby-identifier">_top_mh</span>) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">_top_mh</span>&#x000A;              <span class="ruby-identifier">out</span>.<span class="ruby-identifier">puts</span> <span class="ruby-value str">&quot;BEGIN IONS&quot;</span>&#x000A;              <span class="ruby-identifier">out</span>.<span class="ruby-identifier">puts</span> <span class="ruby-node">&quot;TITLE=#{self.parent_basename_noext}.#{sn}.#{sn}.#{z}&quot;</span>&#x000A;              <span class="ruby-identifier">out</span>.<span class="ruby-identifier">puts</span> <span class="ruby-node">&quot;CHARGE=#{z}+&quot;</span>&#x000A;              <span class="ruby-identifier">out</span>.<span class="ruby-identifier">printf</span>(<span class="ruby-identifier">prec_string</span>, <span class="ruby-identifier">pmz</span>, <span class="ruby-identifier">scan</span>.<span class="ruby-identifier">precursor</span>.<span class="ruby-identifier">intensity</span>)&#x000A;              <span class="ruby-identifier">scan</span>.<span class="ruby-identifier">spectrum</span>.<span class="ruby-identifier">peaks</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">mz</span>,<span class="ruby-identifier">int</span><span class="ruby-operator">|</span>&#x000A;                <span class="ruby-identifier">out</span>.<span class="ruby-identifier">printf</span>(<span class="ruby-identifier">frag_string</span>, <span class="ruby-identifier">mz</span>, <span class="ruby-identifier">sep</span>, <span class="ruby-identifier">int</span> )&#x000A;              <span class="ruby-keyword kw">end</span>&#x000A;              <span class="ruby-identifier">out</span>.<span class="ruby-identifier">puts</span> <span class="ruby-value str">&quot;END IONS\n\n&quot;</span>&#x000A;            <span class="ruby-keyword kw">end</span>&#x000A;          <span class="ruby-keyword kw">end</span>&#x000A;&#x000A;          <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">out_type</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">:string_io</span>&#x000A;            <span class="ruby-identifier">out</span>.<span class="ruby-identifier">string</span>&#x000A;          <span class="ruby-keyword kw">else</span>&#x000A;            <span class="ruby-identifier">count</span>&#x000A;          <span class="ruby-keyword kw">end</span>&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;&#x000A;      <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

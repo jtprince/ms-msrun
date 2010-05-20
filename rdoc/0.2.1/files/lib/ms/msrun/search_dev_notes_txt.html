@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>File: search_dev_notes.txt [RDoc Documentation]</title>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+    <link href='../../../../rdoc-style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>search_dev_notes.txt</h1>
+        <div class='paths'>
+          lib/ms/msrun/search_dev_notes.txt
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2010-05-20 10:21:58 -0600</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            <p>
+            (file stamp of Feb 15 2005)
+            </p>
+            <p>
+            $ ./extract_msn.exe
+            </p>
+            <pre>EXTRACT_MSN usage:  extract_msn [options] [datafile]&#x000A;options = -Fnum     where num is an INT specifying the first scan&#x000A;          -Lnum     where num is an INT specifying the last scan&#x000A;          -Bnum     where num is a FLOAT specifying the bottom MW for datafile creation&#x000A;          -Tnum     where num is a FLOAT specifying the top MW for datafile creation&#x000A;          -Mnum     where num is a FLOAT specifying the precursor mass&#x000A;                       tolerance for grouping (default=1.4)&#x000A;          -Snum     where num is an INT specifying the number of allowed&#x000A;                       different intermediate scans for grouping. (default=1)&#x000A;          -Cnum     where num is an INT specifying the charge state to use&#x000A;          -Gnum     where num is an INT specifying the minimum # of related&#x000A;                       grouped scans needed for a .dta file (default=2)&#x000A;          -Inum     where num is an INT specifying the minimum # of ions&#x000A;                       needed for a .dta file (default=0)&#x000A;          -Rnum     where num is a FLOAT specifying the minimum signal-to-noise value&#x000A;                       needed for a peak to be written to a .dta file (default=3)&#x000A;          -rnum     where num is an INT specifying the minimum number of major peaks&#x000A;                       (peaks above S/N threshold) needed for a .dta file (default=5)&#x000A;          -Dstring  where string is a path name&#x000A;          -Ystring  where string is a subsequence&#x000A;          -Z        Controls whether the zta files are written&#x000A;          -K        Controls whether the charge calculations are performed&#x000A;          -Ustring  where string is the path of a template file&#x000A;            [Default name is chgstate.tpl]&#x000A;          -Acontrolstring containing any of the options&#x000A;            T: use template          F: use discrete Fourier transform&#x000A;            E: use Eng's algorithm   H: use scan header&#x000A;            M: use MSMS count&#x000A;            O: override header charge state&#x000A;            S: create summary file   L: create log file&#x000A;            D: create both files     C: create MSMS count file&#x000A;            A: find CS even for nonzero headers&#x000A;            tfehm: include algorithm output in summary file even if not called&#x000A;            [NOTE: This version of the program has a default string of -AHTFEMAOSC,&#x000A;            but if -A option is used all desired parameters must be specified]&#x000A;          -H        print this information&#x000A;&#x000A;If lcq_dta.exclude present, will ignore list of ions in exclude list.&#x000A;Format of lcq_dta.exclude:  mass tolerance on 1st line&#x000A;                            precursor masses on subsequent lines</pre>
+          </div>
+          <div id='section'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

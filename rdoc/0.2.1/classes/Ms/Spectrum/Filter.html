@@ -1,0 +1,93 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>: Ms::Spectrum::Filter [RDoc Documentation]</title>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+    <link href='../../../rdoc-style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>Module</span>
+          Ms::Spectrum::Filter
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a href="../../../files/lib/ms/spectrum/filter_rb.html">lib/ms/spectrum/filter.rb</a>
+          </li>
+        </ol>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>public instance</h3>
+            <ol>
+              <li><a href="#M000073">filter</a></li>
+              <li><a href="#M000074">filter_by_bins</a></li>
+            </ol>
+          </div>
+          <div id='section'>
+            <div id='methods'>
+              <h2>Public instance methods</h2>
+              <div class='method public-instance' id='method-M000073'>
+                <a name='M000073'></a>
+                <div class='synopsis'>
+                  <span class='name'>filter</span>
+                  <span class='arguments'>(by=:bins, opts={})</span>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000073-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000073-source'><span class="ruby-comment cmt"># File lib/ms/spectrum/filter.rb, line 7</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">filter</span>(<span class="ruby-identifier">by</span>=<span class="ruby-identifier">:bins</span>, <span class="ruby-identifier">opts</span>={})&#x000A;        <span class="ruby-identifier">send</span>(<span class="ruby-node">&quot;filter_by_#{by}&quot;</span>.<span class="ruby-identifier">to_sym</span>, <span class="ruby-identifier">opts</span>)&#x000A;      <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-M000074'>
+                <a name='M000074'></a>
+                <div class='synopsis'>
+                  <span class='name'>filter_by_bins</span>
+                  <span class='arguments'>(opts={})</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  filters by binning the mz field bin_width is in m/z units num_peaks is the
+                  top peaks to include per bin
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000074-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000074-source'><span class="ruby-comment cmt"># File lib/ms/spectrum/filter.rb, line 14</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">filter_by_bins</span>(<span class="ruby-identifier">opts</span>={})&#x000A;        (<span class="ruby-identifier">bw</span>, <span class="ruby-identifier">np</span>) = {<span class="ruby-identifier">:bin_width</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">100</span>, <span class="ruby-identifier">:num_peaks</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">7</span> }.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">opts</span>).<span class="ruby-identifier">values_at</span>(<span class="ruby-identifier">:bin_width</span>, <span class="ruby-identifier">:num_peaks</span>)&#x000A;&#x000A;        <span class="ruby-identifier">stop</span> = <span class="ruby-identifier">bw</span>&#x000A;        <span class="ruby-identifier">track</span> = []&#x000A;        <span class="ruby-identifier">track_all</span> = [<span class="ruby-identifier">track</span>]&#x000A;        <span class="ruby-identifier">ints</span> = <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">intensities</span>&#x000A;        <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">mz</span>,<span class="ruby-identifier">int</span><span class="ruby-operator">|</span>&#x000A;          <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">mz</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">stop</span>&#x000A;            <span class="ruby-identifier">stop</span> <span class="ruby-operator">+=</span> <span class="ruby-identifier">bw</span>&#x000A;            <span class="ruby-identifier">track</span> = []&#x000A;            <span class="ruby-identifier">track_all</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">track</span>&#x000A;          <span class="ruby-keyword kw">end</span>&#x000A;          <span class="ruby-identifier">track</span> <span class="ruby-operator">&lt;&lt;</span> [<span class="ruby-identifier">int</span>, <span class="ruby-identifier">mz</span>]&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;&#x000A;        <span class="ruby-identifier">include</span> = []&#x000A;        <span class="ruby-identifier">track_all</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">track</span><span class="ruby-operator">|</span>&#x000A;          <span class="ruby-identifier">track</span>.<span class="ruby-identifier">sort!</span>&#x000A;          <span class="ruby-identifier">start</span> = (<span class="ruby-identifier">track</span>.<span class="ruby-identifier">size</span> <span class="ruby-operator">&lt;</span> <span class="ruby-identifier">np</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">track</span>.<span class="ruby-identifier">size</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">np</span>&#x000A;          <span class="ruby-identifier">include</span>.<span class="ruby-identifier">push</span>( <span class="ruby-operator">*</span>( <span class="ruby-identifier">track</span>[<span class="ruby-operator">-</span><span class="ruby-identifier">start</span>,<span class="ruby-identifier">np</span>]) )&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;&#x000A;        <span class="ruby-identifier">ret_ints</span> = []&#x000A;        <span class="ruby-identifier">ret_mzs</span> = <span class="ruby-identifier">include</span>.<span class="ruby-identifier">map</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">int</span>, <span class="ruby-identifier">mz</span><span class="ruby-operator">|</span> [<span class="ruby-identifier">mz</span>, <span class="ruby-identifier">int</span>] }.<span class="ruby-identifier">sort</span>.<span class="ruby-identifier">map</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">mz</span>,<span class="ruby-identifier">int</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ret_ints</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">int</span> ; <span class="ruby-identifier">mz</span> }&#x000A;&#x000A;        <span class="ruby-keyword kw">return</span> <span class="ruby-constant">Spectrum</span>.<span class="ruby-identifier">new</span>([<span class="ruby-identifier">ret_mzs</span>, <span class="ruby-identifier">ret_ints</span>])&#x000A;      <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>
