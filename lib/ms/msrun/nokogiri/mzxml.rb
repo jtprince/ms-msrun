@@ -75,15 +75,16 @@ class Ms::Msrun::Nokogiri::Mzxml
     opts = {:spectrum => true, :precursor => true}.merge(options)
     start_io_pos = @io.pos
     @io.pos = start_byte
-
     # read in the data keeping track of peaks start and stop
     string = ""
     if opts[:spectrum]
       string = @io.read(length)
     else
+printf("%s %d\n", __FILE__, __LINE__);      #
       # don't bother reading all the peak information if we aren't wanting it
       # and can avoid it!  This is important for high res instruments
       # especially since the peak data is huge.
+printf("%s %d\n", __FILE__, __LINE__);
       @io.each do |line|
         if md = %r{<peaks}.match(line)
           # just add the part of the string before the <peaks> tag
@@ -132,7 +133,9 @@ class Ms::Msrun::Nokogiri::Mzxml
       # data is stored as the base64 string until we actually try to access
       # it!  At that point the string is decoded and knows it is interleaved
       # data.  So, no spectrum is actually decoded unless it is accessed!
-      peaks_data = Ms::Data.new_interleaved(Ms::Data::LazyString.new(peaks_n.text, Ms::Data::LazyIO.unpack_code(peaks_n['precision'].to_i, NetworkOrder)))
+      compression_type = peaks_n['compressionType']
+      lazy_string = Ms::Data::LazyString.new(peaks_n.text, Ms::Data::LazyIO.unpack_code(peaks_n['precision'].to_i, NetworkOrder), compression_type == 'zlib')
+      peaks_data = Ms::Data.new_interleaved(lazy_string)
       spec = Ms::Spectrum.new(peaks_data)
       scan[8] = Ms::Spectrum.new(peaks_data)
     end
