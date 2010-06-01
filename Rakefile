@@ -16,7 +16,7 @@ gemspec = Gem::Specification.new do |s|
   s.summary = "an mspire library for working with LC/MS runs (mzxml, mzData, mzML)"
   s.description = 'A library for working with LC/MS runs. Part of mspire.  Has parsers for mzXML v1, 2, and 3, mzData (currently broken) and mzML (planned).  Can convert to commonly desired search output (such as mgf).  Fast random access of scans, and fast reading of the entire file.'
   s.rubyforge_project = 'mspire'
-  s.add_dependency 'ms-core'
+  s.add_dependency 'ms-core', ">= 0.0.3"
   s.add_dependency 'nokogiri'
   s.add_dependency 'narray'
   s.add_development_dependency("spec-more")
