@@ -80,11 +80,9 @@ class Ms::Msrun::Nokogiri::Mzxml
     if opts[:spectrum]
       string = @io.read(length)
     else
-printf("%s %d\n", __FILE__, __LINE__);      #
       # don't bother reading all the peak information if we aren't wanting it
       # and can avoid it!  This is important for high res instruments
       # especially since the peak data is huge.
-printf("%s %d\n", __FILE__, __LINE__);
       @io.each do |line|
         if md = %r{<peaks}.match(line)
           # just add the part of the string before the <peaks> tag
