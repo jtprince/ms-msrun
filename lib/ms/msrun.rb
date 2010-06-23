@@ -278,8 +278,8 @@ class Ms::Msrun
       io.rewind
       found
     else
-      File.open(file_or_io) do |io|
-        filetype_and_version(io)
+      File.open(file_or_io) do |_io|
+        filetype_and_version(_io)
       end
     end
   end
