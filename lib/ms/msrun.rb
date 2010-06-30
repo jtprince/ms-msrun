@@ -240,7 +240,7 @@ class Ms::Msrun
   # 'http://sashimi.sourceforge.net/schema_revision/mzXML_X.X' # others
   Mzdata_regexp = /<mzData.*version="([\d\.]+)"/m
   Raw_header_unpack_code = '@2axaxaxaxaxaxaxa'
-  Mzml_regexp = /http:\/\/psi.hupo.org\/schema_revision\/mzML_([\w\d\.]+)/o
+  Mzml_regexp = /http:\/\/psidev.info\/files\/ms\/mzML\/xsd\/([\w\d_\.]+)/o#mzML1.1.0.xsd/o
 
   def self.filetype_and_version(file_or_io)
     if file_or_io.is_a? IO

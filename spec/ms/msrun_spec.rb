@@ -134,6 +134,11 @@ module MsrunSpec
       end
       File.unlink(newname) if File.exist?(newname)
     end
-
+  end
+  
+  describe 'reading an mzML file' do
+    @file = TESTFILES + '/J/test.mzML'
+    (@key, @nums) = before_all.call(@file)
+    behaves_like 'an msrun object'
   end
 end
