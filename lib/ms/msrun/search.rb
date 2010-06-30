@@ -66,14 +66,14 @@ module Ms
               next unless (mh >= opts[:bottom_mh]) 
               next unless (mh <= opts[:top_mh]) if opts[:top_mh]
               
-              mgf_header(out, sn, z, prec_string, pmz) if type == :mgf
-              ms2_header(out, sn, z, mh, pmz) if type == :ms2
+              mgf_header(out, scan, sn, z, prec_string, pmz) if format == :mgf
+              ms2_header(out, scan, sn, z, mh, pmz) if format == :ms2
               
               scan.spectrum.peaks do |mz,int|
                 out.printf(frag_string, mz, sep, int)
               end
               
-              out.puts "END IONS\n\n" if type == :mgf
+              out.puts "END IONS\n\n" if format == :mgf
             end
           end
           
@@ -86,7 +86,7 @@ module Ms
       end
       
       #Creates the mgf-type spectrum header
-      def mgf_header(out, sn, z, prec_string, pmz)
+      def mgf_header(out, scan, sn, z, prec_string, pmz)
         out.puts "BEGIN IONS"
         out.puts "TITLE=#{self.parent_basename_noext}.#{sn}.#{sn}.#{z}"
         out.puts "CHARGE=#{z}+"
@@ -94,7 +94,7 @@ module Ms
       end
       
       #Creates the ms2-type spectrum header
-      def ms2_header(out, sn, z, mh, pmz)
+      def ms2_header(out, scan, sn, z, mh, pmz)
         out.puts "S\t#{sn}\t#{sn}\t#{pmz}"
         out.puts "I\tRTime\t#{scan.time}"
         out.puts "Z\t#{z}\t#{mh}"
