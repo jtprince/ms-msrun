@@ -115,7 +115,12 @@ class Ms::Msrun::Index < Array
       #  @scan_nums << el['id'].to_i
       #end
     when :mzml
-      raise NotImplementedError
+      xml_string.each_line("\n") do |line|
+        if line =~ /<offset idRef=".*scan=(\d+)".*>(\d+)</
+          @scan_nums << $1.to_i
+          indices << $2.to_i
+        end
+      end
     end
     indices << last_offset
 

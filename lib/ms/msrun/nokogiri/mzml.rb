@@ -28,19 +28,16 @@ class Ms::Msrun::Nokogiri::Mzml
       else
         length_or_header_string
       end
+    
     doc = Nokogiri::XML.parse(string, *Ms::Msrun::Nokogiri::PARSER_ARGS)
     msrun_n = doc.root 
-    if @version >= '2.0'
-      msrun_n = msrun_n.child
-    end
-    @msrun.scan_count = msrun_n['scanCount'].to_i
-    @msrun.start_time = msrun_n['startTime'][2...-1].to_f
-    @msrun.end_time = msrun_n['endTime'][2...-1].to_f
+    
+    @msrun.scan_count = msrun_n.xpath("//xmlns:spectrumList/@count").to_s.to_i
+    @msrun.start_time = msrun_n.xpath("//xmlns:run/@startTimeStamp").to_s
+    #@msrun.end_time = msrun_n['endTime'][2...-1].to_f  #There doesn't appear to be an endTime
 
-    filename = msrun_n.search("parentFile").first['fileName']
-    (bn, dn) = Ms::Mzxml.parent_basename_and_dir(filename)
-    @msrun.parent_basename = bn
-    @msrun.parent_location = dn
+    @msrun.parent_basename = msrun_n.xpath("//xmlns:sourceFile/@name").to_s
+    @msrun.parent_location = msrun_n.xpath("//xmlns:sourceFile/@location").to_s
     @msrun
   end
 
