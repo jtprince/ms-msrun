@@ -20,7 +20,7 @@ module MsrunSpec
         end
       end
     end
-
+    
     it 'can access random scans' do
       Ms::Msrun.open(@file) do |ms|
         scan = ms.scan(20)
