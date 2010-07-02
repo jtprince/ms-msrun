@@ -35,7 +35,6 @@ class Ms::Msrun::Nokogiri::Mzml
     @msrun.scan_count = msrun_n.xpath("//xmlns:spectrumList/@count").to_s.to_i
     @msrun.start_time = msrun_n.xpath("//xmlns:run/@startTimeStamp").to_s
     #@msrun.end_time = msrun_n['endTime'][2...-1].to_f  #There doesn't appear to be an endTime
-    
     @msrun.parent_basename = msrun_n.xpath("//xmlns:sourceFile/@name").to_s
     @msrun.parent_location = msrun_n.xpath("//xmlns:sourceFile/@location").to_s
     @msrun
@@ -56,6 +55,7 @@ class Ms::Msrun::Nokogiri::Mzml
       break if total_length > length
     end
     @io.pos = start_io_pos
+    
     ms_level
   end
   
@@ -127,6 +127,7 @@ class Ms::Msrun::Nokogiri::Mzml
       spec = Ms::Spectrum.new(peaks_data)
       scan[8] = Ms::Spectrum.new(peaks_data)
     end
+    
     scan
   end
   
@@ -143,18 +144,23 @@ class Ms::Msrun::Nokogiri::Mzml
     scan = Ms::Scan.new  # array class creates one with 9 positions
     scan[0] = $1.to_i if node['id'] =~ /scan=(\d+)/
     scan[1] = node.xpath(".//cvParam[@name=\"ms level\"]/@value").to_s.to_i
+    
     if x = node['retentionTime']  #I don't see such a value in the mzML file
       scan[2] = x[2...-1].to_f
     end
+    
     if x = node['startMz']  #Or this
       scan[3] = x.to_f
       scan[4] = node['endMz'].to_f
     end
+    
     scan[5] = node['defaultArrayLength'].to_i
     scan[6] = node.xpath(".//cvParam[@name=\"total ion current\"]/@value").to_s.to_f
+    
     if fl = node['filterLine']
       (scan[3], scan[4]) = start_end_from_filter_line(fl)
     end
+    
     scan
   end
 end

@@ -1,12 +1,11 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
-
 require 'ms/msrun'
 
 module MsrunSpec
 
   before_all = lambda do |file|
-    nums = (1..20).to_a  # define scan numbers
     key = YAML.load_file(file + '.key.yml')
+    nums = (1..key['scan_count'][0]).to_a  # define scan numbers
     [key, nums]
   end
 
