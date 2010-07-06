@@ -9,7 +9,7 @@ require 'ms/mzxml'
 require 'narray'
 
 class Ms::Msrun::Nokogiri::Mzml
-  NetworkOrder = true
+  NetworkOrder = false
   
   attr_accessor :msrun, :io, :version
   
@@ -47,7 +47,7 @@ class Ms::Msrun::Nokogiri::Mzml
     ms_level = nil
     total_length = 0
     @io.each("\n") do |line|
-      if line =~ /msLevel="(\d+)"/o
+      if line =~ /ms level" value="(\d+)"/o
         ms_level = $1.to_i
         break
       end
@@ -108,8 +108,8 @@ class Ms::Msrun::Nokogiri::Mzml
           prec = Ms::Precursor.new
           prec[1] = prec_n.xpath(".//cvParam[@name=\"peak intensity\"]/@value").to_s.to_f
           prec[0] = prec_n.xpath(".//cvParam[@name=\"selected ion m/z\"]/@value").to_s.to_f
-          if x = prec_n.xpath(".//cvParam[@name=\"charge state\"]/@value").to_s
-            prec[3] = [x.to_i]
+          if x = prec_n.xpath(".//cvParam[@name=\"charge state\"]/@value").to_s.to_i
+            prec[3] = [x]
           end
           scan.precursor = prec
         end
@@ -119,20 +119,27 @@ class Ms::Msrun::Nokogiri::Mzml
       end
     
     if opts[:spectrum]
-      # all mzXML (at least versions 1--3.0) *must* be 'network' byte order!
-      # data is stored as the base64 string until we actually try to access
-      # it!  At that point the string is decoded and knows it is interleaved
-      # data.  So, no spectrum is actually decoded unless it is accessed!
-      peaks_data = Ms::Data.new_interleaved(Ms::Data::LazyString.new(peaks_n.text, Ms::Data::LazyIO.unpack_code(precision(peaks_n), NetworkOrder)))
-      spec = Ms::Spectrum.new(peaks_data)
-      scan[8] = Ms::Spectrum.new(peaks_data)
+      # make sure packing order (Network Order is correct) and precision is correct
+      mzArray = peaks_n.xpath(".//binaryDataArray[.//cvParam/@name=\"m/z array\"]")
+      intensityArray = peaks_n.xpath(".//binaryDataArray[.//cvParam/@name=\"intensity array\"]")
+      
+      mzs = lazilyGetString(mzArray)
+      intensities = lazilyGetString(intensityArray)
+      spec = Ms::Spectrum.new(Ms::Data::new_simple([mzs, intensities]))  # Ms::Data
+      
+      scan[8] = spec
     end
     
     scan
   end
   
+  def lazilyGetString(binaryDataArray)
+    Ms::Data::LazyString.new(binaryDataArray.text, Ms::Data::LazyIO.unpack_code(precision(binaryDataArray), Ms::Msrun::Nokogiri::Mzml::NetworkOrder))
+  end
+  
   def precision(peaks_n)
-    peaks_n.xpath(".//binaryDataArray[1]/cvParam[1]/@name").to_s[0..2].to_i
+    return 64 unless peaks_n.xpath(".//cvParam[@name=\"64-bit float\"]").empty?
+    return 32 unless peaks_n.xpath(".//cvParam[@name=\"32-bit float\"]").empty?
   end
   
   def start_end_from_filter_line(line)

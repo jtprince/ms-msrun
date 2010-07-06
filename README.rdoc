@@ -60,7 +60,7 @@ The following example works on any version of *mzXML* (doesn't support mzXML 3.1
     # Quicker way to get at scans:
     Ms::Msrun.foreach("file.mzXML") {|scan|  scan <do something> }
 
-mzData support to be re-included in the future and mzML support planned.
+mzData support to be re-included in the future and mzML support is in the works.
 
 == Features
 

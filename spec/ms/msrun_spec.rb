@@ -42,13 +42,19 @@ module MsrunSpec
 
     it 'can read scans of a certain ms_level' do
       nums = [1,5,9,13,17]
+      nums = [4,10,16] if @file.include? "mzML"
+      temp = nums.dup
+      
       Ms::Msrun.open(@file) do |ms|
         ms.each(:ms_level => 1) do |scan|
-          scan.num.is nums.shift 
+          break if scan.num > 20
+          scan.num.is temp.shift 
         end
       end
-      nums = [2,3,4,6,7,8,10,11,12,14,15,16,18,19,20]
+      
+      nums = (1..20).to_a - nums
       Ms::Msrun.foreach(@file, :ms_level => 2) do |scan|
+        break if scan.num > 20
         scan.num.is nums.shift 
       end
     end
