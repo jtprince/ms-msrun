@@ -68,7 +68,7 @@ module Ms
             end
 
             chrg_sts = scan.precursor.charge_states
-            if chrg_sts.nil? || !chrg_sts.first.is_a?(Integer)
+            if chrg_sts.nil? || !chrg_sts.first.is_a?(Integer) || chrg_sts.first == 0
               chrg_sts = _charge_states_for_unknowns
             end
 
