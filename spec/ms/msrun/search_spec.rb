@@ -1,5 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
-
+require 'fileutils'
 require 'ms/msrun'
 
 
@@ -51,6 +51,19 @@ describe 'mzxml to search formats' do
       end
     end
     # TODO: should write some more specs here
+  end
+  
+  it 'creates ms2 formatted files' do
+    key = TESTFILES + '/J/key-test.ms2'
+    mzFile = TESTFILES + '/J/test.mzXML'
+    msFile = ""
+    
+    Ms::Msrun.open(mzFile) do |ms|
+      msFile = mzFile.chomp(".mzXML") + ".ms2"
+      ms.to_ms2(:output => msFile)
+    end
+    
+    FileUtils::cmp(msFile, key).is true
   end
 
 end

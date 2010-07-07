@@ -9,4 +9,4 @@ require 'libxml'
 LibXML::XML.default_keep_blanks = false
 
 
-LibXML::XML::Reader.io(
+#LibXML::XML::Reader.io(

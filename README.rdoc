@@ -4,15 +4,15 @@ A library for working with LC/MS runs.
 
 == Examples
 
-The following example works on any version of *mzXML* (doesn't support mzXML 3.1 compression just yet).
+The following example works on any version of *mzXML* and works similarly for *mzML* (doesn't support mzXML 3.1 compression just yet).
 
     require "ms/msrun" 
 
     Ms::Msrun.open("file.mzXML") do |ms|
       
       # Run level information:
-      ms.start_time       # in seconds
-      ms.end_time         # in seconds 
+      ms.start_time       # in seconds, gives date for mzML
+      ms.end_time         # in seconds, returns nil in mzML
 
       ms.scan_count       # number of scans
       ms.scan_count(1)    # number of MS scans
@@ -29,8 +29,8 @@ The following example works on any version of *mzXML* (doesn't support mzXML 3.1
         scan.num          # scan number
         scan.ms_level     # ms_level
         scan.time         # retention time in seconds
-        scan.start_mz     # the first m/z value
-        scan.end_mz       # the last m/z value
+        scan.start_mz     # the first m/z value, returns nil in mzML
+        scan.end_mz       # the last m/z value, returns nil in mzML
   
         # Precursor information
         pr = scan.precursor  # an Ms::Precursor object
@@ -60,7 +60,7 @@ The following example works on any version of *mzXML* (doesn't support mzXML 3.1
     # Quicker way to get at scans:
     Ms::Msrun.foreach("file.mzXML") {|scan|  scan <do something> }
 
-mzData support to be re-included in the future and mzML support planned.
+mzData support to be re-included in the future.
 
 == Features
 
