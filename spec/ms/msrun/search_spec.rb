@@ -60,9 +60,7 @@ describe 'mzxml to search formats' do
     
     Ms::Msrun.open(mzFile) do |ms|
       msFile = mzFile.chomp(".mzXML") + ".ms2"
-      File.open(msFile, 'w') do |f|
-        f.puts ms.to_ms2() 
-      end
+      ms.to_ms2(:output => msFile)
     end
     
     FileUtils::cmp(msFile, key).is true
