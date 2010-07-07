@@ -108,9 +108,12 @@ class Ms::Msrun::Nokogiri::Mzml
           prec = Ms::Precursor.new
           prec[1] = prec_n.xpath(".//cvParam[@name=\"peak intensity\"]/@value").to_s.to_f
           prec[0] = prec_n.xpath(".//cvParam[@name=\"selected ion m/z\"]/@value").to_s.to_f
-          if x = prec_n.xpath(".//cvParam[@name=\"charge state\"]/@value").to_s.to_i
-            prec[3] = [x]
+          charge = prec_n.xpath(".//cvParam[@name=\"charge state\"]/@value").to_s.to_i
+          
+          if charge > 0
+            prec[3] = [charge]
           end
+          
           scan.precursor = prec
         end
         scan_n.xpath(".//binaryDataArrayList")
