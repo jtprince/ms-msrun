@@ -4,11 +4,12 @@ A library for working with LC/MS runs.
 
 == Examples
 
-The following example works on any version of *mzXML* and works similarly for *mzML* (doesn't support mzXML 3.1 compression just yet).
+The following example works on *ALL* versions of *mzXML* and *mzML* (including support for compressed peak data).
 
     require "ms/msrun" 
 
-    Ms::Msrun.open("file.mzXML") do |ms|
+    file = "file.mzXML" # works identical for "file.mzML"
+    Ms::Msrun.open(file) do |ms|
       
       # Run level information:
       ms.start_time       # in seconds, gives date for mzML
@@ -21,7 +22,7 @@ The following example works on any version of *mzXML* and works similarly for *m
       ms.parent_basename_noext   # "file" (as recorded _in the xml_)
       ms.filename                # "file.mzXML"
 
-      # Random scan access (very fast)
+      # Random scan access (blazing fast)
       ms.scan(22)         # a scan object
 
       # Complete scan access
@@ -57,16 +58,16 @@ The following example works on any version of *mzXML* and works similarly for *m
       ms.each(:ms_level => 1, :precursor => false) {|scan| scan.spectrum }
     end
 
-    # Quicker way to get at scans:
+    # Quicker way to get at the scans:
     Ms::Msrun.foreach("file.mzXML") {|scan|  scan <do something> }
-
-mzData support to be re-included in the future.
 
 == Features
 
 [<b>Fast</b>] uses Nokogiri and a dash of regular expressions to achieve very fast random access of scans and full access.
 [<b>Unified</b>] one interface for all formats.
 [<b>Lazy evaluation at scan and spectrum level</b>] Scans are only read from IO when requested.  Spectra are also decoded only when explicitly accessed.
+[<b>Extensively tested</b>] To release, the parser must pass an extensive specification for each file version (a total of ~1500 tests).
+[<b>Long-term support</b>] We will continue to support newer versions and fix any bugs or edge cases that are found.  *Please* alert us of any mzXML or mzML file that is not parsed correctly.
 
 == Installation
 
@@ -78,4 +79,4 @@ mzData support to be re-included in the future.
 
 == See also
 
-mzml[http://github.com/delagoya/mzml]
+mzml[http://github.com/delagoya/mzml] and the TPP[http://tools.proteomecenter.org/wiki/index.php?title=Software:TPP]
