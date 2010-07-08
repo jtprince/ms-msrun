@@ -148,6 +148,13 @@ module MsrunSpec
     behaves_like 'an msrun object'
   end
   
+  describe 'reading a compressed mzXML v3.1 file' do
+    @file = TESTFILES + '/J/j24.mzXML'
+    (@key, @nums) = before_all.call(@file)
+    
+    behaves_like 'an msrun object'
+  end
+  
   describe 'reading an mzML file' do
     @file = TESTFILES + '/J/j24.mzML'
     (@key, @nums) = before_all.call(@file)
