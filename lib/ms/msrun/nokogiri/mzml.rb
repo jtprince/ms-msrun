@@ -137,7 +137,10 @@ class Ms::Msrun::Nokogiri::Mzml
   end
   
   def lazilyGetString(binaryDataArray)
-    Ms::Data::LazyString.new(binaryDataArray.text, Ms::Data::LazyIO.unpack_code(precision(binaryDataArray), Ms::Msrun::Nokogiri::Mzml::NetworkOrder))
+    unpackFormat = Ms::Data::LazyIO.unpack_code(precision(binaryDataArray), Ms::Msrun::Nokogiri::Mzml::NetworkOrder)
+    compression = false
+    compression = true if binaryDataArray.xpath(".//cvParam[@name=\"no compression\"]").empty?
+    Ms::Data::LazyString.new(binaryDataArray.text, unpackFormat, compression)
   end
   
   def precision(peaks_n)

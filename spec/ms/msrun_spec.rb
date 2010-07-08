@@ -42,19 +42,19 @@ module MsrunSpec
 
     it 'can read scans of a certain ms_level' do
       nums = [1,5,9,13,17]
-      nums = [4,10,16] if @file.include? "mzML"
+      nums = [1,7,13,19] if @file.include? "j24"
       temp = nums.dup
       
       Ms::Msrun.open(@file) do |ms|
         ms.each(:ms_level => 1) do |scan|
-          break if scan.num > 20
+          break if scan.num > 20 && !@file.include?("j24")
           scan.num.is temp.shift 
         end
       end
       
-      nums = (1..20).to_a - nums
+      nums = (1..24).to_a - nums
       Ms::Msrun.foreach(@file, :ms_level => 2) do |scan|
-        break if scan.num > 20
+        break if scan.num > 20 && !@file.include?("j24")
         scan.num.is nums.shift 
       end
     end
@@ -141,9 +141,24 @@ module MsrunSpec
     end
   end
   
-  describe 'reading an mzML file' do
-    @file = TESTFILES + '/J/test.mzML'
+  describe 'reading an mzXML v3.1 file' do
+    @file = TESTFILES + '/J/j24.mzXML'
     (@key, @nums) = before_all.call(@file)
+    
+    behaves_like 'an msrun object'
+  end
+  
+  describe 'reading an mzML file' do
+    @file = TESTFILES + '/J/j24.mzML'
+    (@key, @nums) = before_all.call(@file)
+    
+    behaves_like 'an msrun object'
+  end
+  
+  describe 'reading a compressed mzML file' do
+    @file = TESTFILES + '/J/j24z.mzML'
+    (@key, @nums) = before_all.call(@file)
+    
     behaves_like 'an msrun object'
   end
 end
