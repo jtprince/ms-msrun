@@ -63,8 +63,8 @@ The following example works on *ALL* versions of *mzXML* and *mzML* (including s
 
 == Features
 
-[<b>Fast</b>] uses Nokogiri and a dash of regular expressions to achieve very fast random access of scans and full access.
-[<b>Unified</b>] one interface for all formats.
+[<b>Fast</b>] Uses Nokogiri and a dash of regular expressions to achieve very fast random access of scans (also supports accessing all scans or subsets of scans).
+[<b>Unified</b>] One interface for all formats.
 [<b>Lazy evaluation at scan and spectrum level</b>] Scans are only read from IO when requested.  Spectra are also decoded only when explicitly accessed.
 [<b>Extensively tested</b>] To release, the parser must pass an extensive specification for each file version (a total of ~1500 tests).
 [<b>Long-term support</b>] We will continue to support newer versions and fix any bugs or edge cases that are found.  *Please* alert us of any mzXML or mzML file that is not parsed correctly.
