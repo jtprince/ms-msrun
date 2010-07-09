@@ -2,24 +2,36 @@
 
 require 'rubygems'
 require 'optparse'
+require 'ms/msrun'
 require 'ms/msrun/search'
 
 opts = OptionParser.new do |op|
-  op.banner = "usage: #{File.basename(__FILE__)} <file>.mzXML ..."
-  op.separator "outputs: <file>.mgf"
-  op.separator "[by default outputs .mgf file]"
+  op.banner = "usage: #{File.basename(__FILE__)} <file>.mz[XML | ML] ... <type>"
+  op.separator "outputs: <file>.[mgf | ms2]"
+  op.separator "Example: test.mzML mgf"
 
 end
 
 if ARGV.size == 0
   puts opts.to_s
   exit
+elsif ARGV[-1] != "mgf" && ARGV[-1] != "ms2"
+  puts "Invalid type"
+  puts opts.to_s
+  exit
 end
 
-ARGV.each do |file|
+ARGV[0...-1].each do |file|
+  if !File.exist?(file)
+    puts "Invalid file. Skipping #{file}..."
+    next
+  end
+  
   Ms::Msrun.open(file) do |ms|
-    outfile = ms.to_mgf(file.sub(/\.mzxml/i, '.mgf'))
-    ms.to_mgf(outfile)
+    outfile = file.sub(/\.mzxml|\.mzml/i, ".#{ARGV[-1]}")
+    File.open(outfile, 'w') do |f|
+      f.puts eval "ms.to_#{ARGV[-1]}"  #This is a dynamic method call.
+    end
   end
 end
 

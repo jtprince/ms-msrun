@@ -1,3 +1,4 @@
+require 'ms/msrun'
 require 'ms/mass'
 
 module Ms
