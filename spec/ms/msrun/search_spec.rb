@@ -3,7 +3,7 @@ require 'fileutils'
 require 'ms/msrun'
 
 
-describe 'mzxml to search formats' do
+describe 'mzXML or mzML to search formats' do
 
   it 'creates mgf formatted files' do
     @file = TESTFILES + '/opd1/000.v1.mzXML'
@@ -54,13 +54,26 @@ describe 'mzxml to search formats' do
   end
   
   it 'creates ms2 formatted files' do
-    key = TESTFILES + '/J/key-test.ms2'
-    mzFile = TESTFILES + '/J/test.mzXML'
+    key = TESTFILES + '/J/key-j24z.ms2'
+    mzFile = TESTFILES + '/J/j24z.mzML'
     msFile = ""
     
     Ms::Msrun.open(mzFile) do |ms|
-      msFile = mzFile.chomp(".mzXML") + ".ms2"
+      msFile = mzFile.chomp(".mzML") + ".ms2"
       ms.to_ms2(:output => msFile)
+    end
+    
+    FileUtils::cmp(msFile, key).is true
+  end
+  
+  it 'allows for selecting specific scans in output' do
+    key = TESTFILES + '/J/key-j10z.mgf'
+    mzFile = TESTFILES + '/J/j24z.mzML'
+    msFile = ""
+    
+    Ms::Msrun.open(mzFile) do |ms|
+      msFile = mzFile.chomp(".mzML") + ".mgf"
+      ms.to_mgf(:output => msFile, :included_scans => [1,2,3,8,10,11,15,17,18,20,24])
     end
     
     FileUtils::cmp(msFile, key).is true

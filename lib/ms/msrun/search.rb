@@ -15,7 +15,7 @@ module Ms
 
     module Search
     
-      # returns a string unless :output given (may be a String (filename) or a
+      # Returns a string unless :output given (may be a String (filename) or a
       # writeable IO object in which case the data is written to file or io
       # and the number of spectra written is returned
       def to_mgf(opts={})
@@ -57,6 +57,7 @@ module Ms
           each_scan(:ms_level => opts[:ms_levels]) do |scan|
             sn = scan.num
             
+            next unless opts[:included_scans].include? sn
             next unless sn >= opts[:first_scan] and sn <= opts[:last_scan]
             next unless scan.num_peaks >= opts[:min_peaks]
             
@@ -117,6 +118,7 @@ module Ms
           :frag_int_precision => 1,
           :charge_states_for_unknowns => [2,3],
           :determine_plus_ones => false,
+          :included_scans => (1..scan_count).to_a  #An array of scans to include in the output. :ms_levels precedes :included_scans.
         }.merge(opts)
         
         if opts[:top_mh].nil? || opts[:top_mh] == -1
