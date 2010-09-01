@@ -66,8 +66,10 @@ module Ms
               next unless (mh >= opts[:bottom_mh]) 
               next unless (mh <= opts[:top_mh]) if opts[:top_mh]
               
-              mgf_header(out, scan, sn, z, prec_string, pmz) if format == :mgf
-              ms2_header(out, scan, sn, z, mh, pmz) if format == :ms2
+              case format
+              when :mgf ; mgf_header(out, scan, sn, z, prec_string, pmz)
+              when :ms2 ; ms2_header(out, scan, sn, z, mh, pmz)
+              end
               
               scan.spectrum.peaks do |mz,int|
                 out.printf(frag_string, mz, sep, int)
@@ -95,9 +97,12 @@ module Ms
       
       #Creates the ms2-type spectrum header
       def ms2_header(out, scan, sn, z, mh, pmz)
-        out.puts "S\t#{sn}\t#{sn}\t#{pmz}"
-        out.puts "I\tRTime\t#{scan.time}"
-        out.puts "Z\t#{z}\t#{mh}"
+        [['S', sn, sn, pmz], ['I', 'RTime', scan.time], ['Z', z, mh]].each do |ar|
+          out.puts ar.join("\t")
+        end
+        #out.puts "S\t#{sn}\t#{sn}\t#{pmz}"
+        #out.puts "I\tRTime\t#{scan.time}"
+        #out.puts "Z\t#{z}\t#{mh}"
       end
       
       #Sets options and other variables to be used by the to_* methods.
