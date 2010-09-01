@@ -23,4 +23,13 @@ module Bacon
   end
 end
 
+class File
+  # unlinks the file and won't complain if it doesn't exist
+  def self.unlink_f(file)
+    if File.exist?(file)
+      File.unlink(file)
+    end
+  end
+end
+
 Bacon.summary_on_exit

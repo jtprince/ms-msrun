@@ -3,16 +3,28 @@ require 'ms/mass'
 module Ms
   class Msrun
   
-    #config :first_scan, 0, :short => 'F', &c.integer # first scan
-    #config :last_scan, 1e12, :short => 'L', &c.integer  # last scan
-    ## if not determined to be +1, then create these charge states
-    #config( :charge_states, [2,3], :short => 'c') {|v| v.split(',') }
-    #config :bottom_mh, 0, :short => 'B', &c.float # bottom MH+ 
-    #config :top_mh, -1.0, :short => 'T', &c.float # top MH+
-    #config :min_peaks, 0, :short => 'P', &c.integer # minimum peak count
-    #config :ms_levels, 2..-1, :short => 'M', &c.range  # ms levels to export
-
     module Search
+
+      # convenience method to convert a file to a search format
+      # @param [Symbol] format valid format symbol
+      # @param [String] file the filename (relative or absolute)
+      # @param [Hash] opts other options taken by Search:to_search
+      # @option opts [Object] :run_id concatenated to output filename with :run_id_cat
+      # @option opts [String] :run_id_cat ('.') concatenate run_id
+      # @example
+      #   Ms::Msrun::Search.convert(:mgf, "myfilename.mzXML", :run_id => 25, :run_id_cat => '__')
+      #   # writes to the file: "myfilename__25.mgf"
+      def self.convert(format, file, opts={})
+        opts[:run_id_cat] ||= '.'
+        new_filename = file.chomp(File.extname(file))
+        if opts[:run_id]
+          new_filename << opts[:run_id_cat].to_s << opts[:run_id].to_s
+        end
+        new_filename << '.' << format.to_s
+        Ms::Msrun.open(file) do |ms|
+          ms.to_search(format, :output => new_filename)
+        end
+      end
     
       # returns a string unless :output given (may be a String (filename) or a
       # writeable IO object in which case the data is written to file or io
@@ -21,36 +33,18 @@ module Ms
         to_search(:mgf, opts)
       end
       
-      #Same as to_mgf, but for the ms2 format
+      # same as to_mgf, but for the ms2 format
       def to_ms2(opts={})
         to_search(:ms2, opts)
       end
       
-      # yields an IO object and the type input (:io, :filename, :string_io)
-      def any_output(arg, &block)
-        # this is pretty ugly, can we clean up?
-        if arg.is_a? IO  # an IO object passed in
-          block.call(arg, :io)
-        elsif arg && arg.is_a?(String)  # open the file
-          File.open(arg, 'w') do |io|
-            block.call(io, :filename)
-          end
-        else  # nil
-          st_io = StringIO.new
-          block.call(st_io, :string_io)
-        end
-      end
-      
-      
-      private
-      
-      #Performs the common actions for the different formats, and calls the command for the given format
+      # performs the common actions for the different formats, and calls the command for the given format
       def to_search(format, opts)
         opts = set_opts(opts)
         
         sep = ' '
         frag_string = "%0.#{opts[:frag_mz_precision]}f%s%0.#{opts[:frag_int_precision]}f\n"
-        prec_string = "PEPMASS=%0.#{opts[:prec_mz_precision]}f %0.#{opts[:prec_int_precision]}f\n"
+        mgf_prec_string = "PEPMASS=%0.#{opts[:prec_mz_precision]}f %0.#{opts[:prec_int_precision]}f\n"
         
         any_output(opts[:output]) do |out, out_type|
           each_scan(:ms_level => opts[:ms_levels]) do |scan|
@@ -67,7 +61,7 @@ module Ms
               next unless (mh <= opts[:top_mh]) if opts[:top_mh]
               
               case format
-              when :mgf ; mgf_header(out, scan, sn, z, prec_string, pmz)
+              when :mgf ; mgf_header(out, scan, sn, z, mgf_prec_string, pmz)
               when :ms2 ; ms2_header(out, scan, sn, z, mh, pmz)
               end
               
@@ -100,9 +94,6 @@ module Ms
         [['S', sn, sn, pmz], ['I', 'RTime', scan.time], ['Z', z, mh]].each do |ar|
           out.puts ar.join("\t")
         end
-        #out.puts "S\t#{sn}\t#{sn}\t#{pmz}"
-        #out.puts "I\tRTime\t#{scan.time}"
-        #out.puts "Z\t#{z}\t#{mh}"
       end
       
       #Sets options and other variables to be used by the to_* methods.
@@ -158,6 +149,37 @@ module Ms
       end
     end
 
+    protected
+
+    # yields an IO object and the type input (:io, :filename, :string_io)
+    def any_output(arg, &block)
+      # this is pretty ugly, can we clean up?
+      if arg.is_a? IO  # an IO object passed in
+        block.call(arg, :io)
+      elsif arg && arg.is_a?(String)  # open the file
+        File.open(arg, 'w') do |io|
+          block.call(io, :filename)
+        end
+      else  # nil
+        st_io = StringIO.new
+        block.call(st_io, :string_io)
+      end
+    end
+
+
     include Search
   end
 end
+
+
+
+#config :first_scan, 0, :short => 'F', &c.integer # first scan
+#config :last_scan, 1e12, :short => 'L', &c.integer  # last scan
+## if not determined to be +1, then create these charge states
+#config( :charge_states, [2,3], :short => 'c') {|v| v.split(',') }
+#config :bottom_mh, 0, :short => 'B', &c.float # bottom MH+ 
+#config :top_mh, -1.0, :short => 'T', &c.float # top MH+
+#config :min_peaks, 0, :short => 'P', &c.integer # minimum peak count
+#config :ms_levels, 2..-1, :short => 'M', &c.range  # ms levels to export
+
+

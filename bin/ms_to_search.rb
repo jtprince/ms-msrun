@@ -4,23 +4,20 @@ require 'rubygems'
 require 'optparse'
 require 'ms/msrun/search'
 
+opt = { :format => :mgf }
 opts = OptionParser.new do |op|
   op.banner = "usage: #{File.basename(__FILE__)} <file>.mzXML ..."
   op.separator "outputs: <file>.mgf"
-  op.separator "[by default outputs .mgf file]"
-
+  op.on("-f", "--format <mgf|ms2>", Symbol, "the format type") {|v| opt[:format] = v }
 end
 
 if ARGV.size == 0
-  puts opts.to_s
+  puts opts
   exit
 end
 
 ARGV.each do |file|
-  Ms::Msrun.open(file) do |ms|
-    outfile = ms.to_mgf(file.sub(/\.mzxml/i, '.mgf'))
-    ms.to_mgf(outfile)
-  end
+  Ms::Msrun::Search.convert(opt[:format], file)
 end
 
 # extract_msn.exe -M0.2 -B85 -T4500 -S0 -G1 -I35 -C0 -P2 -D output smallraw.RAW
