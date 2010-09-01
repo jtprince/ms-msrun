@@ -17,7 +17,11 @@ if ARGV.size == 0
 end
 
 ARGV.each do |file|
-  Ms::Msrun::Search.convert(opt[:format], file)
+  if File.exist?(file)
+    Ms::Msrun::Search.convert(opt[:format], file)
+  else
+    puts "missing file: #{file} [skipping]"
+  end
 end
 
 # extract_msn.exe -M0.2 -B85 -T4500 -S0 -G1 -I35 -C0 -P2 -D output smallraw.RAW

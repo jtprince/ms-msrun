@@ -1,3 +1,4 @@
+require 'ms/msrun'
 require 'ms/mass'
 
 module Ms
@@ -26,7 +27,7 @@ module Ms
         end
       end
     
-      # returns a string unless :output given (may be a String (filename) or a
+      # Returns a string unless :output given (may be a String (filename) or a
       # writeable IO object in which case the data is written to file or io
       # and the number of spectra written is returned
       def to_mgf(opts={})
@@ -40,6 +41,13 @@ module Ms
       
       # performs the common actions for the different formats, and calls the command for the given format
       def to_search(format, opts)
+
+        # set up included_scans for fast access
+        if opts[:included_scans]
+          included_scans = []
+          opts[:included_scans].each {|num| included_scans[num] = true }
+        end
+
         opts = set_opts(opts)
         
         sep = ' '
@@ -50,7 +58,7 @@ module Ms
           each_scan(:ms_level => opts[:ms_levels]) do |scan|
             sn = scan.num
             
-            next unless sn >= opts[:first_scan] and sn <= opts[:last_scan]
+            next unless included_scans[sn] if included_scans
             next unless scan.num_peaks >= opts[:min_peaks]
             
             opts, chrg_sts, pmz = get_vals(opts, scan)
@@ -97,6 +105,7 @@ module Ms
       end
       
       #Sets options and other variables to be used by the to_* methods.
+      # @option opts [Array] :included_scans only include a subset of scans in the output (:ms_levels precedes :included_scans)
       def set_opts(opts)
         opts = {
           :output => nil,  # an output file or io object
@@ -104,14 +113,13 @@ module Ms
           :top_mh => nil,
           :ms_levels => (2..-1),  # range or intger, -1 at end will be substituted for last level
           :min_peaks => 0,
-          :first_scan => 0,
-          :last_scan => nil,
           :prec_mz_precision => 6,
           :prec_int_precision => 6,
           :frag_mz_precision => 5,
           :frag_int_precision => 1,
           :charge_states_for_unknowns => [2,3],
           :determine_plus_ones => false,
+          :included_scans => nil 
         }.merge(opts)
         
         if opts[:top_mh].nil? || opts[:top_mh] == -1

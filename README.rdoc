@@ -60,6 +60,21 @@ The following example works on *ALL* versions of *mzXML* and *mzML* (including s
 
     # Quicker way to get at the scans:
     Ms::Msrun.foreach("file.mzXML") {|scan|  scan <do something> }
+    
+== Conversion
+
+Can convert *mzXML* or *mzML* to *mgf* or *ms2* 
+
+    Ms::Msrun.open(mzmlFile) do |ms|
+      mgfFile = mzmlFile.chomp(".mzML") + ".ms2"
+      ms.to_ms2(:output => mgfFile)
+    end
+
+Or it can be done through the command line program *ms_to_search.rb* 
+
+    "usage:  <file>.mz[XML | ML] ... <type>"
+
+Other output formats can be included in future versions.
 
 == Features
 

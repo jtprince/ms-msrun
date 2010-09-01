@@ -1,14 +1,18 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
+
 require 'fileutils'
 require 'ms/msrun'
 
 
-describe 'mzxml to search formats' do
+describe 'mzXML or mzML to search formats' do
 
   @mzxml_file1 = TESTFILES + '/opd1/000.v1.mzXML'
-  @mzxml_file2 = TESTFILES + '/J/test.mzXML'
-  @key = { :ms2 => TESTFILES + '/J/key-test.ms2', 
-    :mgf => TESTFILES + '/J/key-test.mgf' }
+  @mzxml_file2 = TESTFILES + '/J/j24z.mzXML'
+  @mzml_file2 = TESTFILES + '/J/j24z.mzML'
+  @key = { :ms2 => TESTFILES + '/J/key-j24z.ms2', 
+    :mgf => TESTFILES + '/J/key-j24z.mgf',
+    :subset_mgf => TESTFILES + '/J/key-j10z.mgf'
+  }
 
   it 'creates mgf formatted files' do
     params = {
@@ -21,9 +25,7 @@ describe 'mzxml to search formats' do
     # no scans:
     no_scans = [
       [:min_peaks, 1000],
-      [:first_scan, 21],
-      [:first_scan, 10000],
-      [:last_scan, 0],
+      [:included_scans, []],
       [:ms_levels, (3..4)],
       [:ms_levels, 0], 
       [:ms_levels, 3], 
@@ -38,9 +40,8 @@ describe 'mzxml to search formats' do
 
     some_scans = [
       [:min_peaks, 0],
-      [:first_scan, 1],
-      [:first_scan, 9],
-      [:last_scan, 8],
+      [:included_scans, (9..20).to_a],
+      [:included_scans, (1..10).to_a],
       [:ms_levels, 2],
       [:ms_levels, (2..2)],
       [:ms_levels, (2...3)],
@@ -62,8 +63,18 @@ describe 'mzxml to search formats' do
     Ms::Msrun.open(@mzxml_file2) do |ms|
       ms.to_ms2(:output => outfile)
     end
-    FileUtils::cmp(outfile, @key[:ms2]).is true
+    ok FileUtils::cmp(outfile, @key[:ms2])
     File.unlink_f(outfile)
+  end
+  
+  it 'allows for selecting specific scans in output' do
+    outfile = @mzml_file2.chomp(".mzML") + ".mgf"
+    
+    Ms::Msrun.open(@mzml_file2) do |ms|
+      ms.to_mgf(:output => outfile, :included_scans => [1,2,3,8,10,11,15,17,18,20,24])
+    end
+    
+    ok FileUtils::cmp(outfile, @key[:subset_mgf])
   end
 
   it 'converts files to search formats with a simple convenience method' do
@@ -74,7 +85,7 @@ describe 'mzxml to search formats' do
       # filename
       Ms::Msrun::Search.convert(format, @mzxml_file2, :run_id => 3)
 
-      FileUtils.cmp(outfile, @key[format]).is true
+      ok FileUtils.cmp(outfile, @key[format])
       File.unlink_f(outfile)
     end
   end
