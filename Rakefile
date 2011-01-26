@@ -19,7 +19,6 @@ gemspec = Gem::Specification.new do |s|
   s.add_dependency 'ms-core', ">= 0.0.3"
   s.add_dependency 'nokogiri'
   s.add_dependency 'narray'
-  s.add_development_dependency("spec-more")
 end
 
 Jeweler::Tasks.new(gemspec)

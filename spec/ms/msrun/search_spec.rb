@@ -63,6 +63,7 @@ describe 'mzXML or mzML to search formats' do
     Ms::Msrun.open(@mzxml_file2) do |ms|
       ms.to_ms2(:output => outfile)
     end
+    # this guy can be finicky with the precision on a couple of values
     ok FileUtils::cmp(outfile, @key[:ms2])
     File.unlink_f(outfile)
   end
