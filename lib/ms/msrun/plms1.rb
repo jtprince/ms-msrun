@@ -5,12 +5,25 @@ require 'stringio'
 module Ms
   class Msrun
 
-    def to_plms1
+    # if given scans, will use those, or optionally takes a block where an
+    # array of ms1 scans are yielded and it expects Enumerable scans back.
+    def to_plms1(scans=nil)
       times = []
       scan_numbers = []
       spectra = []
 
-      ms.each(:ms_level => 1, :precursor => false) do |scan|
+      unless scans
+        scans = []
+        ms.each(:ms_level => 1, :precursor => false) do |scan|
+          scans << scan
+        end
+      end
+
+      if block_given?
+        scans = yield(scans)
+      end
+
+      scans.each do |scan|
         times << scan.time
         scan_numbers << scan.num
         spec = scan.spectrum
