@@ -14,7 +14,7 @@ module Ms
 
       unless scans
         scans = []
-        ms.each(:ms_level => 1, :precursor => false) do |scan|
+        self.each(:ms_level => 1, :precursor => false) do |scan|
           scans << scan
         end
       end
@@ -31,7 +31,7 @@ module Ms
       end
       plms1 = Plms1.new
       plms1.times = times
-      plms1.scan_numbers = times
+      plms1.scan_numbers = scan_numbers
       plms1.spectra = spectra
       plms1
     end
