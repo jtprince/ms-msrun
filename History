@@ -1,3 +1,6 @@
+== 0.3.3 / 2011-01-27
+* bug fixes on plms1
+
 == 0.3.1 / 2011-01-26
 * (since 0.1.1): added support for mzML and parsing zlib compressed spectra
 * added read/write for the .plms1 filetype, an ad hoc binary filetype for ms1 data
