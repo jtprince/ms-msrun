@@ -16,20 +16,21 @@ module MsrunSpec
     it 'reads header information' do
       Ms::Msrun.open(@file) do |ms|
         @key['header'].each do |k,v|
-          #puts "K: #{k} Vexp: #{v} Vact: #{ms.send(k.to_sym)}"
-          ms.send(k.to_sym).is v
+          #puts "K: #{k.inspect} Vexp: #{v.inspect} Vact: #{ms.send(k.to_sym).inspect}"
+          actual = ms.send(k.to_sym)
+          actual.is v
         end
       end
     end
     
     it 'can access random scans' do
       Ms::Msrun.open(@file) do |ms|
-        scan = ms.scan(20)
-        hash_match(@key['scans'][20], scan)
+        scan = ms.scan(@random_scan_num)
+        hash_match(@key['scans'][@random_scan_num], scan)
       end
     end
 
-    it 'can read all scans' do
+    xit 'can read all scans' do
       num_required_scans = @key['scans'].size
       Ms::Msrun.open(@file) do |ms|
         ms.each do |scan|
@@ -42,7 +43,7 @@ module MsrunSpec
       num_required_scans.is 0
     end
 
-    it 'can read scans of a certain ms_level' do
+    xit 'can read scans of a certain ms_level' do
       nums = [1,5,9,13,17]
       nums = [1,7,13,19] if @file.include? "j24"
       temp = nums.dup
@@ -61,7 +62,7 @@ module MsrunSpec
       end
     end
 
-    it 'can avoid reading spectra' do 
+    xit 'can avoid reading spectra' do 
       nums = @nums.dup
       Ms::Msrun.foreach(@file, :spectrum => false) do |scan|
         scan.spectrum.nil?.ok
@@ -69,13 +70,13 @@ module MsrunSpec
       end
     end
 
-    it 'can avoid reading precursor information' do 
+    xit 'can avoid reading precursor information' do 
       Ms::Msrun.foreach(@file, :precursor => false) do |scan|
         scan.precursor.nil?.ok
       end
     end
 
-    it 'gives scan counts for different ms levels' do
+    xit 'gives scan counts for different ms levels' do
       Ms::Msrun.open(@file) do |ms|
         @key['scan_count'].each do |index, count|
           ms.scan_count(index).is count
@@ -83,15 +84,16 @@ module MsrunSpec
       end
     end
 
-    it 'gives start and end mz even if the information is not given' do
+    xit 'gives start and end mz even if the information is not given' do
       Ms::Msrun.open(@file) do |ms|
         ms.start_and_end_mz_brute_force.is(@key['start_and_end_mz'][1])
       end
     end
   end
 
-  describe 'reading an mzXML v1 file' do
+  xdescribe 'reading an mzXML v1 file' do
     @file = TESTFILES + '/opd1/000.v1.mzXML'
+    @random_scan_num = 20
     
     (@key, @nums) = before_all.call(@file)
 
@@ -108,14 +110,16 @@ module MsrunSpec
 
   end
 
-  describe 'reading an mzXML v2.0 file' do
+  xdescribe 'reading an mzXML v2.0 file' do
     @file = TESTFILES + '/opd1/020.v2.0.readw.mzXML'
+    @random_scan_num = 20
     (@key, @nums) = before_all.call(@file)
     behaves_like 'an msrun object'
   end
 
-  describe 'reading an mzXML v2.1 file' do
+  xdescribe 'reading an mzXML v2.1 file' do
     @file = TESTFILES + '/opd1/000.v2.1.mzXML'
+    @random_scan_num = 20
     (@key, @nums) = before_all.call(@file)
     behaves_like 'an msrun object'
 
@@ -143,29 +147,33 @@ module MsrunSpec
     end
   end
   
-  describe 'reading an mzXML v3.1 file' do
+  xdescribe 'reading an mzXML v3.1 file' do
     @file = TESTFILES + '/J/j24.mzXML'
+    @random_scan_num = 20
     (@key, @nums) = before_all.call(@file)
     
     behaves_like 'an msrun object'
   end
   
-  describe 'reading a compressed mzXML v3.1 file' do
+  xdescribe 'reading a compressed mzXML v3.1 file' do
     @file = TESTFILES + '/J/j24.mzXML'
+    @random_scan_num = 20
     (@key, @nums) = before_all.call(@file)
     
     behaves_like 'an msrun object'
   end
   
-  describe 'reading an mzML file' do
+  xdescribe 'reading an mzML file' do
     @file = TESTFILES + '/J/j24.mzML'
+    @random_scan_num = 20
     (@key, @nums) = before_all.call(@file)
     
     behaves_like 'an msrun object'
   end
   
-  describe 'reading a compressed mzML file' do
+  xdescribe 'reading a compressed mzML file' do
     @file = TESTFILES + '/J/j24z.mzML'
+    @random_scan_num = 20
     (@key, @nums) = before_all.call(@file)
     
     behaves_like 'an msrun object'
@@ -173,6 +181,7 @@ module MsrunSpec
 
   describe 'reading a short stubby mzML file written by openms toppview' do
     @file = TESTFILES + '/openms/saved.mzML'
+    @random_scan_num = 5436
     (@key, @nums) = before_all.call(@file)
     behaves_like 'an msrun object'
   end
