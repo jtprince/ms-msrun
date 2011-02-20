@@ -6,6 +6,11 @@ require 'ms/msrun/search'
 require 'ms/msrun/index'
 
 module Ms; end
+class Ms::Spectrum
+  attr_accessor :scans
+end
+
+module Ms; end
 class Ms::Msrun
   include Enumerable
 
@@ -13,24 +18,18 @@ class Ms::Msrun
   #DEFAULT_PARSER = 'regexp'
   DEFAULT_PARSER = 'nokogiri'
 
-  # the retention time in seconds of the first scan (regardless of any
-  # meta-data written in the header)
-  attr_accessor :start_time
-  # the retention time in seconds of the last scan (regardless of any
-  # meta-data written in the header)
-  attr_accessor :end_time
-
   # The filetype. Valid types (for parsing) are:
   #   :mzxml
-  #   :mzdata
   #   :mzml
   attr_accessor :filetype
 
   # the string passed in to open the file for reading
   attr_accessor :filename
 
-  # The version string of this type of file
+  # The version string for this type of file (i.e., for mzXML version 2.1,
+  # version would be: '2.1')
   attr_accessor :version
+
   # the total number of scans
   attr_writer :scan_count
 
@@ -75,6 +74,12 @@ class Ms::Msrun
   def parent_basename_noext
     @parent_basename.chomp(File.extname(@parent_basename))
   end
+
+  def each_spectrum(parse_opts={}, &block)
+    raise NotImplementedError
+  end
+
+  def alias_method :each, :each_spectrum
 
   # returns each scan
   # options:
@@ -124,7 +129,6 @@ class Ms::Msrun
   #alias_method bracket_method, :scan
 
   # returns an array, whose indices provide the number of scans in each index level the ms_levels, [0] = all the scans, [1] = mslevel 1, [2] = mslevel 2,
-  # ...
   def scan_counts
     return @scan_counts if @scan_counts
     ar = []
@@ -140,6 +144,13 @@ class Ms::Msrun
     @scan_counts = ar
   end
 
+  # returns an array, whose indices provide the number of spectrum in each index level the ms_levels, [0] = all the scans, [1] = mslevel 1, [2] = mslevel 2,
+  def spectrum_counts
+    raise NotImplementedError
+  end
+
+  # returns the number of scans at that ms level.  returns total scan count if
+  # given 0
   def scan_count(mslevel=0)
     if @scan_counts
       @scan_counts[mslevel]
@@ -152,11 +163,10 @@ class Ms::Msrun
     end
   end
 
-
-  # returns [start_mz, end_mz] for ms level 1 scans or [nil,nil] if unknown
-  def start_and_end_mz
-    scan = first(:ms_level => 1, :spectrum => false, :precursor => false)
-    [scan.start_mz, scan.end_mz]
+  # returns the number of spectra at that ms level.  returns total spectrum
+  # count if given 0
+  def spectrum_count(mslevel=0)
+    raise NotImplementedError
   end
 
   # goes through every scan and gets the first and last m/z, then returns the
@@ -180,6 +190,7 @@ class Ms::Msrun
     [lo_mz.floor, hi_mz.ceil]
   end
 
+  # takes normal filter options
   def first(opts={})
     the_first = nil
     each_scan(opts) do |scan|

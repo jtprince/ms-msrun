@@ -12,7 +12,12 @@ module Bacon
         else
           
           if v.is_a?(Float)
-            obj.send(k.to_sym).should.be.close v, 0.00000001
+            actual = obj.send(k.to_sym)
+            if actual.nil?
+              actual.is v  # this will be a more informative fail
+            else
+              actual.should.be.close v, 0.00000001
+            end
           else
             puts "\n**********************************\n#{k}: #{v} but was #{obj.send(k.to_sym)}" if obj.send(k.to_sym) != v
             obj.send(k.to_sym).should.equal v

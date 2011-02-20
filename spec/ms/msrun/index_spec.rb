@@ -3,7 +3,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require 'rexml/document'
 require 'ms/msrun/index'
 
-
 describe 'an Ms::Msrun::Index' do
 
   @files = %w(000.v1.mzXML 000.v2.1.mzXML 020.v2.0.readw.mzXML).map {|v| TESTFILES + '/opd1/' + v }
@@ -13,7 +12,6 @@ describe 'an Ms::Msrun::Index' do
       indices = Ms::Msrun::Index.new(file)
     end
   end
-
 
   it 'is indexed by scan num and gives doublets of byte and length' do
     @files.zip(@indices) do |file, index|
@@ -53,6 +51,22 @@ describe 'an Ms::Msrun::Index' do
     @indices.each do |index|
       ok !index.first.nil?
       ok !index.last.nil?
+    end
+  end
+
+  it 'can create a scan index from an un-indexed file' do
+    file = TESTFILES + '/openms/saved.mzML'
+    index = Ms::Msrun::Index.new(file)
+    index.scan_nums.enums [5435, 5436, 5437]  # <- will deprecate this behavior in future
+    File.open(file) do |io|
+      cnt = 0
+      index.each do |start, len|
+        string = (io.pos = start) && io.read(len)
+        string.matches %r{^<spectrum }
+        string.matches %r{</spectrum>\s*}
+        string["scan=#{index.scan_nums[cnt]}"]
+        cnt += 1
+      end
     end
   end
 

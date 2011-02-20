@@ -34,8 +34,10 @@ class Ms::Msrun::Nokogiri::Mzml
     
     @msrun.scan_count = msrun_n.xpath("//xmlns:spectrumList/@count").to_s.to_i
     @msrun.start_time = msrun_n.xpath("//xmlns:run/@startTimeStamp").to_s
+    @msrun.start_time = nil if @msrun.start_time == ""
     #@msrun.end_time = msrun_n['endTime'][2...-1].to_f  #There doesn't appear to be an endTime
-    @msrun.parent_basename = msrun_n.xpath("//xmlns:sourceFile/@name").to_s
+    filename_pieces = msrun_n.xpath("//xmlns:sourceFile/@name").to_s.split(/[\/\\]/)
+    @msrun.parent_basename = filename_pieces.last
     @msrun.parent_location = msrun_n.xpath("//xmlns:sourceFile/@location").to_s
     @msrun
   end
