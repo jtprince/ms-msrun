@@ -2,6 +2,8 @@
 
 A library for working with LC/MS runs.
 
+{Online API}[http://rubydoc.info/gems/ms-msrun]
+
 == Examples
 
 The following example works on *ALL* versions of *mzXML* and *mzML* (including support for compressed peak data).
