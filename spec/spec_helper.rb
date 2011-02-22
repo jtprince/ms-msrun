@@ -13,6 +13,8 @@ TESTFILES = File.expand_path(File.dirname(__FILE__)) + '/testfiles'
 
 module Bacon
   class Context
+    undef_method :hash_match
+
     def hash_match(hash, obj)
       hash.each do |k,v|
         if v.is_a?(Hash)

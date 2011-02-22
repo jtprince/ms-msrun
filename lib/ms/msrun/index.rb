@@ -1,4 +1,4 @@
-require 'ms/msrun'
+# require 'ms/msrun'
 require 'openany'
 
 module Ms ; end
@@ -25,18 +25,24 @@ module Ms::Msrun::Index
 
   # takes an mz[X]ML filename or io object
   # and returns an array of offsets and lengths for the scans
-  # note that the offset 
-  def self.new(filename_or_io=nil)
-    if filename_or_io
-      (ft, version) = Ms::Msrun.filetype_and_version(filename_or_io)
-      Ms::Msrun::Index.const_get(ft.to_s.capitalize).new
-    end
+  def self.new(filename_or_io)
+    (ft, version) = Ms::Msrun.filetype_and_version(filename_or_io)
+    Ms::Msrun::Index.const_get(ft.to_s.capitalize).new
   end
 
   # returns the length in bytes from the start to the first scan
   def header_length
     #self.each {|pair| return (pair.first) }
     self[0][0]
+  end
+
+  # returns a hash with id string keys and spectra/scans as values
+  def index_by_id
+    Hash[ ids.zip(self) ]
+  end
+
+  def get_by_id(id)
+    self[ids.index(id)]
   end
 
   # for each item indexed, yields the id String and the [offset, length] array
