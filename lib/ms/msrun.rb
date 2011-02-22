@@ -4,6 +4,7 @@ require 'ms/precursor'
 require 'ms/spectrum'
 require 'ms/msrun/search'
 require 'ms/msrun/index'
+require 'openany'
 
 module Ms; end
 class Ms::Spectrum
@@ -79,7 +80,7 @@ class Ms::Msrun
     raise NotImplementedError
   end
 
-  def alias_method :each, :each_spectrum
+  alias_method :each, :each_spectrum
 
   # returns each scan
   # options:
@@ -254,8 +255,7 @@ class Ms::Msrun
   Mzml_regexp = /http:\/\/psidev.info\/files\/ms\/mzML\/xsd\/mzML([\d\.]+)(_idx)?.xsd/o
 
   def self.filetype_and_version(file_or_io)
-    if file_or_io.is_a? IO
-      io = file_or_io
+    openany(file_or_io) do |io|
       found = nil
       io.rewind
       # Test for RAW file:
@@ -288,10 +288,6 @@ class Ms::Msrun
       end
       io.rewind
       found
-    else
-      File.open(file_or_io) do |_io|
-        filetype_and_version(_io)
-      end
     end
   end
 

@@ -3,34 +3,32 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require 'rexml/document'
 require 'ms/msrun/index'
 
-describe 'an Ms::Msrun::Index' do
-
-  @files = %w(000.v1.mzXML 000.v2.1.mzXML 020.v2.0.readw.mzXML).map {|v| TESTFILES + '/opd1/' + v }
+shared 'an Ms::Msrun::Index' do
 
   before do
-    @indices = @files.map do |file|
-      indices = Ms::Msrun::Index.new(file)
+    @index = Ms::Msrun::Index.new(@file)
+    # should define:
+    # @id_list, @first_word, @last_word, @header_length
+  end
+
+  it 'is an array of doublets of byte and length' do
+    index.zip(@id_list) do |pair, id_string|
+      string.matches id_string
+      string = IO.read(file, pair.last, pair.first).strip
+      words = string.split(' ')
+      words.first.is @first_word
+      words.last.matches @last_word
+      string.should.match id_string
     end
   end
 
-  it 'is indexed by scan num and gives doublets of byte and length' do
-    @files.zip(@indices) do |file, index|
-      index.each_with_index do |pair,i|
-        string = IO.read(file, pair.last, pair.first).strip
-        string[0,5].is '<scan'
-        string[-7..-1].should.match %r{</scan>|/peaks>|/msRun>}
-        string.should.match %r{num="#{i+1}"}
-      end
-    end
-  end
-
-  it 'gives scan_nums' do
+  xit 'gives scan_nums' do
     @indices.each do |index|
       index.scan_nums.is((1..20).to_a)
     end
   end
 
-  it 'is enumerable' do
+  xit 'is enumerable' do
     @indices.each do |index|
       scan_nums = index.scan_nums
       index.each_with_index do |doublet,i|
@@ -40,23 +38,47 @@ describe 'an Ms::Msrun::Index' do
   end
 
   it 'gives header length' do
+    @index.header_length.is @header_length
     header_lengths = [824, 1138, 1147]
     @indices.zip(@files, header_lengths) do |index, file, header_length|
       index.header_length.is header_length
     end
   end
+end
 
-  it 'gives a scan for #first and #last' do
-    # TODO: fill in with actual data too
-    @indices.each do |index|
-      ok !index.first.nil?
-      ok !index.last.nil?
+
+opd_files = %w(000.v1 020.v2.0.readw 000.v2.1).map {|v| TESTFILES + '/opd1/' + v + '.mzXML' }
+j_files = *%w(j24z).map {|v| TESTFILES + '/J/' + v + '.mzXML' }
+files = opd_files + j_files
+versions = %w(1 2.0 2.1 3.1)
+files.zip(versions) do |file, version|
+  describe "an Ms::Msrun::Index for mzXML v#{version}" do
+    before do 
+      @file = file
+      @id_list = (1..20).map(&:to_s)
+      @first_word = "<scan"
+      @last_word = %r{</scan>|</msRun>|</peaks>}
     end
+    behaves_like 'an Ms::Msrun::Index'
   end
+end
 
-  it 'can create a scan index from an un-indexed file' do
-    file = TESTFILES + '/openms/saved.mzML'
-    index = Ms::Msrun::Index.new(file)
+xdescribe 'an Ms::Msrun::Index from an mzML file' do
+  before do
+    @file = TESTFILES + '/J/j24z.mzML'
+  end
+  behaves_like 'an Ms::Msrun::Index'
+end
+
+xdescribe 'an Ms::Msrun::Index from an unindexed mzML file' do
+  before do
+    @file = TESTFILES + '/openms/saved.mzML'
+  end
+  behaves_like 'an Ms::Msrun::Index'
+  # TODO: MORE??
+end
+
+=begin
     index.scan_nums.enums [5435, 5436, 5437]  # <- will deprecate this behavior in future
     File.open(file) do |io|
       cnt = 0
@@ -69,5 +91,4 @@ describe 'an Ms::Msrun::Index' do
       end
     end
   end
-
-end
+=end
