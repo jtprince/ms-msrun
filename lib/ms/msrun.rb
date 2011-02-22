@@ -1,4 +1,3 @@
-
 require 'ms/scan'
 require 'ms/precursor'
 require 'ms/spectrum'
@@ -247,7 +246,7 @@ class Ms::Msrun
   end
 
 
-  Mzxml_regexp = /http:\/\/sashimi.sourceforge.net\/schema(_revision)?\/([\w\d_\.]+)/o
+  Mzxml_regexp = %r{http://sashimi.sourceforge.net/schema(_revision)?/([\w\d_\.]+)}
   # 'http://sashimi.sourceforge.net/schema/MsXML.xsd' # version 1
   # 'http://sashimi.sourceforge.net/schema_revision/mzXML_X.X' # others
   Mzdata_regexp = /<mzData.*version="([\d\.]+)"/m

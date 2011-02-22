@@ -5,6 +5,7 @@ require 'jeweler'
 require 'rake/testtask'
 #require 'rcov/rcovtask'
 
+require 'jeweler'
 Jeweler::Tasks.new do |gem|
   # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
   gem.name = "ms-msrun"
@@ -35,17 +36,13 @@ end
 #  spec.verbose = true
 #end
 
+task :default => :spec
+
 require 'rake/rdoctask'
 Rake::RDocTask.new do |rdoc|
-  base_rdoc_output_dir = WEBSITE_OUTPUT + '/rdoc'
-  version = File.read('VERSION')
+  version = File.exist?('VERSION') ? File.read('VERSION') : ""
   rdoc.rdoc_dir = 'rdoc'
-  rdoc.title = NAME + ' ' + version
+  rdoc.title = "ms-msrun #{version}"
   rdoc.rdoc_files.include('README*')
   rdoc.rdoc_files.include('lib/**/*.rb')
 end
-
-task :default => :spec
-
-task :build => :gemspec
-
