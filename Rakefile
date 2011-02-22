@@ -35,4 +35,17 @@ end
 #  spec.verbose = true
 #end
 
+require 'rake/rdoctask'
+Rake::RDocTask.new do |rdoc|
+  base_rdoc_output_dir = WEBSITE_OUTPUT + '/rdoc'
+  version = File.read('VERSION')
+  rdoc.rdoc_dir = 'rdoc'
+  rdoc.title = NAME + ' ' + version
+  rdoc.rdoc_files.include('README*')
+  rdoc.rdoc_files.include('lib/**/*.rb')
+end
+
+task :default => :spec
+
+task :build => :gemspec
 

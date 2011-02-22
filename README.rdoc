@@ -2,38 +2,41 @@
 
 A library for working with LC/MS runs.
 
-{Online API}[http://rubydoc.info/gems/ms-msrun]
+{Online API}[http://rubydoc.info/gems/ms-msrun/frames] of the latest gem.
 
 == Examples
 
-The following example works on *ALL* versions of *mzXML* and *mzML* (including support for compressed peak data).
+The following example works on *ALL* versions of *mzXML* and *mzML*.
 
     require "ms/msrun" 
 
-    file = "file.mzXML" # works identical for "file.mzML"
+    file = "file.mzML" # works similarly
     Ms::Msrun.open(file) do |ms|
       
       # Run level information:
-      ms.start_time       # in seconds, gives date for mzML
-      ms.end_time         # in seconds, returns nil in mzML
+      ms.index.size       # number of indexed items (scans or spectra)
 
-      ms.scan_count       # number of scans
-      ms.scan_count(1)    # number of MS scans
-      ms.scan_count(2)    # number of MS/MS scans, etc.
-
-      ms.parent_basename_noext   # "file" (as recorded _in the xml_)
-      ms.filename                # "file.mzXML"
-
-      # Random scan access (blazing fast)
-      ms.scan(22)         # a scan object
+      sourcefile = ms.sourcefiles.first
+      sourcefile.basename_noext   # "file"
+      sourcefile.basename         # "file.raw"
+      ms.filename                 # "file.mzML"
 
       # Complete scan access
-      ms.each do |scan|
-        scan.num          # scan number
-        scan.ms_level     # ms_level
-        scan.time         # retention time in seconds
-        scan.start_mz     # the first m/z value, returns nil in mzML
-        scan.end_mz       # the last m/z value, returns nil in mzML
+      ms.each do |spectrum|
+
+        spectrum.mzs          # NArray of m/z values
+        spectrum.intensities  # NArray of m/z values
+        spectrum.peaks do |mz, inten|
+          puts "#{mz} #{inten}"   # print each peak on own line
+        end
+        spectrum.ms_level
+
+        scan = spectrum.scan  # returns the first scan associated with spectrum
+        scan.num              # scan number (if defined in the spectrum id for mzML)
+        scan.time             # retention time in seconds
+        scan.filter_string    # the filter line (if any)
+        scan.monoisotopic_mz  # monoisotopic m/z (Thermo param)
+        scan.window           # [lower_limit, upper_limit] or nil if NA
   
         # Precursor information
         pr = scan.precursor  # an Ms::Precursor object
@@ -42,12 +45,6 @@ The following example works on *ALL* versions of *mzXML* and *mzML* (including s
         pr.parent         # the parent scan
         pr.charge_states  # Array of possible charge states
 
-        # Spectral information
-        spectrum = scan.spectrum
-        spectrum.mzs          # Array of m/z values
-        spectrum.intensities  # Array of m/z values
-        spectrum.peaks do |mz, inten|
-          puts "#{mz} #{inten}"   # print each peak on own line
         end
       end
 
@@ -62,6 +59,13 @@ The following example works on *ALL* versions of *mzXML* and *mzML* (including s
 
     # Quicker way to get at the scans:
     Ms::Msrun.foreach("file.mzXML") {|scan|  scan <do something> }
+
+    ids = ms.index.ids  # list of id's for each spectrum/scan
+    id_for_spectrum_22 = ids.grep(/scan=22/).first       # mzML with Thermo derived id's
+    id_for_scan_42 = ms.index.scan_num_id(42)            # mzXML
+
+# Random access
+    spectrum22 = ms.spectrum(id_for_spectrum_22)         # retrieve spectrum associated with scan 22
     
 == Conversion
 
