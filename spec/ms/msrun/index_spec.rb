@@ -2,6 +2,7 @@ require 'spec_helper'
 
 require 'ms/msrun/index'
 
+=begin
 describe "MsMsrun" do
   it "fails" do
     'happy'.is 'happy'
@@ -10,71 +11,80 @@ describe "MsMsrun" do
     'dorky'.is 'happy'
   end
 end
+=end
 
-=begin
-shared 'an Ms::Msrun::Index' do
-
-  # those that behave_like should define:
-  # @id_list, @first_word, @last_word, @header_length
-  before do
-    @index = Ms::Msrun::Index.new(@file)
-  end
-
-  it 'is an array of doublets of byte and length' do
-    @id_list.zip(@index) do |pair, id_string|
-      string.matches id_string
-      string = IO.read(file, pair.last, pair.first).strip
-      words = string.split(' ')
-      words.first.is @first_word
-      words.last.matches @last_word
-      string.should.match id_string
+shared 'an Ms::Msrun::Index::Mzxml' do
+  it 'has the right scan numbers' do
+    @id_list.zip(@index) do |id_string, pair|
+      string = IO.read(@file, pair.last, pair.first).strip
+      ok string.include?(%Q{num="#{id_string}"})
     end
   end
 
-  xit 'gives scan_nums' do
-    @indices.each do |index|
-      index.scan_nums.is((1..20).to_a)
-    end
-  end
-
-  xit 'is enumerable' do
-    @indices.each do |index|
-      scan_nums = index.scan_nums
-      index.each_with_index do |doublet,i|
-        index[scan_nums[i]].is doublet
-      end
-    end
-  end
-
-  it 'gives header length' do
-    @index.header_length.is @header_length
-    header_lengths = [824, 1138, 1147]
-    @indices.zip(@files, header_lengths) do |index, file, header_length|
-      index.header_length.is header_length
+  it 'can access by integer scan number' do
+    @id_list.zip(@index) do |id_string, pair|
+      @index.scan(id_string.to_i).is pair
     end
   end
 end
 
+shared 'an Ms::Msrun::Index' do
+
+  # those that behave_like should define:
+  # @id_list, @first_word, @last_word, @header_length
+
+  it 'is an array of doublets of byte and length' do
+    @id_list.zip(@index) do |id_string, pair|
+      string = IO.read(@file, pair.last, pair.first).strip
+      string.matches id_string
+      words = string.split(' ')
+      words.first.is @first_word
+      words.last.matches @last_word
+      ok string.include?(id_string)
+    end
+  end
+
+  it 'gives ids' do
+    @id_list.enums @index.ids
+  end
+
+  it 'is enumerable' do
+    # some nonsense showing that each_cons works (hence enumberable)
+    reply = @index.each_cons(3).map {|pairs| [pairs.first, pairs.last] }
+    reply.size.is( @index.length - 2 )
+    reply.first.size.is 2
+  end
+
+  it 'gives header length' do
+    donkey.is "nelly"
+    @index.header_length.is @header_length
+  end
+end
+
+=begin
 describe "an Ms::Msrun::Index" do
   it 'requires a file to create without subclass' do
     lambda { x = Ms::Msrun::Index.new }.should.raise(ArgumentError)
   end
 end
+=end
 
 describe "an Ms::Msrun::Index for mzXML v1" do
   before do 
     @file = "#{TESTFILES}/opd1/000.v1.mzXML"
+    @index = Ms::Msrun::Index.new(@file)
     @id_list = (1..20).map(&:to_s)
     @first_word = "<scan"
     @last_word = %r{</scan>|</msRun>|</peaks>}
+    @header_length = 824
   end
   behaves_like 'an Ms::Msrun::Index'
+  behaves_like 'an Ms::Msrun::Index::Mzxml'
 end
-
-=end
 
 
 =begin
+
 opd_files = %w(000.v1 020.v2.0.readw 000.v2.1).map {|v| TESTFILES + '/opd1/' + v + '.mzXML' }
 j_files = *%w(j24z).map {|v| TESTFILES + '/J/' + v + '.mzXML' }
 files = opd_files + j_files

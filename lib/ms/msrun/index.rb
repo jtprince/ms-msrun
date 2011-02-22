@@ -1,4 +1,4 @@
-# require 'ms/msrun'
+require 'ms/msrun'
 require 'openany'
 
 module Ms ; end
@@ -27,7 +27,7 @@ module Ms::Msrun::Index
   # and returns an array of offsets and lengths for the scans
   def self.new(filename_or_io)
     (ft, version) = Ms::Msrun.filetype_and_version(filename_or_io)
-    Ms::Msrun::Index.const_get(ft.to_s.capitalize).new
+    Ms::Msrun::Index.const_get(ft.to_s.capitalize).new(filename_or_io)
   end
 
   # returns the length in bytes from the start to the first scan
@@ -55,12 +55,12 @@ module Ms::Msrun::Index
   # self with a parallel array of doublets, where each doublet consists of a
   # start byte and length. returns self.
   def set_from_file_io(io)
-    (offset, length) = Ms::Msrun::Index.index_offset(io, index_offset_tag)
-    xml_st = io.seek(offset) && io.read(length)
-    index_to_array(xml_st, offset, index_ref_re)
-    (_ids, start_bytes) = id_and_start_byte_arrays(xml_st, index_ref_re)
-    doublets = start_bytes.push(last_offset).each_cons(2).map {|s,sp1| [s, sp1 - s] }
-    ids = _ids
+    (index_start_byte_offset, length) = Ms::Msrun::Index.index_offset(io, index_offset_tag)
+    
+    xml_st = io.seek(index_start_byte_offset) && io.read(length)
+    #index_to_array(xml_st, offset, index_ref_re)
+    (@ids, start_bytes) = id_and_start_byte_arrays(xml_st, index_ref_re)
+    doublets = start_bytes.push(index_start_byte_offset).each_cons(2).map {|s,sp1| [s, sp1 - s] }
     self.replace(doublets)
     self
   end
@@ -135,6 +135,12 @@ module Ms::Msrun::Index
           set_from_file_io(io)
         end
       end
+    end
+
+    # takes a scan number as string or integer and retrieves the start byte
+    # and length doublet
+    def scan(scan_number)
+      get_by_id(scan_number.to_s)
     end
   end
 
