@@ -29,6 +29,11 @@ shared 'an Ms::Msrun::Index' do
   it 'gives header length' do
     @index.header_length.is @header_length  # frozen
   end
+  it 'can access by integer scan number' do
+    @scan_nums.zip(@index) do |scan_num, pair|
+      @index.scan(scan_num).is pair
+    end
+  end
 
  end
 
@@ -45,11 +50,6 @@ shared 'an Ms::Msrun::Index::Mzxml' do
     @id_list.zip(@index) do |id_string, pair|
       string = IO.read(@file, pair.last, pair.first).strip
       ok string.include?(%Q{num="#{id_string}"})
-    end
-  end
-  it 'can access by integer scan number' do
-    @id_list.zip(@index) do |id_string, pair|
-      @index.scan(id_string.to_i).is pair
     end
   end
   it 'gives the header length' do
@@ -76,7 +76,8 @@ files.each do |file, data|
     before do 
       @file = TESTFILES + '/' + file + '.mzXML'
       @index = Ms::Msrun::Index.new(@file)
-      @id_list = (1..(data[:num_scans])).map(&:to_s)
+      @scan_nums = (1..(data[:num_scans])).to_a
+      @id_list = @scan_nums.map(&:to_s)
       @first_word = "<scan"
       @last_word = %r{</scan>|</msRun>|</peaks>}
       @header_length = data[:header_length]
@@ -89,11 +90,12 @@ files = {
   'J/j24' => {:version => '1.1', :header_length => 1041, :num_scans => 24},
 }
 files.each do |file, data|
-  xdescribe "an Ms::Msrun::Index for mzML v#{data[:version]}" do
+  describe "an Ms::Msrun::Index for mzML v#{data[:version]}" do
     before do
       @file = TESTFILES + '/' + file + '.mzML'
       @index = Ms::Msrun::Index.new(@file)
-      @id_list = (1..(data[:num_scans])).map {|v| "controllerType=0 controllerNumber=1 scan=#{v}" }
+      @scan_nums = (1..(data[:num_scans])).to_a
+      @id_list = @scan_nums.map {|v| "controllerType=0 controllerNumber=1 scan=#{v}" }
       @first_word = "<spectrum"
       @last_word = "</spectrum>"
       @header_length = data[:header_length]
