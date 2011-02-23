@@ -2,36 +2,9 @@ require 'spec_helper'
 
 require 'ms/msrun/index'
 
-=begin
-describe "MsMsrun" do
-  it "fails" do
-    'happy'.is 'happy'
-    dorky = 'sunshine'
-    dorky.is 'sunshine'
-    'dorky'.is 'happy'
-  end
-end
-=end
-
-shared 'an Ms::Msrun::Index::Mzxml' do
-  it 'has the right scan numbers' do
-    @id_list.zip(@index) do |id_string, pair|
-      string = IO.read(@file, pair.last, pair.first).strip
-      ok string.include?(%Q{num="#{id_string}"})
-    end
-  end
-
-  it 'can access by integer scan number' do
-    @id_list.zip(@index) do |id_string, pair|
-      @index.scan(id_string.to_i).is pair
-    end
-  end
-end
-
+# those that behave_like should define:
+# @id_list, @first_word, @last_word, @header_length
 shared 'an Ms::Msrun::Index' do
-
-  # those that behave_like should define:
-  # @id_list, @first_word, @last_word, @header_length
 
   it 'is an array of doublets of byte and length' do
     @id_list.zip(@index) do |id_string, pair|
@@ -43,71 +16,90 @@ shared 'an Ms::Msrun::Index' do
       ok string.include?(id_string)
     end
   end
-
   it 'gives ids' do
     @id_list.enums @index.ids
   end
-
   it 'is enumerable' do
     # some nonsense showing that each_cons works (hence enumberable)
     reply = @index.each_cons(3).map {|pairs| [pairs.first, pairs.last] }
     reply.size.is( @index.length - 2 )
     reply.first.size.is 2
   end
-
+  # minimal/frozen test
   it 'gives header length' do
-    donkey.is "nelly"
-    @index.header_length.is @header_length
+    @index.header_length.is @header_length  # frozen
   end
-end
 
-=begin
+ end
+
 describe "an Ms::Msrun::Index" do
   it 'requires a file to create without subclass' do
+    # Meaning, to construct an Ms::Msrun::Index that is blank, you need to
+    # choose either an Mzxml or Mzml class (e.g.,  Ms::Msrun::Index::Mzml)
     lambda { x = Ms::Msrun::Index.new }.should.raise(ArgumentError)
   end
 end
-=end
 
-describe "an Ms::Msrun::Index for mzXML v1" do
-  before do 
-    @file = "#{TESTFILES}/opd1/000.v1.mzXML"
-    @index = Ms::Msrun::Index.new(@file)
-    @id_list = (1..20).map(&:to_s)
-    @first_word = "<scan"
-    @last_word = %r{</scan>|</msRun>|</peaks>}
-    @header_length = 824
+shared 'an Ms::Msrun::Index::Mzxml' do
+  it 'has the right scan numbers' do
+    @id_list.zip(@index) do |id_string, pair|
+      string = IO.read(@file, pair.last, pair.first).strip
+      ok string.include?(%Q{num="#{id_string}"})
+    end
   end
+  it 'can access by integer scan number' do
+    @id_list.zip(@index) do |id_string, pair|
+      @index.scan(id_string.to_i).is pair
+    end
+  end
+  it 'gives the header length' do
+    ok (!IO.read(@file, @index.header_length).match(/<scan /))
+    IO.read(@file, @index.header_length + 6).matches /<scan /
+  end
+
   behaves_like 'an Ms::Msrun::Index'
-  behaves_like 'an Ms::Msrun::Index::Mzxml'
 end
 
+shared 'an Ms::Msrun::Index::Mzml' do
+  behaves_like 'an Ms::Msrun::Index'
+end
 
-=begin
+files = {
+  'opd1/000.v1' => {:version => '1', :header_length => 824, :num_scans => 20},
+  'opd1/020.v2.0.readw' => {:version => '2.0', :header_length => 1147, :num_scans => 20},
+  'opd1/000.v2.1' => {:version => '2.1', :header_length => 1138, :num_scans => 20},
+  'J/j24' => {:version => '3.1', :header_length => 1041, :num_scans => 24},
+}
 
-opd_files = %w(000.v1 020.v2.0.readw 000.v2.1).map {|v| TESTFILES + '/opd1/' + v + '.mzXML' }
-j_files = *%w(j24z).map {|v| TESTFILES + '/J/' + v + '.mzXML' }
-files = opd_files + j_files
-versions = %w(1 2.0 2.1 3.1)
-files.zip(versions) do |file, version|
-  describe "an Ms::Msrun::Index for mzXML v#{version}" do
+files.each do |file, data|
+  describe "an Ms::Msrun::Index for mzXML v#{data[:version]}" do
     before do 
-      @file = file
-      @id_list = (1..20).map(&:to_s)
+      @file = TESTFILES + '/' + file + '.mzXML'
+      @index = Ms::Msrun::Index.new(@file)
+      @id_list = (1..(data[:num_scans])).map(&:to_s)
       @first_word = "<scan"
       @last_word = %r{</scan>|</msRun>|</peaks>}
+      @header_length = data[:header_length]
     end
-    behaves_like 'an Ms::Msrun::Index'
+    behaves_like 'an Ms::Msrun::Index::Mzxml'
   end
 end
-=end
 
-=begin
-xdescribe 'an Ms::Msrun::Index from an mzML file' do
-  before do
-    @file = TESTFILES + '/J/j24z.mzML'
+files = {
+  'J/j24' => {:version => '1.1', :header_length => 1041, :num_scans => 24},
+}
+files.each do |file, data|
+  xdescribe "an Ms::Msrun::Index for mzML v#{data[:version]}" do
+    before do
+      @file = TESTFILES + '/' + file + '.mzML'
+      @index = Ms::Msrun::Index.new(@file)
+      @id_list = (1..(data[:num_scans])).map {|v| "controllerType=0 controllerNumber=1 scan=#{v}" }
+      @first_word = "<spectrum"
+      @last_word = "</spectrum>"
+      @header_length = data[:header_length]
+    end
+    behaves_like 'an Ms::Msrun::Index::Mzml'
   end
-  behaves_like 'an Ms::Msrun::Index'
 end
 
 xdescribe 'an Ms::Msrun::Index from an unindexed mzML file' do
@@ -117,7 +109,6 @@ xdescribe 'an Ms::Msrun::Index from an unindexed mzML file' do
   behaves_like 'an Ms::Msrun::Index'
   # TODO: MORE??
 end
-=end
 
 =begin
     index.scan_nums.enums [5435, 5436, 5437]  # <- will deprecate this behavior in future
