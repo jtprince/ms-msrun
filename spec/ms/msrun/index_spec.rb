@@ -16,27 +16,24 @@ shared 'an Ms::Msrun::Index' do
       ok string.include?(id_string)
     end
   end
-=begin
-  xit 'gives ids' do
+  it 'gives ids' do
     @id_list.enums @index.ids
   end
-  xit 'is enumerable' do
+  it 'is enumerable' do
     # some nonsense showing that each_cons works (hence enumberable)
     reply = @index.each_cons(3).map {|pairs| [pairs.first, pairs.last] }
     reply.size.is( @index.length - 2 )
     reply.first.size.is 2
   end
   # minimal/frozen test
-  xit 'gives header length' do
+  it 'gives header length' do
     @index.header_length.is @header_length  # frozen
   end
-  xit 'can access by integer scan number' do
+  it 'can access by integer scan number' do
     @scan_nums.zip(@index) do |scan_num, pair|
       @index.scan(scan_num).is pair
     end
   end
-=end
-
 end
 
 describe "an Ms::Msrun::Index needin' a file" do

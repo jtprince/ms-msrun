@@ -75,7 +75,7 @@ module Ms::Msrun::Index
       start_positions_plus_final = []
       safe_io_rewind(io) do |inner_io|
         inner_io.each("\n") do |line|
-          if md=%r{<scan .*(num="(\d+)")}.match(line)
+          if md=%r{<scan .*num="(\d+)"}.match(line)
             start_positions_plus_final << ( inner_io.pos - line.bytesize + md.pre_match.bytesize )
             @ids << md[1]
           end
