@@ -28,7 +28,9 @@ module Ms::Msrun::Index
   attr_accessor :name
 
   def self.index_list(file_or_io)
-    self.const_get(Ms::Msrun.filetype(file_or_io).capitalize).index_list(file_or_io)
+    ft = Ms::Msrun.filetype(file_or_io)
+    require "ms/msrun/index/#{ft}"
+    self.const_get(ft.to_s.capitalize).index_list(file_or_io)
   end
 
   # returns a hash with id string keys and spectra/scans as values
@@ -36,6 +38,8 @@ module Ms::Msrun::Index
     Hash[ ids.zip(self) ]
   end
 
+  # retrieve scan by id.  This method currently does a linear scan through the
+  # ids to find the index.  Use index_by_id to create hash index
   def get_by_id(id)
     self[ids.index(id)]
   end

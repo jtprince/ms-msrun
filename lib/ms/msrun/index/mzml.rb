@@ -76,9 +76,6 @@ module Ms::Msrun::Index
       _length = end_pos - start if end_pos
       @header_startbyte_and_length = [start, _length]
     end
-  end
-
-
 
     # reads the io and generates an Index object.
     # assumes the file is formatted with no more than one spectrum tag per line

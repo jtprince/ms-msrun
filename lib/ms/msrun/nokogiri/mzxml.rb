@@ -2,6 +2,7 @@
 require 'nokogiri'
 require 'ms/msrun/nokogiri'
 require 'ms/msrun'
+require 'ms/msrun/sourcefile'
 require 'ms/spectrum'
 require 'ms/data'
 require 'ms/data/lazy_io'
@@ -20,13 +21,13 @@ class Ms::Msrun::Nokogiri::Mzxml
   end
 
   # returns the msrun
-  def parse_header(byte_length_or_header_string)
+  def parse_header(startbyte_and_length_or_header_string)
     string = 
-      if byte_length_or_header_string.is_a? Integer
-        @io.rewind
-        @io.read(byte_length_or_header_string)
+      if startbyte_and_length_or_header_string.is_a? Array
+        @io.pos = startbyte_and_length_or_header_string[0]
+        @io.read(startbyte_and_length_or_header_string[1])
       else
-        length_or_header_string
+        startbyte_and_length_or_header_string
       end
     doc = Nokogiri::XML.parse(string, *Ms::Msrun::Nokogiri::PARSER_ARGS)
     msrun_n = doc.root 
@@ -34,8 +35,8 @@ class Ms::Msrun::Nokogiri::Mzxml
       msrun_n = msrun_n.child
     end
     @msrun.scan_count = msrun_n['scanCount'].to_i
-    @msrun.start_time = msrun_n['startTime'].andand[2...-1].to_f
-    @msrun.end_time = msrun_n['endTime'][2...-1].andand.to_f
+    #@msrun.start_time = msrun_n['startTime'].andand[2...-1].to_f
+    #@msrun.end_time = msrun_n['endTime'][2...-1].andand.to_f
 
     parent_file_n = msrun_n.search("parentFile").first
     @msrun.sourcefile = Ms::Msrun::Sourcefile.from_mzxml(parent_file_n['fileName'], parent_file_n['fileSha1'])
