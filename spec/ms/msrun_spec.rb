@@ -186,7 +186,7 @@ module MsrunSpec
     behaves_like 'an msrun object'
   end
 
-  describe 'reading a short stubby mzML file written by openms toppview' do
+  xdescribe 'reading a short stubby mzML file written by openms toppview' do
     @file = TESTFILES + '/openms/saved.mzML'
     @random_scan_num = 5436
     (@key, @nums) = before_all.call(@file)
