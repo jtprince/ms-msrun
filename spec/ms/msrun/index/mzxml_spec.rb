@@ -24,7 +24,6 @@ end
 shared 'an Ms::Msrun::Index::Mzxml' do
   behaves_like 'an Ms::Msrun::Index'
   it 'has the right scan numbers' do
-    p @id_list
     @id_list.zip(@index) do |id_string, pair|
       string = IO.read(@file, pair.last, pair.first).strip
       ok string.include?(%Q{num="#{id_string}"})
@@ -33,16 +32,16 @@ shared 'an Ms::Msrun::Index::Mzxml' do
 
   it 'gives the header length' do
     ok (!IO.read(@file, @index.header_length).match(/<scan /))
-    IO.read(@file, @index.header_length + 6).matches /<scan /
+    #IO.read(@file, @index.header_length + 6).matches /<scan /
   end
 end
 
 files = {
- # 'opd1/000.v1' => {:version => '1', :header_length => 824, :num_scans => 20, :indexed => true},
- # 'opd1/020.v2.0.readw' => {:version => '2.0', :header_length => 1147, :num_scans => 20, :indexed => true},
- # 'opd1/000.v2.1' => {:version => '2.1', :header_length => 1138, :num_scans => 20, :indexed => true},
- # 'J/j24' => {:version => '3.1', :header_length => 1041, :num_scans => 24, :indexed => true},
- 'openms/test_set' => {:version => '2.1', :header_length => 1041, :num_scans => 64, :indexed => false},
+  'opd1/000.v1' => {:version => '1', :header_length => 824, :num_scans => 20, :indexed => true},
+  'opd1/020.v2.0.readw' => {:version => '2.0', :header_length => 1147, :num_scans => 20, :indexed => true},
+  'opd1/000.v2.1' => {:version => '2.1', :header_length => 1138, :num_scans => 20, :indexed => true},
+  'J/j24' => {:version => '3.1', :header_length => 1041, :num_scans => 24, :indexed => true},
+  'openms/test_set' => {:version => '2.1', :header_length => 1524, :num_scans => 65, :start_scan => 8848, :indexed => false},
 }
 
 files.each do |file, data|
@@ -52,7 +51,8 @@ files.each do |file, data|
       # we won't usually call it this way, but we can
       # usually called as a list Ms::Msrun::List.new(@file).first
       @index = Ms::Msrun::Index::Mzxml.new(@file)
-      @scan_nums = (1..(data[:num_scans])).to_a
+      start_scan = data[:start_scan] || 1
+      @scan_nums = (start_scan.step(start_scan+data[:num_scans]-1)).to_a
       @id_list = @scan_nums.map(&:to_s)
       @first_word = "<scan"
       @last_word = %r{</scan>|</msRun>|</peaks>}
