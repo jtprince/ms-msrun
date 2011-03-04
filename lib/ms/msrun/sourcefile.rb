@@ -47,7 +47,7 @@ module Ms
       end
 
       # the filename stripped of any location information and without extension
-      def basename_no_ext
+      def basename_noext
         bn = basename
         bn.chomp(File.extname(bn))
       end

@@ -14,7 +14,7 @@ module Ms
 
       unless scans
         scans = []
-        self.each(:ms_level => 1, :precursor => false) do |scan|
+        self.each_scan(:ms_level => 1, :precursor => false) do |scan|
           scans << scan
         end
       end

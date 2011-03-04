@@ -11,27 +11,34 @@ module MsrunSpec
 
   shared 'an msrun object' do
 
-    it 'reads header information' do
-      Ms::Msrun.open(@file) do |ms|
-        @key['header'].each do |k,v|
-          #puts "K: #{k.inspect} Vexp: #{v.inspect} Vact: #{ms.send(k.to_sym).inspect}"
-          actual = ms.send(k.to_sym)
-          actual.is v
+    def hash_match(hash, obj)
+      hash.each do |k,v|
+        if v.is_a?(Hash)
+          hash_match(v, obj.send(k))
+        else
+          puts("#{k} -> expecting: #{v.inspect} actual:#{obj.send(k).inspect}") unless obj.send(k) == v
+          obj.send(k).is v
         end
       end
     end
+
+    it 'reads header information' do
+      Ms::Msrun.open(@file) do |ms|
+        hash_match(@key['header'], ms)
+      end
+    end
     
-    xit 'can access random scans' do
+    it 'can access random scans' do
       Ms::Msrun.open(@file) do |ms|
         scan = ms.scan(@random_scan_num)
         hash_match(@key['scans'][@random_scan_num], scan)
       end
     end
 
-    xit 'can read all scans' do
+    it 'can read all scans' do
       num_required_scans = @key['scans'].size
       Ms::Msrun.open(@file) do |ms|
-        ms.each do |scan|
+        ms.each_scan do |scan|
           if hash = @key['scans'][scan.num]
             hash_match(hash, scan)
             num_required_scans -= 1
@@ -47,20 +54,22 @@ module MsrunSpec
       temp = nums.dup
       
       Ms::Msrun.open(@file) do |ms|
-        ms.each(:ms_level => 1) do |scan|
+        ms.each_scan(:ms_level => 1) do |scan|
           break if scan.num > 20 && !@file.include?("j24")
           scan.num.is temp.shift 
         end
       end
       
       nums = (1..24).to_a - nums
-      Ms::Msrun.foreach(@file, :ms_level => 2) do |scan|
-        break if scan.num > 20 && !@file.include?("j24")
-        scan.num.is nums.shift 
+      Ms::Msrun.open(@file) do |ms|
+        ms.each_scan(@file, :ms_level => 2) do |scan|
+          break if scan.num > 20 && !@file.include?("j24")
+          scan.num.is nums.shift 
+        end
       end
     end
 
-    xit 'can avoid reading spectra' do 
+    it 'can avoid reading spectra' do 
       nums = @nums.dup
       Ms::Msrun.foreach(@file, :spectrum => false) do |scan|
         scan.spectrum.nil?.ok
@@ -179,7 +188,7 @@ module MsrunSpec
 
   describe 'reading a short stubby mzXML file written by openms toppview' do
     @file = TESTFILES + '/openms/test_set.mzXML'
-    @random_scan_num = 5436
+    @random_scan_num = 8849
     (@key, @nums) = before_all.call(@file)
     behaves_like 'an msrun object'
   end

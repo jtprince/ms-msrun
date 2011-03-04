@@ -11,9 +11,6 @@ module Ms::Msrun::Index
     INDEX_TAG_RE = %r{<#{INDEX_TAG}>(\d+)</#{INDEX_TAG}>}
       INDEX_REF_RE = %r{id="(\d+)".*>(\d+)</}
 
-    # returns an array of the scan numbers as Integers
-    attr_reader :scan_nums
-
     # returns :scan
     def name ; :scan end
 
@@ -23,6 +20,18 @@ module Ms::Msrun::Index
           set_from_file_io(io)
         end
       end
+    end
+
+    def self.index_list(filename_or_io)
+      [ self.new(filename_or_io) ]
+    end
+
+    def header_startbyte_and_length
+      [0,self[0][0]]
+    end
+
+    def scan_nums
+      ids.map(&:to_i)
     end
 
     # returns boolean based on whether the file has a usable scan index

@@ -11,8 +11,8 @@ shared 'a sourcefile' do
   it 'extracts basename from name' do
     @sourcefile.basename.is @basename
   end
-  it 'extracts basename_no_ext from name' do
-    @sourcefile.basename_no_ext.is @basename_no_ext
+  it 'extracts basename_noext from name' do
+    @sourcefile.basename_noext.is @basename_noext
   end
   it 'returns the whether the name is a uri' do
     @sourcefile.name_is_uri?.is @name_is_uri
@@ -43,7 +43,7 @@ describe 'a sourcefile where the name is a complete URI' do
     @name_is_uri = true
     @full_uri = @name
     @basename = "Hek_cells_100904050914.RAW"
-    @basename_no_ext = "Hek_cells_100904050914"
+    @basename_noext = "Hek_cells_100904050914"
     @host = "E130JP3"
     @dirname = "/c/Inetpub/wwwroot/ISB/data"
     @host_and_dirname = [@host, @dirname]
@@ -63,7 +63,7 @@ describe 'a sourcefile where the name and location specify local paths' do
     @name_is_uri = false
     @full_uri = "file://C:/Documents and Settings/Sequest/Desktop/pwiz/../#{@basename}"
     @basename = "j24.raw"
-    @basename_no_ext = "j24"
+    @basename_noext = "j24"
     @host = nil
     @dirname = "C:/Documents and Settings/Sequest/Desktop/pwiz/.."
     @host_and_dirname = [@host, @dirname]

@@ -20,11 +20,11 @@ class Ms::Msrun::Nokogiri::Mzml
   end
   
   # returns the msrun
-  def parse_header(byte_length_or_header_string)
+  def parse_header(startbyte_and_header_length_or_string)
     string = 
-      if byte_length_or_header_string.is_a? Integer
-        @io.rewind
-        @io.read(byte_length_or_header_string)
+      if startbyte_and_header_length_or_string.is_a? Array
+        @io.pos = startbyte_and_header_length_or_string[0]
+        @io.read(startbyte_and_header_length_or_string[1])
       else
         length_or_header_string
       end

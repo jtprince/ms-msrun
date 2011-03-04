@@ -38,12 +38,15 @@ class Ms::Msrun
   # list.
   attr_accessor :index_list
 
+  # the files that preceded the one you are working with
+  attr_accessor :sourcefiles
+
   # holds the class that parses the file
   attr_accessor :parser
 
   # Opens the filename 
   def self.open(filename, &block)
-    File.open(filename) {|io| block.call( self.new(io, filename) ) }
+    File.open(filename) {|io| block.call( self.new(io) ) }
   end
 
   # retrieves the first index object
@@ -56,24 +59,36 @@ class Ms::Msrun
     @index_list[0] = val
   end
 
+  def sourcefile
+    sourcefiles[0]
+  end
+
+  def sourcefile=(val)
+    sourcefiles[0] = val
+  end
+
   # takes an io object.  The preferred way to access Msrun objects is through
   # the open method since it ensures that the io object will be available for
-  # the lazy evaluation of spectra.
-  def initialize(io, filename=nil)
+  # the lazy evaluation of spectra.  If you are passing in an IO object that
+  # doesn't respond to path for retrieval of the size, you should pass it in
+  # as it will speed up lots of methods that need to seek to the end of the io
+  # stream.
+  def initialize(io, filename=nil, io_size=nil)
     @scan_counts = nil
-    @filename = filename
+    @filename = filename || ( io.respond_to?(:path) ? io.path : nil )
+    @io_size = io_size || File.size(@filename)
+    @sourcefiles = []
     @filetype, @version = Ms::Msrun.filetype_and_version(io)
     parser_klass = Ms::Msrun.get_parser(@filetype, @version)
 
     @parser = parser_klass.new(self, io, @version)
-    @index_list = Ms::Msrun::Index::List.new(io)
-    @scan_nums = @index.scan_nums
-    @parser.parse_header(@index.header_length)
+    @index_list = Ms::Msrun::Index.index_list(io)
+    @parser.parse_header(index.header_startbyte_and_length)
   end
 
   # retrieves scan numbers if they are found in the index (mzXML only?)
   def scan_nums
-    @index_list.scan_nums
+    @index_list.respond_to?(:scan_nums) ? @index_list.scan_nums : nil
   end
 
   def each_spectrum(parse_opts={}, &block)
@@ -95,7 +110,7 @@ class Ms::Msrun
         else ; msl  
         end
       end
-    snums = @index.scan_nums
+    snums = index.scan_nums
     snums = snums.reverse if parse_opts[:reverse]
     snums.each do |scan_num|
       if ms_levels
@@ -114,16 +129,16 @@ class Ms::Msrun
     end
   end
 
-  # a very fast method to only query the ms_level of a scan
+  # fast method to only query the ms_level of a scan
   def ms_level(num)
-    @parser.parse_ms_level(@index[num].first, @index[num].last)
+    @parser.parse_ms_level(*index.scan(num))
   end
 
   # returns a Ms::Scan object for the scan at that number
   #
   def scan(num, parse_opts={})
-    #@parser.parse_scan(*(@index[num]), parse_opts)
-    @parser.parse_scan(@index[num].first, @index[num].last, parse_opts)
+    i = index.scan(num)
+    @parser.parse_scan(i[0], i[1], parse_opts)
   end
 
   #bracket_method = '[]'.to_sym
