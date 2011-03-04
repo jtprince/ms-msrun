@@ -41,7 +41,7 @@ files = {
   'opd1/020.v2.0.readw' => {:version => '2.0', :header_length => 1147, :num_scans => 20, :indexed => true},
   'opd1/000.v2.1' => {:version => '2.1', :header_length => 1138, :num_scans => 20, :indexed => true},
   'J/j24' => {:version => '3.1', :header_length => 1041, :num_scans => 24, :indexed => true},
-  'openms/test_set' => {:version => '2.1', :header_length => 1524, :num_scans => 65, :start_scan => 8848, :indexed => false},
+  'openms/test_set' => {:version => '2.1', :header_length => 1524, :num_scans => 155, :start_scan => 8848, :indexed => false},
 }
 
 files.each do |file, data|

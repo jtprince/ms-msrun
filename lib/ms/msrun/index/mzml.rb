@@ -18,10 +18,12 @@ module Ms::Msrun::Index
 
     Scan_re = %r{scan=(\d+)}
 
+    attr_accessor :header_startbyte_and_length
+
     # returns an array (Ms::Msrun::Index::List object) of all the indices
     def self.index_list(io)
       if has_index?(io)
-         # this needs a revamping, right??? broken.... right????
+        # this needs a revamping, right??? broken.... right????
         (index_offset, length_of_index) = Ms::Msrun::Index.index_offset(io, Ms::Msrun::Index::Mzml::INDEX_TAG)
         doc = Nokogiri::XML.parse(io.read(length_of_index, index_offset), *Ms::Msrun::Nokogiri::PARSER_ARGS)
         index_list_node = doc.root
@@ -47,9 +49,35 @@ module Ms::Msrun::Index
           chromatogram_index = Ms::Msrun::Index::Mzml.new_from_indexless_io_by_regex(inner_io, :chromatogram, Ms::Msrun::Index::Mzxml::ChromatogramList_re, Ms::Msrun::Index::Mzxml::Chromatogram_re, Ms::Msrun::Index::Mzxml::Chromatogram_close_re)
         end
       end
-      set_header_startbyte_and_length(io)
-      self
+      header_sb_and_l = find_header_startbyte_and_length(io)
+      [spectrum_index, chromatogram_index].each {|index| index.header_startbyte_and_length = header_sb_and_l }
+      [spectrum_index, chromatogram_index]
     end
+
+    def self.find_header_startbyte_and_length(io)
+      start = nil
+      _length = nil
+      end_pos = nil
+      openany(io) do |inner_io|
+        io.rewind
+        io.each_line("\n") do |line|
+          if md = line.match(/<mzML /)
+            start = io.pos - (line.bytesize - md.prematch.bytesize)
+            break
+          end
+        end
+        io.each_line("\n") do |line|
+          if md = line.match(/<run /)
+            end_pos = io.pos - (line.bytesize - md.prematch.bytesize)
+            break
+          end
+        end
+      end
+      _length = end_pos - start if end_pos
+      @header_startbyte_and_length = [start, _length]
+    end
+  end
+
 
 
     # reads the io and generates an Index object.

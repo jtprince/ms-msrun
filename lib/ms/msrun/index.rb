@@ -1,4 +1,3 @@
-require 'ms/msrun'
 require 'andand'
 require 'openany'
 
@@ -28,14 +27,8 @@ module Ms::Msrun::Index
   # :chromatogram for mzML
   attr_accessor :name
 
-  # returns an Array of Ms::Msrun::Index objects. For  
-  def self.new_index_list(filename)
-    List.new(filename)
-  end
-
-  # returns the length in bytes from the start to the first scan
-  def header_length
-    self[0][0]
+  def self.index_list(file_or_io)
+    self.const_get(Ms::Msrun.filetype(file_or_io).capitalize).index_list(file_or_io)
   end
 
   # returns a hash with id string keys and spectra/scans as values

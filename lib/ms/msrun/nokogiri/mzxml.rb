@@ -6,8 +6,8 @@ require 'ms/spectrum'
 require 'ms/data'
 require 'ms/data/lazy_io'
 require 'ms/precursor'
-require 'ms/mzxml'
 require 'narray'
+require 'andand'
 
 class Ms::Msrun::Nokogiri::Mzxml
   NetworkOrder = true
@@ -35,13 +35,11 @@ class Ms::Msrun::Nokogiri::Mzxml
       msrun_n = msrun_n.child
     end
     @msrun.scan_count = msrun_n['scanCount'].to_i
-    @msrun.start_time = msrun_n['startTime'][2...-1].to_f
-    @msrun.end_time = msrun_n['endTime'][2...-1].to_f
+    @msrun.start_time = msrun_n['startTime'].andand[2...-1].to_f
+    @msrun.end_time = msrun_n['endTime'][2...-1].andand.to_f
 
-    filename = msrun_n.search("parentFile").first['fileName']
-    (bn, dn) = Ms::Mzxml.parent_basename_and_dir(filename)
-    @msrun.parent_basename = bn
-    @msrun.parent_location = dn
+    parent_file_n = msrun_n.search("parentFile").first
+    @msrun.sourcefile = Ms::Msrun::Sourcefile.from_mzxml(parent_file_n['fileName'], parent_file_n['fileSha1'])
     @msrun
   end
 

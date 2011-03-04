@@ -14,8 +14,6 @@ module Ms; end
 class Ms::Msrun
   include Enumerable
 
-  #DEFAULT_PARSER = 'axml'
-  #DEFAULT_PARSER = 'regexp'
   DEFAULT_PARSER = 'nokogiri'
 
   # The filetype. Valid types (for parsing) are:
@@ -33,25 +31,15 @@ class Ms::Msrun
   # the total number of scans
   attr_writer :scan_count
 
-  # The basename of the parent file listed (e.g., a .RAW file).  Note that in
-  # v1 mzXML this will be *.mzXML while in later versions it's *.RAW.
-  # See parent_basename_noext for more robust value
-  attr_accessor :parent_basename
-
-  # The location of the parent file (e.g., a .RAW file).  In version mzXML v1
-  # this will be nil.
-  attr_accessor :parent_location
-
-  # an array hold index objects.  Each index object is an an array of
+  # an array holding index objects.  Each index object is an an array of
   # doublets, [start_byte, length] for each indexed element (spectra,
-  # chromatograms, scans, or whatever)
+  # chromatograms, scans, or whatever).  mzXML has a single index list (the
+  # scan list) while mzML will typically have a spectra list and chromatogram
+  # list.
   attr_accessor :index_list
 
   # holds the class that parses the file
   attr_accessor :parser
-
-  # an array holding the scan numbers found in the run
-  attr_accessor :scan_nums
 
   # Opens the filename 
   def self.open(filename, &block)
@@ -78,13 +66,14 @@ class Ms::Msrun
     parser_klass = Ms::Msrun.get_parser(@filetype, @version)
 
     @parser = parser_klass.new(self, io, @version)
-    @index = Ms::Msrun::Index.new(io)
+    @index_list = Ms::Msrun::Index::List.new(io)
     @scan_nums = @index.scan_nums
     @parser.parse_header(@index.header_length)
   end
 
-  def parent_basename_noext
-    @parent_basename.chomp(File.extname(@parent_basename))
+  # retrieves scan numbers if they are found in the index (mzXML only?)
+  def scan_nums
+    @index_list.scan_nums
   end
 
   def each_spectrum(parse_opts={}, &block)

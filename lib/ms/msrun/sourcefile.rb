@@ -15,6 +15,14 @@ module Ms
         self.new(id, pieces.last, ("file://" + pieces[0...-1].join('/')))
       end
 
+      # sets the id to be the sha1sum and creates a cv params for the sha1
+      def self.from_mzxml(filename, sha1)
+        obj = self.new(sha1, filename)
+        obj.cv_description = [Cv::Param.new('MS', "MS:1000569", 'SHA-1', sha1)]
+        # consider grabbing the fileType??
+        obj 
+      end
+
       # an identifier for the file
       attr_accessor :id
       # Name of the source file, without reference to location (either URI or local path).
