@@ -42,8 +42,10 @@ class Ms::Msrun
   # this will be nil.
   attr_accessor :parent_location
 
-  # an array of doublets, [start_byte, length] for each scan element
-  attr_accessor :index
+  # an array hold index objects.  Each index object is an an array of
+  # doublets, [start_byte, length] for each indexed element (spectra,
+  # chromatograms, scans, or whatever)
+  attr_accessor :index_list
 
   # holds the class that parses the file
   attr_accessor :parser
@@ -54,6 +56,16 @@ class Ms::Msrun
   # Opens the filename 
   def self.open(filename, &block)
     File.open(filename) {|io| block.call( self.new(io, filename) ) }
+  end
+
+  # retrieves the first index object
+  def index
+    @index_list.first
+  end
+
+  # sets the first index
+  def index=(val)
+    @index_list[0] = val
   end
 
   # takes an io object.  The preferred way to access Msrun objects is through
@@ -253,6 +265,12 @@ class Ms::Msrun
   Raw_header_unpack_code = '@2axaxaxaxaxaxaxa'
   Mzml_regexp = /http:\/\/psidev.info\/files\/ms\/mzML\/xsd\/mzML([\d\.]+)(_idx)?.xsd/o
 
+  # returns :mzml, :mzxml, or :mzdata or nil
+  def self.filetype(file_or_io)
+    filetype_and_version(file_or_io).first
+  end
+
+  # returns :mzml, :mzxml, or :mzdata and a version string
   def self.filetype_and_version(file_or_io)
     openany(file_or_io) do |io|
       found = nil
