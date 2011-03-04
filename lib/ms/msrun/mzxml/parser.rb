@@ -1,24 +1,12 @@
+require 'ms/msrun/parser'
 
-require 'nokogiri'
-require 'ms/msrun/nokogiri'
-require 'ms/msrun'
-require 'ms/msrun/sourcefile'
-require 'ms/spectrum'
-require 'ms/data'
-require 'ms/data/lazy_io'
-require 'ms/precursor'
-require 'ms/mzxml'
+class Ms::Msrun::Mzxml ; end
 
-class Ms::Msrun::Nokogiri::Mzxml
+class Ms::Msrun::Mzxml::Parser
+  include Ms::Msrun::Parser
   NetworkOrder = true
 
   attr_accessor :msrun, :io, :version
-
-  def initialize(msrun_object, io, version)
-    @msrun = msrun_object
-    @io = io
-    @version = version
-  end
 
   # returns the msrun
   def parse_header(startbyte_and_length_or_header_string)
@@ -123,14 +111,14 @@ class Ms::Msrun::Nokogiri::Mzxml
     #if x = node['precursorScanNum']
     #  prec[2] = scans_by_num[x.to_i]
     #end
-     
+
     if opts[:spectrum]
       # all mzXML (at least versions 1--3.0) *must* be 'network' byte order!
       # data is stored as the base64 string until we actually try to access
       # it!  At that point the string is decoded and knows it is interleaved
       # data.  So, no spectrum is actually decoded unless it is accessed!
       compression_type = peaks_n['compressionType']
-      lazy_string = Ms::Data::LazyString.new(peaks_n.text, Ms::Data::LazyIO.unpack_code(peaks_n['precision'].to_i, NetworkOrder), compression_type == 'zlib')
+      lazy_string = Ms::Data::LazyString.new(peaks_n.text, Ms::Data::LazyIO.unpack_code(peaks_n['precision'].to_i, Ms::Msrun::Mzxml::NetworkOrder), compression_type == 'zlib')
       peaks_data = Ms::Data.new_interleaved(lazy_string)
       spec = Ms::Spectrum.new(peaks_data)
       scan[8] = Ms::Spectrum.new(peaks_data)

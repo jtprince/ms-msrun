@@ -30,13 +30,6 @@ module MsrunSpec
       end
     end
     
-    it 'can access random scans' do
-      Ms::Msrun.open(@file) do |ms|
-        scan = ms.scan(@random_scan_num)
-        hash_match(@key['scans'][@random_scan_num], scan)
-      end
-    end
-
     it 'can read all scans' do
       num_required_scans = @key['scans'].size
       Ms::Msrun.open(@file) do |ms|
@@ -50,14 +43,14 @@ module MsrunSpec
       num_required_scans.is 0
     end
 
-    xit 'can read scans of a certain ms_level' do
+    it 'can read scans of a certain ms_level' do
       nums = [1,5,9,13,17]
       nums = [1,7,13,19] if @file.include? "j24"
       temp = nums.dup
       
       Ms::Msrun.open(@file) do |ms|
         ms.each_scan(:ms_level => 1) do |scan|
-          break if scan.num > 20 && !@file.include?("j24")
+          break if scan.num > nums.last && !@file.include?("j24")
           scan.num.is temp.shift 
         end
       end
@@ -93,11 +86,6 @@ module MsrunSpec
       end
     end
 
-    xit 'gives start and end mz even if the information is not given' do
-      Ms::Msrun.open(@file) do |ms|
-        ms.start_and_end_mz_brute_force.is(@key['start_and_end_mz'][1])
-      end
-    end
   end
 
   xdescribe 'reading an mzXML v1 file' do
