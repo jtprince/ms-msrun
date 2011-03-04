@@ -1,14 +1,10 @@
-require 'nokogiri'
-require 'ms/msrun/nokogiri'
-require 'ms/msrun'
-require 'ms/spectrum'
-require 'ms/data'
-require 'ms/data/lazy_io'
-require 'ms/precursor'
-require 'ms/mzxml'
-require 'narray'
+require 'ms/msrun/parser'
 
-class Ms::Msrun::Nokogiri::Mzml
+class Ms::Msrun::Mzml ; end
+
+class Ms::Msrun::Mzml::Parser
+  include Ms::Msrun::Parser
+
   NetworkOrder = false
   
   attr_accessor :msrun, :io, :version
@@ -139,7 +135,7 @@ class Ms::Msrun::Nokogiri::Mzml
   end
   
   def lazilyGetString(binaryDataArray)
-    unpackFormat = Ms::Data::LazyIO.unpack_code(precision(binaryDataArray), Ms::Msrun::Nokogiri::Mzml::NetworkOrder)
+    unpackFormat = Ms::Data::LazyIO.unpack_code(precision(binaryDataArray), Ms::Msrun::Mzml::NetworkOrder)
     compression = false
     compression = true if binaryDataArray.xpath(".//cvParam[@name=\"no compression\"]").empty?
     Ms::Data::LazyString.new(binaryDataArray.text, unpackFormat, compression)
