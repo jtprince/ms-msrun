@@ -84,29 +84,6 @@ module Ms; end
 
     alias_method :each, :each_spectrum
 
-    # returns each scan
-    # options:
-    #     :spectrum => true | false (default is true)
-    #     :precursor => true | false (default is true)
-    #     :ms_level => Integer or Array return only scans of that level
-    #     :reverse => true | false (default is false) goes backwards
-    def each_scan(parse_opts={}, &block)
-      ms_levels = 
-        if msl = parse_opts[:ms_level]
-          if msl.is_a?(Integer) ; [msl]
-          else ; msl  
-          end
-        end
-      snums = index.scan_nums
-      snums = snums.reverse if parse_opts[:reverse]
-      snums.each do |scan_num|
-        if ms_levels
-          next unless ms_levels.include?(get_ms_level(scan_num))
-        end
-        block.call(scan(scan_num, parse_opts))
-      end
-    end
-
     # opens the file and yields each spectrum in the block
     # see each_scan for parsing options
     def self.foreach(filename, parse_opts={}, &block)
@@ -120,64 +97,40 @@ module Ms; end
       @parser.parse_ms_level(*index.get_by_id(idstring))
     end
 
-    # returns a Ms::Scan object for the scan at that number
+    # returns an array whose indices provide the number of objects in each
+    # index level.  type may be :spectrum (default) or :scan
     #
-    def scan(num, parse_opts={})
-      i = index.scan(num)
-      @parser.parse_scan(i[0], i[1], parse_opts)
-    end
-
-    # returns an array, whose indices provide the number of scans in each index level the ms_levels, [0] = all the scans, [1] = mslevel 1, [2] = mslevel 2,
-    def scan_counts
-      return @scan_counts if @scan_counts
+    #     ms_levels[0] = all the objects
+    #     ms_levels[1] = mslevel 1
+    #     ms_levels[2] = mslevel 2
+    #     # ... and so on.
+    #
+    # ms_levels is only calculated once and the result saved in @ms_levels.
+    # Sets @ms_levels if it is calculated.
+    def ms_levels(type=:spectrum)
+      ms_levels_type = instance_variable_get("@ms_levels_#{type}".to_sym)
+      return ms_levels_type if ms_levels_type
       ar = []
       ar[0] = 0
-      each_scan do |sc|
-        level = sc.get_ms_level
-        unless ar[level]
-          ar[level] = 0
-        end
+      self.send("each_#{type}".to_sym, :spectrum=>false, :precursor=>false) do |obj|
+        level = obj.ms_level
+        ar[level] ||= 0
         ar[level] += 1
         ar[0] += 1
       end
-      @scan_counts = ar
-    end
-
-    # returns an array, whose indices provide the number of spectrum in each index level the ms_levels, [0] = all the scans, [1] = mslevel 1, [2] = mslevel 2,
-    def spectrum_counts
-      raise NotImplementedError
-    end
-
-    # returns the number of scans at that ms level.  returns total scan count if
-    # given 0
-    def scan_count(mslevel=0)
-      if @scan_counts
-        @scan_counts[mslevel]
-      else
-        if mslevel == 0
-          @scan_count 
-        else
-          scan_counts[mslevel]
-        end
-      end
-    end
-
-    # returns the number of spectra at that ms level.  returns total spectrum
-    # count if given 0
-    def spectrum_count(mslevel=0)
-      raise NotImplementedError
+      instance_variable_set("@ms_levels_#{type}".to_sym, ar)
     end
 
     # goes through every scan and gets the first and last m/z, then returns the
     # max.ceil and min.floor
-    def start_and_end_mz_brute_force
-      first_scan = first(:ms_level => 1, :precursor => false)
+    def start_and_end_mz_brute_force(ms_level=1)
+      first_scan = first(:ms_level => ms_level, :precursor => false)
       first_mzs = first_scan.spectrum.mzs
 
       lo_mz = first_mzs[0]
       hi_mz = first_mzs[-1]
 
-      each_scan(:ms_level => 1, :precursor => false) do |sc|
+      each_spectrum(:ms_level => ms_level, :precursor => false) do |sc|
         mz_ar = sc.spectrum.mzs
         if mz_ar.last > hi_mz
           hi_mz = mz_ar.last
@@ -191,8 +144,7 @@ module Ms; end
 
     # takes normal filter options
     def first(opts={})
-      the_first = nil
-      each_scan(opts) do |scan|
+      each_spectrum(opts) do |spectrum|
         the_first = scan
         break
       end
@@ -205,7 +157,7 @@ module Ms; end
     end
 
     def self.get_parser(filetype, version)
-      require "ms/msrun/#{DEFAULT_PARSER}/#{filetype}"
+      require "ms/msrun/#{filetype}/parser"
       parser_class = filetype.to_s.capitalize
       base_class = Ms::Msrun.const_get( DEFAULT_PARSER.capitalize )
       if base_class.const_defined? parser_class

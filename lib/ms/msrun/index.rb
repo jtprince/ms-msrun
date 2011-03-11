@@ -102,16 +102,5 @@ module Ms::Msrun::Index
       [nil,nil]
     end
   end
-
-  # non-destructive rewind: saves the position and returns it after the block
-  # is executed. Returns the block's reply.
-  def safe_io_rewind(io, &block)
-    start = io.pos
-    io.rewind
-    reply = block.call(io) 
-    io.pos = start
-    reply
-  end
- 
 end
 

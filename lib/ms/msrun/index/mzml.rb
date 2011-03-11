@@ -42,7 +42,7 @@ module Ms::Msrun::Index
         self.replace(indices)
         self
       else
-        safe_io_rewind(io) do |inner_io|
+        io.bookmark(true) do |inner_io|
           spectrum_index = Ms::Msrun::Index::Mzml.new_from_indexless_io_by_regex(inner_io, :spectrum, Ms::Msrun::Index::Mzxml::SpectrumList_re, Ms::Msrun::Index::Mzxml::Spectrum_re, Ms::Msrun::Index::Mzxml::Spectrum_close_re)
           (last_spec_start, last_spec_length) = spectrum_index.last
           inner_io.seek(last_spec_start + last_spec_length)

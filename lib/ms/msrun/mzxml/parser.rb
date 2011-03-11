@@ -8,7 +8,7 @@ class Ms::Msrun::Mzxml::Parser
 
   attr_accessor :msrun, :io, :version
 
-  # returns the msrun
+  # returns the msrun object
   def parse_header(startbyte_and_length_or_header_string)
     string = 
       if startbyte_and_length_or_header_string.is_a? Array
@@ -33,25 +33,26 @@ class Ms::Msrun::Mzxml::Parser
 
   # returns the ms_level as an Integer, nil if it cannot be found.
   def parse_ms_level(start_byte, length)
-    start_io_pos = @io.pos
-    @io.pos = start_byte
-    ms_level = nil
-    total_length = 0
-    @io.each("\n") do |line|
-      if line =~ /msLevel="(\d+)"/o
-        ms_level = $1.to_i
-        break
+    @io.bookmark do |inner_io|
+      ms_level = nil
+      total_length = 0
+      inner_io.each("\n") do |line|
+        if line =~ /msLevel="(\d+)"/o
+          ms_level = $1.to_i
+          break
+        end
+        total_length += line.size
+        break if total_length > length
       end
-      total_length += line.size
-      break if total_length > length
+      ms_level
     end
-    @io.pos = start_io_pos
-    ms_level
   end
 
   # assumes that the io object has been set to the beginning of the scan
   # element.  Returns an Ms::Scan object
+  #
   # options: 
+  #
   #     :spectrum => true | false (default is true)
   #     :precursor => true | false (default is true)
   #
@@ -106,11 +107,6 @@ class Ms::Msrun::Mzxml::Parser
       else
         prec_n # this is a peaks node
       end
-
-    # is this for mzData?
-    #if x = node['precursorScanNum']
-    #  prec[2] = scans_by_num[x.to_i]
-    #end
 
     if opts[:spectrum]
       # all mzXML (at least versions 1--3.0) *must* be 'network' byte order!
