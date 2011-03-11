@@ -82,7 +82,7 @@ module Ms::Msrun::Index
     def set_from_indexless_io_by_regex(io)
       @ids = []
       start_positions_plus_final = []
-      safe_io_rewind(io) do |inner_io|
+      io.bookmark(true) do |inner_io|
         inner_io.each("\n") do |line|
           if md=%r{<scan .*num="(\d+)"}.match(line)
             start_positions_plus_final << ( inner_io.pos - line.bytesize + md.pre_match.bytesize )
