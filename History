@@ -1,3 +1,6 @@
+== 0.3.4 / 2011-03-30
+* removed dependency on narray until its better supported on windows (for 1.9)
+
 == 0.3.3 / 2011-01-27
 * bug fixes on plms1
 

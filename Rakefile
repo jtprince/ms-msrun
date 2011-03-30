@@ -18,7 +18,6 @@ gemspec = Gem::Specification.new do |s|
   s.rubyforge_project = 'mspire'
   s.add_dependency 'ms-core', ">= 0.0.3"
   s.add_dependency 'nokogiri'
-  s.add_dependency 'narray'
 end
 
 Jeweler::Tasks.new(gemspec)

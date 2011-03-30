@@ -7,7 +7,6 @@ require 'ms/data'
 require 'ms/data/lazy_io'
 require 'ms/precursor'
 require 'ms/mzxml'
-require 'narray'
 
 class Ms::Msrun::Nokogiri::Mzxml
   NetworkOrder = true
