@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 
 require 'rubygems'
 require 'optparse'
@@ -8,7 +8,7 @@ opt = { :format => :mgf }
 opts = OptionParser.new do |op|
   op.banner = "usage: #{File.basename(__FILE__)} <file>.mzXML ..."
   op.separator "outputs: <file>.mgf"
-  op.on("-f", "--format <mgf|ms2>", Symbol, "the format type") {|v| opt[:format] = v }
+  op.on("-f", "--format <mgf|ms2>", "the format type") {|v| opt[:format] = v.to_sym }
 end
 
 if ARGV.size == 0
