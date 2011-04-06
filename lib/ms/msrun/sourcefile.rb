@@ -2,7 +2,7 @@ require 'andand'
 require 'cv'
 
 module Ms
-  class Msrun
+  module Msrun
     class Sourcefile   
       OS_SAFE_PATH_SPLIT = /[\/\\]/o
       REMOTE_LOCATION_RE = %r{^(\w+)://(.*?)(/.*)}

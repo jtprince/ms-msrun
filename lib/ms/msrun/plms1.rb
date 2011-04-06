@@ -3,7 +3,7 @@ require 'ms/msrun'
 require 'stringio'
 
 module Ms
-  class Msrun
+  module Msrun
 
     # if given scans, will use those, or optionally takes a block where an
     # array of ms1 scans are yielded and it expects Enumerable scans back.

@@ -1,8 +1,7 @@
 require 'andand'
 require 'openany'
 
-module Ms ; end
-class Ms::Msrun ; end
+require 'ms/msrun'
 
 # An Ms::Msrun::Index is merely an array of doublets, where each doublet is a
 # start byte and a length.  It is always zero indexed, but it can be queried

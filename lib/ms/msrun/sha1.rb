@@ -1,7 +1,7 @@
 require 'digest/sha1'
 
 module Ms
-  class Msrun
+  module Msrun
     # the mzXML digest is from the start of the document to the end of the
     # first sha1 tag: '...<sha1>'
     module Sha1

@@ -1,7 +1,8 @@
 require 'ms/msrun/index'
+require 'io/bookmark'
 
 module Ms ; end
-class Ms::Msrun ; end
+module Ms::Msrun ; end
 
 module Ms::Msrun::Index
   class Mzxml < Array

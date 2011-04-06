@@ -1,5 +1,7 @@
+require 'io/bookmark'
+
 module Ms ; end
-class Ms::Msrun ; end
+module Ms::Msrun ; end
 
 module Ms::Msrun::Index
   class Mzml < Array
@@ -75,6 +77,11 @@ module Ms::Msrun::Index
       end
       _length = end_pos - start if end_pos
       @header_startbyte_and_length = [start, _length]
+    end
+
+    def self.new_from_indexless_io(io, name)
+      Nokogiri::XML.parse(
+
     end
 
     # reads the io and generates an Index object.

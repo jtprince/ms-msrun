@@ -7,7 +7,7 @@ require 'ms/precursor'
 require 'axml'
 
 module Ms
-  class Msrun
+  module Msrun
     module Axml
     end
   end
