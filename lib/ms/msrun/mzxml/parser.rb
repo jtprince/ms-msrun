@@ -1,5 +1,7 @@
 require 'ms/msrun/parser'
 
+require 'io/bookmark'
+
 
 class Ms::Msrun::Mzxml ; end
 

@@ -2,7 +2,7 @@ require 'ms/msrun'
 require 'ms/mass'
 
 module Ms
-  class Msrun
+  module Msrun
   
     module Search
 

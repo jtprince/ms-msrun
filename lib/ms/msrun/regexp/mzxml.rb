@@ -7,7 +7,7 @@ require 'ms/precursor'
 require 'ms/mzxml'
 
 module Ms
-  class Msrun
+  module Msrun
     module Regexp
     end
   end

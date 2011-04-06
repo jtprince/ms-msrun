@@ -26,9 +26,9 @@ shared 'an Ms::Msrun::Index' do
     reply.first.size.is 2
   end
   # minimal/frozen test
-  it 'gives header length' do
-    @index.header_length.is @header_length  # frozen
-  end
+end
+
+shared 'an Ms::Msrun::Index holding scans' do
   it 'can access by integer scan number' do
     @scan_nums.zip(@index) do |scan_num, pair|
       @index.scan(scan_num).is pair
