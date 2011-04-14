@@ -22,8 +22,12 @@ module Ms
           new_filename << opts[:run_id_cat].to_s << opts[:run_id].to_s
         end
         new_filename << '.' << format.to_s
+
+        search_opts = {:output => new_filename}.merge(opts)
+        [:run_id, :run_id_cat].each {|s| search_opts.delete(s) }
+
         Ms::Msrun.open(file) do |ms|
-          ms.to_search(format, :output => new_filename)
+          ms.to_search(format, search_opts)
         end
       end
     
@@ -39,7 +43,14 @@ module Ms
         to_search(:ms2, opts)
       end
       
-      # performs the common actions for the different formats, and calls the command for the given format
+      # performs the common actions for the different formats (currently :mgf
+      # and :ms2), and calls the command for the given format recognizes: 
+      #   
+      #     :output => file to write to
+      #     :included_scans => Array of scan numbers
+      #     :filter_zero_intensity => remove peaks whose intensity is zero
+      #     :bottom_mh => lowest mh value to consider
+      #     :top_mh => highest mh value to consider
       def to_search(format, opts)
 
         # set up included_scans for fast access
@@ -53,11 +64,12 @@ module Ms
         sep = ' '
         frag_string = "%0.#{opts[:frag_mz_precision]}f%s%0.#{opts[:frag_int_precision]}f\n"
         mgf_prec_string = "PEPMASS=%0.#{opts[:prec_mz_precision]}f %0.#{opts[:prec_int_precision]}f\n"
+        retention_times = opts[:retention_times]
         
         any_output(opts[:output]) do |out, out_type|
           each_scan(:ms_level => opts[:ms_levels]) do |scan|
             sn = scan.num
-            
+
             next unless included_scans[sn] if included_scans
             next unless scan.num_peaks >= opts[:min_peaks]
             
@@ -69,12 +81,14 @@ module Ms
               next unless (mh <= opts[:top_mh]) if opts[:top_mh]
               
               case format
-              when :mgf ; mgf_header(out, scan, sn, z, mgf_prec_string, pmz)
+              when :mgf ; mgf_header(out, scan, sn, z, mgf_prec_string, pmz, (retention_times ? scan.time : nil))
               when :ms2 ; ms2_header(out, scan, sn, z, mh, pmz)
               end
               
               scan.spectrum.peaks do |mz,int|
-                out.printf(frag_string, mz, sep, int)
+                unless opts[:filter_zero_intensity] && (int == 0.0)
+                  out.printf(frag_string, mz, sep, int)
+                end
               end
               
               out.puts "END IONS\n\n" if format == :mgf
@@ -90,10 +104,12 @@ module Ms
       end
       
       #Creates the mgf-type spectrum header
-      def mgf_header(out, scan, sn, z, prec_string, pmz)
+      def mgf_header(out, scan, sn, z, prec_string, pmz, rtinseconds=nil)
         out.puts "BEGIN IONS"
         out.puts "TITLE=#{self.parent_basename_noext}.#{sn}.#{sn}.#{z}"
         out.puts "CHARGE=#{z}+"
+        # our current mzML parser doesn't have scan.time implemented...
+        out.puts "RTINSECONDS=#{rtinseconds}" if rtinseconds
         out.printf(prec_string, pmz, scan.precursor.intensity)
       end
       
@@ -108,6 +124,8 @@ module Ms
       # @option opts [Array] :included_scans only include a subset of scans in the output (:ms_levels precedes :included_scans)
       def set_opts(opts)
         opts = {
+          :retention_times => true,  # includes retention time if applicable
+          :filter_zero_intensity => true,
           :output => nil,  # an output file or io object
           :bottom_mh => 0.0,
           :top_mh => nil,

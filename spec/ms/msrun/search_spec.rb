@@ -11,6 +11,7 @@ describe 'mzXML or mzML to search formats' do
   @mzml_file2 = TESTFILES + '/J/j24z.mzML'
   @key = { :ms2 => TESTFILES + '/J/key-j24z.ms2', 
     :mgf => TESTFILES + '/J/key-j24z.mgf',
+    :mgf_rt => TESTFILES + '/J/key-j24z.3.mgf',
     :subset_mgf => TESTFILES + '/J/key-j10z.mgf'
   }
 
@@ -85,8 +86,14 @@ describe 'mzXML or mzML to search formats' do
       # :run_id allows the user to tack on meaningful additions to the
       # filename
       Ms::Msrun::Search.convert(format, @mzxml_file2, :run_id => 3)
+      keyfile = 
+        if format == :mgf
+          @key[:mgf_rt]
+        else
+          @key[format]
+        end
 
-      ok FileUtils.cmp(outfile, @key[format])
+      ok FileUtils.cmp(outfile, keyfile)
       File.unlink_f(outfile)
     end
   end

@@ -5,11 +5,18 @@ require 'optparse'
 require 'ms/msrun/search'
 
 opt = { :format => :mgf }
+
 opts = OptionParser.new do |op|
   op.banner = "usage: #{File.basename(__FILE__)} <file>.mzXML ..."
   op.separator "outputs: <file>.mgf"
   op.on("-f", "--format <mgf|ms2>", "the format type") {|v| opt[:format] = v.to_sym }
+  # the default is set in ms/msrun/search.rb -> set_opts
+  op.on("--no-filter-zeros", "won't remove values with zero intensity") {|v| opt[:filter_zero_intensity] = false }
+  # the default is set in ms/msrun/search.rb -> set_opts
+  op.on("--no-retention-times", "won't include RT even if available") {|v| opt[:retention_times] = false }
 end
+
+opts.parse!
 
 if ARGV.size == 0
   puts opts
@@ -18,7 +25,7 @@ end
 
 ARGV.each do |file|
   if File.exist?(file)
-    Ms::Msrun::Search.convert(opt[:format], file)
+    Ms::Msrun::Search.convert(opt[:format], file, opt)
   else
     puts "missing file: #{file} [skipping]"
   end

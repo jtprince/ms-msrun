@@ -2,7 +2,7 @@ require 'rubygems'
 require 'rake'
 require 'jeweler'
 require 'rake/testtask'
-require 'rcov/rcovtask'
+#require 'rcov/rcovtask'
 
 NAME = "ms-msrun"
 WEBSITE_BASE = "website"
@@ -29,11 +29,11 @@ Rake::TestTask.new(:spec) do |spec|
   spec.verbose = true
 end
 
-Rcov::RcovTask.new do |spec|
-  spec.libs << 'spec'
-  spec.pattern = 'spec/**/*_spec.rb'
-  spec.verbose = true
-end
+#Rcov::RcovTask.new do |spec|
+#  spec.libs << 'spec'
+#  spec.pattern = 'spec/**/*_spec.rb'
+#  spec.verbose = true
+#end
 
 def rdoc_redirect(base_rdoc_output_dir, package_website_page, version)
   content = %Q{
