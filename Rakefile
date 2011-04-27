@@ -21,6 +21,7 @@ Jeweler::Tasks.new do |gem|
   gem.add_development_dependency "spec-more", ">= 0.0.4"
   gem.add_development_dependency "jeweler", "~> 1.5.2"
 end
+Jeweler::RubygemsDotOrgTasks.new
 
 require 'rake/testtask'
 Rake::TestTask.new(:spec) do |spec|
