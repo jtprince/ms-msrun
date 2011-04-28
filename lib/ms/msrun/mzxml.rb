@@ -11,7 +11,7 @@ module Ms::Msrun ; end
 class Ms::Msrun::Mzxml
   include Msrun
   def scan_nums
-    index.scan_nums
+    index.ids.map(&:to_i)
   end
 
   # creates the parser and sets it as an instance variable

@@ -8,6 +8,7 @@ describe 'an Ms::Msrun::Index::Mzxml class on an indexless file' do
     @klass = Ms::Msrun::Index::Mzxml
     @file = TESTFILES + '/openms/test_set.mzXML'
     @has_index = false
+    @names = [:scan]
   end
   behaves_like 'an Ms::Msrun::Index subclass'
 end
@@ -17,6 +18,7 @@ describe 'an Ms::Msrun::Index::Mzxml class on an indexed file' do
     @klass = Ms::Msrun::Index::Mzxml
     @file = TESTFILES + '/J/j24.mzXML'
     @has_index = true
+    @names = [:scan]
   end
   behaves_like 'an Ms::Msrun::Index subclass'
 end

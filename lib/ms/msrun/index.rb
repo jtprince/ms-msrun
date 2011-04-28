@@ -5,7 +5,8 @@ require 'ms/msrun'
 
 # An Ms::Msrun::Index is merely an array of doublets, where each doublet is a
 # start byte and a length.  It is always zero indexed, but it can be queried
-# by specific id's.
+# by specific id's.  The start byte is guaranteed to be correct.  The length
+# will be at least as long as the xml object, but may be longer.
 #
 #     Ms::Msrun::Index.new("file.mzXML")  # returns an Ms::Msrun::Index::Mz[x]ml object
 #     index.ids # -> ["1", "2", "3" ... ]  # mzXML

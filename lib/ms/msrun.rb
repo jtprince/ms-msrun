@@ -3,6 +3,8 @@ require 'ms/precursor'
 require 'ms/spectrum'
 require 'ms/msrun/search'
 require 'ms/msrun/index'
+require 'ms/msrun/mzml'
+require 'ms/msrun/mzxml'
 require 'openany'
 
 module Ms; end
@@ -24,8 +26,8 @@ module Ms; end
     # an array holding index objects.  Each index object is an an array of
     # doublets, [start_byte, length] for each indexed element (spectra,
     # chromatograms, scans, or whatever).  mzXML has a single index list (the
-    # scan list) while mzML will typically have a spectra list and chromatogram
-    # list.
+    # scan list) while mzML will typically have a spectra list and possibly a
+    # chromatogram list.
     attr_accessor :index_list
 
     # the files that preceded the one you are working with
@@ -77,7 +79,6 @@ module Ms; end
       @parser.parse_header(index.header_startbyte_and_length)
     end
 
-
     def each_spectrum(parse_opts={}, &block)
       raise NotImplementedError, "the subclass ought to implement me"
     end
@@ -85,16 +86,22 @@ module Ms; end
     alias_method :each, :each_spectrum
 
     # opens the file and yields each spectrum in the block
-    # see each_scan for parsing options
+    # see each_spectrum for parsing options
     def self.foreach(filename, parse_opts={}, &block)
       self.open(filename) do |obj|
         obj.each(parse_opts, &block)
       end
     end
 
-    # fast method to only query the ms_level of a scan/spectrum.  Access
+    # fast method to only query the ms_level of a scan/spectrum.
     def get_ms_level(idstring)
       @parser.parse_ms_level(*index.get_by_id(idstring))
+    end
+
+    # returns the number of spectra associated with the first spectrum index.
+    def spectrum_count
+      spec_index = @indices.find {|i| i.name==:spectrum }
+      spec_index.nil? ? 0 : spec_index.size
     end
 
     # returns an array whose indices provide the number of objects in each
@@ -121,27 +128,6 @@ module Ms; end
       instance_variable_set("@ms_levels_#{type}".to_sym, ar)
     end
 
-    # goes through every scan and gets the first and last m/z, then returns the
-    # max.ceil and min.floor
-    def start_and_end_mz_brute_force(ms_level=1)
-      first_scan = first(:ms_level => ms_level, :precursor => false)
-      first_mzs = first_scan.spectrum.mzs
-
-      lo_mz = first_mzs[0]
-      hi_mz = first_mzs[-1]
-
-      each_spectrum(:ms_level => ms_level, :precursor => false) do |sc|
-        mz_ar = sc.spectrum.mzs
-        if mz_ar.last > hi_mz
-          hi_mz = mz_ar.last
-        end
-        if mz_ar.last < lo_mz
-          lo_mz = mz_ar.last
-        end
-      end
-      [lo_mz.floor, hi_mz.ceil]
-    end
-
     # takes normal filter options
     def first(opts={})
       each_spectrum(opts) do |spectrum|
@@ -166,36 +152,6 @@ module Ms; end
         raise RuntimeError, "no class #{base_class}::#{parser_class}"
       end
     end
-
-    # only adds the parent if one is not already present!
-    def self.add_parent_scan(scans, add_intensities=false)
-      prev_scan = nil
-      parent_stack = [nil]
-      ## we want to set the level to be the first mslevel we come to
-      prev_level = scans.first.ms_level
-      scans.each do |scan|
-        #next unless scan  ## the first one is nil, (others?)
-        level = scan.ms_level
-        if prev_level < level
-          parent_stack.unshift prev_scan
-        end
-        if prev_level > level
-          (prev_level - level).times do parent_stack.shift end
-        end
-        if scan.ms_level > 1
-          precursor = scan.precursor
-          #precursor.parent = parent_stack.first  # that's the next line's
-          precursor[2] = parent_stack.first unless precursor[2]
-          #precursor.intensity
-          if add_intensities
-            precursor[1] = precursor[2].spectrum.intensity_at_mz(precursor[0])
-          end
-        end
-        prev_level = level
-        prev_scan = scan
-      end
-    end
-
 
     Mzxml_regexp = %r{http://sashimi.sourceforge.net/schema(_revision)?/([\w\d_\.]+)}
     # 'http://sashimi.sourceforge.net/schema/MsXML.xsd' # version 1
@@ -233,7 +189,7 @@ module Ms; end
               when /MsXML/
                 [:mzxml, '1.0']
               else
-                abort "Cannot determine mzXML version!"
+                raise "Cannot determine mzXML version!"
               end
             when Mzdata_regexp
               [:mzdata, $1.dup]
@@ -248,3 +204,60 @@ module Ms; end
     end
 
   end
+
+
+
+=begin
+
+# goes through every scan and gets the first and last m/z, then returns the
+# max.ceil and min.floor
+def start_and_end_mz_brute_force(ms_level=1)
+  first_scan = first(:ms_level => ms_level, :precursor => false)
+  first_mzs = first_scan.spectrum.mzs
+
+  lo_mz = first_mzs[0]
+  hi_mz = first_mzs[-1]
+
+  each_spectrum(:ms_level => ms_level, :precursor => false) do |sc|
+    mz_ar = sc.spectrum.mzs
+    if mz_ar.last > hi_mz
+      hi_mz = mz_ar.last
+    end
+    if mz_ar.last < lo_mz
+      lo_mz = mz_ar.last
+    end
+  end
+  [lo_mz.floor, hi_mz.ceil]
+end
+
+
+# only adds the parent if one is not already present!
+  def self.add_parent_scan(scans, add_intensities=false)
+    prev_scan = nil
+    parent_stack = [nil]
+    ## we want to set the level to be the first mslevel we come to
+    prev_level = scans.first.ms_level
+    scans.each do |scan|
+      #next unless scan  ## the first one is nil, (others?)
+      level = scan.ms_level
+      if prev_level < level
+        parent_stack.unshift prev_scan
+      end
+      if prev_level > level
+        (prev_level - level).times do parent_stack.shift end
+      end
+      if scan.ms_level > 1
+        precursor = scan.precursor
+        #precursor.parent = parent_stack.first  # that's the next line's
+        precursor[2] = parent_stack.first unless precursor[2]
+        #precursor.intensity
+        if add_intensities
+          precursor[1] = precursor[2].spectrum.intensity_at_mz(precursor[0])
+        end
+      end
+      prev_level = level
+      prev_scan = scan
+    end
+  end
+=end
+

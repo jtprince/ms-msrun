@@ -44,12 +44,19 @@ describe "an Ms::Msrun::Index needin' a file" do
   end
 end
 
-
 shared 'an Ms::Msrun::Index subclass' do
   it 'determines if a file has an index' do
     @klass.has_index?(@file).is @has_index
   end
-end
 
+  it 'returns an index_list' do
+    indices = @klass.index_list(@file)
+    indices.is_a?(Array).is true
+    indices.is_a?(Ms::Msrun::Index).is false
+    indices.each {|index| index.is_a?(Ms::Msrun::Index).is true }
+    indices.size.is @names.size
+    @names.zip(indices) {|name, index| index.name.is name }
+  end
+end
 
 
