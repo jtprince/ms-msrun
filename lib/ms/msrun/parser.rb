@@ -7,7 +7,6 @@ require 'ms/spectrum'
 require 'ms/data'
 require 'ms/data/lazy_io'
 require 'ms/precursor'
-require 'narray'
 require 'andand'
 
 module Ms ; end

@@ -66,12 +66,18 @@ module Ms; end
     # takes an io object.  The preferred way to access Msrun objects is through
     # the open method since it ensures that the io object will be available for
     # the lazy evaluation of spectra.  If you are passing in an IO object that
-    # doesn't respond to path for retrieval of the size, you should pass it in
-    # as it will speed up lots of methods that need to seek to the end of the io
-    # stream.
-    def initialize(io, filename=nil, io_size=nil)
-      @filename = filename || ( io.respond_to?(:path) ? io.path : nil )
-      @io_size = io_size || File.size(@filename)
+    # doesn't respond to path for retrieval of the size, you should pass in
+    # the pathname of the file or its size
+    #
+    # options:
+    #
+    #     # one of these can be used to give the size of the io object if it
+    #     # cannot be determined from File.size(io.path).
+    #     :filename => path to the io object (if object doesn't respond to :path)
+    #     :size => path to the io object (directly state the io size)
+    def initialize(io, opt={})
+      @filename = opt[:filename] || ( io.respond_to?(:path) ? io.path : nil )
+      @io_size = opt[:size] || File.size(@filename)
       @sourcefiles = []
       @index_list = Ms::Msrun::Index.index_list(io)
       parser_klass = Ms::Msrun.get_parser(@filetype, @version)
@@ -144,13 +150,11 @@ module Ms; end
 
     def self.get_parser(filetype, version)
       require "ms/msrun/#{filetype}/parser"
-      parser_class = filetype.to_s.capitalize
-      base_class = Ms::Msrun.const_get( DEFAULT_PARSER.capitalize )
-      if base_class.const_defined? parser_class
-        base_class.const_get parser_class
-      else
-        raise RuntimeError, "no class #{base_class}::#{parser_class}"
-      end
+      kind_classname = filetype.to_s.capitalize
+      base_class = Ms::Msrun
+      kind_class = base_class.const_get kind_classname
+      parser_class = kind_class.const_get('Parser')
+      parser_class
     end
 
     Mzxml_regexp = %r{http://sashimi.sourceforge.net/schema(_revision)?/([\w\d_\.]+)}

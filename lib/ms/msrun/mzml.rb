@@ -1,16 +1,14 @@
 
-
 require 'ms/spectrum'
 require 'ms/data'
 require 'ms/data/lazy_io'
 require 'ms/msrun'
-require 'libxml'
 
 module Ms ; end
 module Ms::Msrun ; end
 
 class Ms::Msrun::Mzml
-  include Msrun
+  include ::Ms::Msrun
 
   # creates the parser and sets it as an instance variable
   def create_parser(io)

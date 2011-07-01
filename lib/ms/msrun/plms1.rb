@@ -67,6 +67,7 @@ module Ms
       attr_accessor :spectra
 
       def initialize(_scan_numbers=[], _times=[], _spectra=[])
+        raise ArgumentError, "scan_numbers must be an array [HINT: try Plms1.new.read(filename)]" if scan_numbers.is_a?(String)
         (@scan_numbers, @times, @spectra) = [_scan_numbers, _times, _spectra]
       end
 
