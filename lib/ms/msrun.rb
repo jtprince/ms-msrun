@@ -6,6 +6,7 @@ require 'ms/msrun/search'
 require 'ms/msrun/index'
 
 module Ms; end
+
 class Ms::Msrun
   include Enumerable
 
@@ -129,7 +130,7 @@ class Ms::Msrun
     return @scan_counts if @scan_counts
     ar = []
     ar[0] = 0
-    each_scan do |sc|
+    each_scan do |sc|Modes of inference for evaluating the confidence of Peptide identifications
       level = sc.ms_level
       unless ar[level]
         ar[level] = 0
